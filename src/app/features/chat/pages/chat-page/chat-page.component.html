@@ -1,8 +1,14 @@
-<div class="w-[789px] mx-auto py-5 gap-5 flex flex-col justify-center" style="height: calc(100vh - 64px);">
+<div class="w-full max-w-[789px] mx-auto px-4 py-5 gap-5 flex flex-col justify-center" style="height: calc(100vh - 64px);">
+  @if (errorMessage()) {
+    <div class="rounded-panel border border-danger/30 bg-danger-soft px-4 py-3 text-sm text-danger" role="alert">
+      {{ errorMessage() }}
+    </div>
+  }
+
   @if (messages().length > 0 || partialResponse() || partialThinking()) {
     <div class="flex flex-1 overflow-hidden">
       <div #scrollContainer class="flex-1 flex flex-col w-full overflow-y-auto gap-2.5 p-2.5">
-        @for (message of messages(); track message) {
+        @for (message of messages(); track message.role + ':' + (message.req_id ?? message.ref_id ?? $index)) {
           <ollama-chat-chat-message
             [message]="message"
             [hideToolbar]="false"
@@ -12,15 +18,17 @@
         @if (partialResponse() || partialThinking()) {
           <ollama-chat-chat-message
             [message]="{
-                 role: 'assistant',
-                 content: partialResponse(),
-                 thinking: partialThinking()
-               }"
-            [hideToolbar]="isLoading()"/>
+              role: 'assistant',
+              content: partialResponse(),
+              thinking: partialThinking()
+            }"
+            [hideToolbar]="isLoading()"
+          />
         }
       </div>
     </div>
   }
+
   <ollama-chat-chat-input
     [isLoading]="isLoading()"
     [hasHistory]="messages().length > 0"

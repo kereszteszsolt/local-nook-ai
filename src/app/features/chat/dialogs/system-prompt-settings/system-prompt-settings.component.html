@@ -109,7 +109,7 @@
     #fileInputCSV
     id="importCSV"
     (change)="importFromCSV($event)"
-    accept=".csv,.xlsx"
+    accept=".csv,text/csv"
     style="display: none;"
   />
   <button mat-button (click)="fileInputJSON.click()">
@@ -128,10 +128,8 @@
     <mat-icon>download</mat-icon>
     Export JSON
   </button>
-  <label for="closeDialog">
-    <button mat-button (click)="closeDialog()">
-      <mat-icon>close</mat-icon>
-      Close
-    </button>
-  </label>
+  <button mat-button (click)="closeDialog()">
+    <mat-icon>close</mat-icon>
+    Close
+  </button>
 </mat-dialog-actions>

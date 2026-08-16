@@ -1,155 +1,79 @@
-# example-ollama-local-chat-angular-tailwind-docker-lightweight
+# LocalNook
 
-A lightweight **Ollama local chat application**, built with **Angular**, **Angular Material**, **Tailwind**, and **Docker**.  
-It allows you to chat with locally installed Ollama models, keeping context during the conversation but without permanently storing messages.  
+**LocalNook** is the working product name of `ng-ollama`, a lightweight Angular client for private conversations with models served by Ollama on the user's machine.
 
----
+This repository keeps the supplied MVP features, replaces the improvised transport path with the official Ollama browser client, introduces typed application boundaries and central branding, and documents the remaining professional refactor as bounded user stories.
 
-## 📸 Screenshots
+## Current capabilities
 
-<img src="readme-assets/Capture1.png" alt="Screenshot 1" width="800"/>  
-<img src="readme-assets/Capture2.png" alt="Screenshot 2" width="800"/>  
-<img src="readme-assets/Capture3.png" alt="Screenshot 3" width="800"/>
-<img src="readme-assets/Capture4.png" alt="Screenshot 4" width="800"/>
+- Discover and select locally available Ollama models.
+- Stream chat responses and optional model thinking through `ollama/browser`.
+- Stop generation, start a new chat, regenerate a response, and copy answers.
+- Build deterministic model context from active system prompts and the current in-memory conversation.
+- Render Markdown, highlighted code, Mermaid diagrams, and KaTeX formulas.
+- Manage browser-local system prompts with CSV/JSON import and JSON export.
+- Configure user-visible product identity through a typed `BrandConfig`.
 
----
+Conversation history is currently in memory. IndexedDB persistence plus reopen/delete UI is planned in Release 0.2.
 
+## Architecture
 
-## ✨ Features
+```mermaid
+flowchart LR
+    UI[Angular UI] --> F[ChatFacade]
+    F --> C[ChatContextBuilder]
+    F --> O[OllamaClientService]
+    O --> SDK[official ollama/browser]
+    SDK --> LOCAL[local Ollama]
+    F --> P[SystemPromptRepository]
+    P --> LS[localStorage]
+```
 
-- Local chat with Ollama-installed models  
-- Context is preserved during the conversation  
-- System commands can be saved in the browser’s local storage and deleted anytime  
-- Basic chat features:
-  - Start a new chat  
-  - Regenerate responses  
-  - Copy answers or code snippets  
-  - Stop response generation
-  - Thinking mode
-- Supports:
-  - **Markdown** (bold, italics, headings, lists, tables, etc.)  
-  - **Mermaid diagrams**  
-  - **Mathematical formulas** (KaTeX syntax)  
-  - **Formatted code blocks** with syntax highlighting and copy support  
-- Detects installed Ollama models and lets you switch between them  
+See [`docs/architecture.md`](docs/architecture.md) for current and planned boundaries.
 
----
-## 🎥 YouTube Demos
+## Local development
 
-<div align="center">
-<table>
-  <tr></tr>
-    <td>
-      <a href="https://www.youtube.com/watch?v=r2X0joUIEbE" target="_blank">
-        <img src="https://img.youtube.com/vi/r2X0joUIEbE/0.jpg" width="300" 
-             alt="Magyar bemutató"><br/>
-        Magyar bemutató
-      </a>
-    </td>
-    <td>
-      <a href="https://www.youtube.com/watch?v=qRj7CoxSkOw" target="_blank">
-        <img src="https://img.youtube.com/vi/qRj7CoxSkOw/0.jpg" width="300"
-             alt="English demo"><br/>
-        English demo
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <a href="https://www.youtube.com/watch?v=Uer_qGa1TC0" target="_blank">
-        <img src="https://img.youtube.com/vi/Uer_qGa1TC0/0.jpg" width="300"
-             alt="Demonstrație Română"><br/>
-        Demonstrație Română
-      </a>
-    </td>
-    <td>
-      <a href="https://www.youtube.com/watch?v=3oHuoYVxqEc" target="_blank">
-        <img src="https://img.youtube.com/vi/3oHuoYVxqEc/0.jpg" width="300"
-             alt="Deutsch Demo"><br/>
-        Deutsch Demo
-      </a>
-    </td>
-  </tr>
-</table>
-</div>
---
-
-## ⚙️ How context works
-
-The Ollama API supports two main modes:
-
-1. **Chat mode** – sends all previous messages with every request in JSON format, keeping track of user, model, and system messages.  
-2. **Generate mode** – only sends the current prompt, with context handled as a token list.  
-
-👉 This app uses **chat mode** for better contextual tracking.  
-
----
-
-## 🚀 Run locally
+Prerequisites: Node.js 22, npm, and a running local Ollama instance.
 
 ```bash
-npm install
+npm ci
 npm start
 ```
 
-Then open in your browser:  
-👉 [http://localhost:4200](http://localhost:4200)
+Open `http://localhost:4200`. The default Ollama endpoint is `http://localhost:11434`.
 
----
-
-## 🐳 Run with Docker
+## Docker development
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
-Then open in your browser:  
-👉 [http://localhost:4201](http://localhost:4201)
+Open `http://localhost:4201`.
 
----
+## Verification
 
-## ⚠️ Important
+```bash
+npm run build
+npm test -- --watch=false --browsers=ChromeHeadless
+```
 
-Make sure you have the **Ollama server** running locally at:  
-👉 [http://localhost:11434](http://localhost:11434) (default port)
+Unit tests use application-owned fakes at the Ollama boundary, so a live Ollama server is not required for the required suite. A local smoke test still verifies real model discovery and streaming.
 
----
+## Project map
 
-## 🔗 Linktree
+- [`AGENTS.md`](AGENTS.md) — repository working agreements.
+- [`docs/README.md`](docs/README.md) — documentation index.
+- [`docs/releases/release-0.1-mvp/`](docs/releases/release-0.1-mvp/) — supplied MVP stories, all implemented.
+- [`docs/releases/release-0.2-professional-refactor/`](docs/releases/release-0.2-professional-refactor/) — implemented and planned refactor stories.
+- [`.codex/README.md`](.codex/README.md) — four custom agents and optional Penpot MCP.
+- [`.agents/skills/`](.agents/skills/) — five focused repository skills.
 
-👉 [https://linktr.ee/kereszteszsolt](https://linktr.ee/kereszteszsolt)
+## Branding and ownership
 
----
+Change display metadata in `src/app/core/config/brand.config.ts`. The repository name, provider name, and browser-storage identifiers remain separate.
 
-## ☕ Support
+Developer: **Keresztes Zsolt** — `https://kereszteszsolt.hu`
 
-Found this helpful? You can support me on **BuyMeACoffee**.  
-Contributions are optional and simply a way to show appreciation for this work, not a payment for services.
+## License
 
-<a href="https://www.buymeacoffee.com/kereszteszsolt" target="_blank">
-  <img src="readme-assets/orange-button.png" alt="Buy Me A Coffee" width="180"/>
-</a>
-
-## 🔑 Keywords
-
-chatgpt clone, open source chatgpt alternative, build your own chatgpt, ai chat ui example, self-hosted ai chatbot, lightweight chatgpt clone, angular chatgpt project, docker ai chatbot, run llm locally, local ai assistant, how to run chatgpt at home, host your own ai model, custom ai chatbot with prompts, best open source chat ui, build ai chat from scratch, fullstack chatgpt clone angular,
-markdown chat app, how to render markdown in chat, display math formulas in ai chat, katex in chat ui, latex support chatbot, show equations in chat, ai chat with math rendering, render mermaid diagrams in chat, flowcharts in chat app, draw diagrams in chatbot, syntax highlighting in ai chat, copy code block chat ui, programming code snippets in chat app, table rendering in chat app, interactive chat with diagrams and formulas,
-ollama chat example, how to use ollama with angular, ollama system prompts, ollama docker tutorial, ollama frontend ui, ollama chat vs generate mode, ollama local llm chat, switch between ollama models, run ollama in docker-compose, ollama nodejs integration, ollama with angular material and tailwind,
-docker angular tailwind starter, run angular app in docker, frontend docker example, tailwind angular ui demo, angular material chatbot, build chat ui with tailwind, nodejs angular docker setup, lightweight frontend for llm,
-ai chat features, start new chat ui, regenerate ai responses, stop ai response, copy answers in chat, code highlighting ai app, save and delete system prompts, localstorage chat app, interactive ai conversation demo
-
-## 🛠️ Tools & Documentation
-
-Here are the main tools and frameworks used in this project, along with their official documentation links:
-
-- [Angular](https://angular.dev) – Frontend framework
-- [Angular Material](https://material.angular.dev) – UI components for Angular
-- [Tailwind CSS](https://tailwindcss.com) – Utility-first CSS framework
-- [Node.js](https://nodejs.org) – JavaScript runtime environment
-- [Docker](https://www.docker.com/) – Containerization platform
-- [Ollama](https://ollama.com/) – Local AI model runner
-- [Ollama API Documentation](https://github.com/ollama/ollama/blob/main/docs/api.md) – API reference for Ollama
-
-##  ❓ Mermaid & KaTeX syntax support
-- [Mermaid docs](https://mermaid.js.org/intro) – Diagramming and visualization tool
-- [KaTeX docs](https://katex.org/docs/supported.html) – High‑performance math typesetting library
+Apache License 2.0. The full text is in [`LICENSE`](LICENSE). In this cleanup phase, short SPDX headers are applied only to newly added hand-authored files that support comments.

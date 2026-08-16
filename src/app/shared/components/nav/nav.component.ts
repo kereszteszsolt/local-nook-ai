@@ -2,8 +2,10 @@ import { Component, inject, OnInit } from '@angular/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatIcon } from '@angular/material/icon';
-import { OllamaService } from '../../../features/chat/services/ollama.service';
+import { ChatFacade } from '../../../features/chat/application/chat-facade.service';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { AiModelDto } from '../../../features/chat/models/ai-model.model';
+import { BRAND_CONFIG } from '../../../core/config/brand.config';
 
 @Component({
   selector: 'ollama-chat-nav',
@@ -14,27 +16,22 @@ import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
     MatMenu,
     MatMenuItem,
     MatButton,
-    MatMenuTrigger
+    MatMenuTrigger,
   ],
   templateUrl: './nav.component.html',
-  styleUrl: './nav.component.scss'
+  styleUrl: './nav.component.scss',
 })
 export class NavComponent implements OnInit {
-  ollamaService = inject(OllamaService);
-  currentModel = this.ollamaService.currentModel;
-  availableModels = this.ollamaService.aiModels;
+  readonly chatFacade = inject(ChatFacade);
+  readonly brand = inject(BRAND_CONFIG);
+  readonly currentModel = this.chatFacade.currentModel;
+  readonly availableModels = this.chatFacade.aiModels;
 
-  ngOnInit() {
-    this.ollamaService.loadModels();
+  ngOnInit(): void {
+    void this.chatFacade.loadModels();
   }
 
-  onModelChange(selectedModel: string) {
-    const model = this.availableModels().find(m => m.name === selectedModel);
-
-    if (model) {
-      this.ollamaService.setCurrentModel(model);
-    } else {
-      console.warn(`Model not found: ${selectedModel}`);
-    }
+  onModelChange(model: AiModelDto): void {
+    this.chatFacade.setCurrentModel(model);
   }
 }

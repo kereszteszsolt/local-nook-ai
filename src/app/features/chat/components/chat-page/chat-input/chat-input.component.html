@@ -1,11 +1,12 @@
-<div class="border border-gray-200 rounded-lg p-4 bg-white shadow-md text-lg flex flex-col gap-4">
+<div class="border border-border-subtle rounded-panel p-4 bg-surface-raised shadow-md text-lg flex flex-col gap-4 text-text-primary">
   <textarea
     cdkTextareaAutosize
     placeholder="Type your message here..."
     [(ngModel)]="currentMessage"
     (keydown)="onKeyPress($event)"
-    class="w-full resize-none focus:outline-none max-h-[350px] overflow-y-auto placeholder:text-gray-400"
+    class="w-full resize-none focus:outline-none max-h-[350px] overflow-y-auto placeholder:text-text-muted bg-transparent"
     [disabled]="isLoading"
+    aria-label="Chat message"
   ></textarea>
   <div class="flex flex-row justify-between gap-2">
     <div class="flex flex-row gap-2 items-center">
@@ -18,17 +19,17 @@
       <button mat-icon-button [disabled]="isLoading" (click)="openSystemPromptSettings()" matTooltip="Show system prompts">
         <mat-icon class="text-xs">description</mat-icon>
       </button>
-      <mat-slide-toggle color="primary" [(ngModel)]="thinkEnabled" [disabled]="isLoading" class="scale-75 -mx-2 flex items-center relative top-[3px] leading-none" matTooltip="Enable or disable 'Thinking' feature">
+      <mat-slide-toggle color="primary" [(ngModel)]="thinkEnabled" [disabled]="isLoading" class="scale-75 -mx-2 flex items-center relative top-[3px] leading-none" matTooltip="Enable or disable model thinking">
         Thinking
       </mat-slide-toggle>
     </div>
     <div class="flex flex-row gap-4 items-center">
       @if (isLoading) {
-        <button mat-icon-button (click)="onAbort()" matTooltip="Abort">
+        <button mat-icon-button (click)="onAbort()" matTooltip="Stop response">
           <mat-icon class="text-xs">stop</mat-icon>
         </button>
       } @else {
-        <button mat-icon-button (click)="onSendCurrentMessage()" matTooltip="Send message">
+        <button mat-icon-button (click)="onSendCurrentMessage()" [disabled]="!currentMessage.trim()" matTooltip="Send message">
           <mat-icon class="text-xs">send</mat-icon>
         </button>
       }

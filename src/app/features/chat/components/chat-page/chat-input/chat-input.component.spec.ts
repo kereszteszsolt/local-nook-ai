@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ChatInputComponent } from './chat-input.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { ChatInputComponent, ChatSubmitEvent } from './chat-input.component';
 
 describe('ChatInputComponent', () => {
   let component: ChatInputComponent;
@@ -8,16 +9,25 @@ describe('ChatInputComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ChatInputComponent]
-    })
-    .compileComponents();
+      imports: [ChatInputComponent, MatDialogModule, NoopAnimationsModule],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ChatInputComponent);
     component = fixture.componentInstance;
+    component.isLoading = false;
+    component.hasHistory = false;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('emits a typed chat payload instead of JSON text', () => {
+    const emitted: ChatSubmitEvent[] = [];
+    component.sendMessage.subscribe((event) => emitted.push(event));
+    component.currentMessage = '  Hello  ';
+    component.thinkEnabled = true;
+
+    component.onSendCurrentMessage();
+
+    expect(emitted).toEqual([{ content: 'Hello', think: true }]);
+    expect(component.currentMessage).toBe('');
   });
 });

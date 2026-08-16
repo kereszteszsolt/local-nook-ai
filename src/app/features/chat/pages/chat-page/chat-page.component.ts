@@ -1,59 +1,55 @@
-import {AfterViewChecked, Component, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
-import { ChatInputComponent } from '../../components/chat-page/chat-input/chat-input.component';
-import { OllamaService } from '../../services/ollama.service';
+import { AfterViewChecked, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChatInputComponent,
+  ChatSubmitEvent,
+} from '../../components/chat-page/chat-input/chat-input.component';
+import { ChatFacade } from '../../application/chat-facade.service';
 import { ChatMessageComponent } from '../../components/chat-page/chat-message/chat-message.component';
 
 @Component({
   selector: 'ollama-chat-chat-page',
-  imports: [
-    ChatInputComponent,
-    ChatMessageComponent
-  ],
+  imports: [ChatInputComponent, ChatMessageComponent],
   templateUrl: './chat-page.component.html',
-  styleUrl: './chat-page.component.scss'
+  styleUrl: './chat-page.component.scss',
 })
 export class ChatPageComponent implements AfterViewChecked, OnInit {
-  @ViewChild('scrollContainer') scrollContainer!: ElementRef<HTMLDivElement>;
-  ollamaService = inject(OllamaService);
-  messages = this.ollamaService.messageHistoryList;
-  partialResponse = this.ollamaService.partialResponse;
-  isLoading = this.ollamaService.isLoadingResponse;
-  partialThinking = this.ollamaService.partialThinking;
+  @ViewChild('scrollContainer') scrollContainer?: ElementRef<HTMLDivElement>;
 
-  ngAfterViewChecked() {
+  readonly chatFacade = inject(ChatFacade);
+  readonly messages = this.chatFacade.messageHistoryList;
+  readonly partialResponse = this.chatFacade.partialResponse;
+  readonly isLoading = this.chatFacade.isLoadingResponse;
+  readonly partialThinking = this.chatFacade.partialThinking;
+  readonly errorMessage = this.chatFacade.errorMessage;
+
+  ngAfterViewChecked(): void {
     this.scrollToBottom();
   }
 
-  ngOnInit() {
-    this.ollamaService.loadSystemPrompts();
+  ngOnInit(): void {
+    this.chatFacade.loadSystemPrompts();
   }
 
-  private scrollToBottom() {
-    if (this.scrollContainer?.nativeElement) {
-      const el = this.scrollContainer.nativeElement;
-      el.scrollTop = el.scrollHeight;
+  onSendMessage(message: ChatSubmitEvent): void {
+    void this.chatFacade.sendChatMessage(message.content, message.think);
+  }
+
+  onAbortMessage(): void {
+    this.chatFacade.abortChatMessage();
+  }
+
+  onNewChat(): void {
+    this.chatFacade.newChat();
+  }
+
+  onRegenerateMessage(requestId: string): void {
+    void this.chatFacade.regenerateResponse(requestId);
+  }
+
+  private scrollToBottom(): void {
+    const element = this.scrollContainer?.nativeElement;
+    if (element) {
+      element.scrollTop = element.scrollHeight;
     }
-  }
-
-  onSendMessage(message: string) {
-    try {
-      const parsed = JSON.parse(message);
-      this.ollamaService.sendChatMessage(parsed.content, parsed.think === true);
-    } catch {
-      // Fallback for older emitters
-      this.ollamaService.sendChatMessage(message);
-    }
-  }
-
-  onAbortMessage() {
-    this.ollamaService.abortChatMessage();
-  }
-
-  onNewChat() {
-    this.ollamaService.newChat();
-  }
-
-  onRegenerateMessage(ref_id: string) {
-    this.ollamaService.regenerateResponse(ref_id);
   }
 }

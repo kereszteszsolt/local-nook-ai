@@ -1,8 +1,13 @@
-export interface ReqMessage {
-  role: 'system' | 'user' | 'assistant';
+export type ChatRole = 'system' | 'user' | 'assistant';
+
+export interface ModelContextMessage {
+  role: ChatRole;
   content: string;
+}
+
+export interface ReqMessage extends ModelContextMessage {
   thinking?: string;
-  think?: boolean | true;
+  think?: boolean;
 }
 
 export interface Message extends ReqMessage {
@@ -11,10 +16,9 @@ export interface Message extends ReqMessage {
   total_duration?: number;
 }
 
-export interface SystemMessage extends ReqMessage {
+export interface SystemMessage extends ModelContextMessage {
   sys_msg_id: string;
   role: 'system';
-  content: string;
   active: boolean;
   folder: string;
 }

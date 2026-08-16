@@ -1,6 +1,6 @@
 {
-  "name": "ollama-local-chat",
-  "version": "0.0.0",
+  "name": "ng-ollama",
+  "version": "0.1.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -37,7 +37,8 @@
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.12",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "ollama": "^0.6.3"
   },
   "devDependencies": {
     "@angular/build": "^20.0.4",
@@ -51,5 +52,12 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.8.2"
-  }
+  },
+  "description": "LocalNook: a lightweight local-first Angular client for Ollama.",
+  "author": {
+    "name": "Keresztes Zsolt",
+    "url": "https://kereszteszsolt.hu"
+  },
+  "homepage": "https://kereszteszsolt.hu",
+  "license": "Apache-2.0"
 }

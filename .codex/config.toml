@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2026 Keresztes Zsolt <https://kereszteszsolt.hu>
+# SPDX-License-Identifier: Apache-2.0
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 4
+
+# Optional local Penpot MCP. The repository remains usable when it is offline.
+[mcp_servers.penpot]
+url = "http://localhost:4401/mcp"
+enabled = true
+required = false
+startup_timeout_sec = 10
+tool_timeout_sec = 60
+default_tools_approval_mode = "writes"

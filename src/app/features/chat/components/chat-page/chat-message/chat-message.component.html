@@ -2,7 +2,7 @@
   <div
     class="text-[16px]"
     [ngClass]="message.role === 'user'
-      ? 'ml-10 border-1 rounded-tl-lg rounded-tr-lg rounded-bl-lg bg-[var(--neutral-color)] w-auto p-2'
+      ? 'ml-10 border border-border-subtle rounded-tl-lg rounded-tr-lg rounded-bl-lg bg-surface-muted w-auto p-2'
       : 'mr-10 w-full'"
   >
     @if (message.role === 'assistant' && message.thinking) {
@@ -18,17 +18,17 @@
             [data]="message.thinking"
             katex
             mermaid
-            [mermaidOptions] ="{ theme: 'forest' }"
+            [mermaidOptions]="{ theme: 'forest' }"
           ></markdown>
         }
       </div>
-      <div class="h-px w-full bg-gray-200 my-2"></div>
+      <div class="h-px w-full bg-border-subtle my-2"></div>
     }
     <markdown
       [data]="message.content"
       katex
       mermaid
-      [mermaidOptions] ="{ theme: 'forest' }"
+      [mermaidOptions]="{ theme: 'forest' }"
     ></markdown>
     @if (message.role === 'assistant' && !hideToolbar) {
       <div class="flex flex-row flex-start gap-2 items-center text-xs">
@@ -38,7 +38,9 @@
         <button mat-icon-button class="p-1" (click)="onRegenerate()" matTooltip="Regenerate">
           <mat-icon class="text-xs">refresh</mat-icon>
         </button>
-        <span>Time spent: {{message.total_duration ?? 0  | timeSpent}}</span>
+        @if (message.total_duration !== undefined) {
+          <span>Time spent: {{ message.total_duration | timeSpent }}</span>
+        }
       </div>
     }
   </div>

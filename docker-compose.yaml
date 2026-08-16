@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ollama-local-chat-ng
     ports:
       - "4201:4201"
     volumes:
