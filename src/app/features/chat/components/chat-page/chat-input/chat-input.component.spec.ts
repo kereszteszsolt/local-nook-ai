@@ -15,7 +15,6 @@ describe('ChatInputComponent', () => {
     fixture = TestBed.createComponent(ChatInputComponent);
     component = fixture.componentInstance;
     component.isLoading = false;
-    component.hasHistory = false;
     fixture.detectChanges();
   });
 

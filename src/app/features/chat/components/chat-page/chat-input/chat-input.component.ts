@@ -28,10 +28,8 @@ export interface ChatSubmitEvent {
 })
 export class ChatInputComponent {
   @Input({ required: true }) isLoading = false;
-  @Input({ required: true }) hasHistory = false;
   @Output() readonly sendMessage = new EventEmitter<ChatSubmitEvent>();
   @Output() readonly abort = new EventEmitter<void>();
-  @Output() readonly newChat = new EventEmitter<void>();
 
   private readonly dialog = inject(MatDialog);
 
@@ -61,11 +59,6 @@ export class ChatInputComponent {
 
   onAbort(): void {
     this.abort.emit();
-  }
-
-  onNewChat(): void {
-    this.newChat.emit();
-    this.onClearInput();
   }
 
   openSystemPromptSettings(): void {

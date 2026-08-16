@@ -4,22 +4,19 @@
     placeholder="Type your message here..."
     [(ngModel)]="currentMessage"
     (keydown)="onKeyPress($event)"
-    class="w-full resize-none focus:outline-none max-h-[350px] overflow-y-auto placeholder:text-text-muted bg-transparent"
+    class="w-full max-h-[350px] resize-none overflow-y-auto bg-transparent placeholder:text-text-muted focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
     [disabled]="isLoading"
     aria-label="Chat message"
   ></textarea>
   <div class="flex flex-row justify-between gap-2">
     <div class="flex flex-row gap-2 items-center">
-      <button mat-icon-button (click)="onNewChat()" [disabled]="isLoading || !hasHistory" matTooltip="Start new chat">
-        <mat-icon class="text-xs">add</mat-icon>
+      <button mat-icon-button [disabled]="isLoading" (click)="openSystemPromptSettings()" matTooltip="Show system prompts">
+        <mat-icon>notes</mat-icon>
       </button>
       <button mat-icon-button (click)="onClearInput()" [disabled]="isLoading || !currentMessage.trim()" matTooltip="Clear input">
-        <mat-icon class="text-xs">cleaning_services</mat-icon>
+        <mat-icon>close</mat-icon>
       </button>
-      <button mat-icon-button [disabled]="isLoading" (click)="openSystemPromptSettings()" matTooltip="Show system prompts">
-        <mat-icon class="text-xs">description</mat-icon>
-      </button>
-      <mat-slide-toggle color="primary" [(ngModel)]="thinkEnabled" [disabled]="isLoading" class="scale-75 -mx-2 flex items-center relative top-[3px] leading-none" matTooltip="Enable or disable model thinking">
+      <mat-slide-toggle color="primary" [(ngModel)]="thinkEnabled" [disabled]="isLoading" class="flex items-center" matTooltip="Enable or disable model thinking">
         Thinking
       </mat-slide-toggle>
     </div>

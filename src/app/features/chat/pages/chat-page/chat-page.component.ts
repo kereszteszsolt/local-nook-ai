@@ -73,6 +73,10 @@ export class ChatPageComponent implements AfterViewChecked, OnInit {
     this.confirmDeleteAll = false;
   }
 
+  currentConversationTitle(): string {
+    return this.conversations().find((conversation) => conversation.id === this.activeConversation())?.title ?? 'New conversation';
+  }
+
   onRegenerateMessage(requestId: string): void {
     void this.chatFacade.regenerateResponse(requestId);
   }

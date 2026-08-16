@@ -40,6 +40,19 @@ Penpot MCP is optional and intended for relevant design work:
 
 Code work must continue when Penpot is unavailable unless the task specifically requires design inspection.
 
+## Penpot-to-code mapping
+
+The Penpot file uses the `LocalNook Semantic` token set. Code tokens remain canonical for the running application; its matching Penpot tokens keep the design reviewable:
+
+| Code token | Penpot token |
+|---|---|
+| `--color-surface`, `--color-surface-raised`, `--color-surface-muted` | `color.surface`, `color.surface-raised`, `color.surface-muted` |
+| `--color-text-primary`, `--color-text-muted`, `--color-border-subtle` | `color.text-primary`, `color.text-muted`, `color.border-subtle` |
+| `--color-accent`, `--color-on-accent`, `--color-accent-soft` | `color.accent`, `color.on-accent`, `color.accent-soft` |
+| `--color-danger`, `--color-danger-soft`, `--radius-panel` | `color.danger`, `color.danger-soft`, `radius.panel` |
+
+Map future Penpot token changes to these code tokens rather than introducing raw palette values in component styles.
+
 ## Review checklist
 
 Check keyboard access, focus visibility, disabled/loading/error states, readable contrast, responsive width, clear model selection, and the separation between `BrandConfig` labels and visual tokens.

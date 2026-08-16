@@ -31,15 +31,15 @@
       [mermaidOptions]="{ theme: 'forest' }"
     ></markdown>
     @if (message.role === 'assistant' && !hideToolbar) {
-      <div class="flex flex-row flex-start gap-2 items-center text-xs">
-        <button mat-icon-button class="p-1" (click)="copyContentToClipboard(message.content)" matTooltip="Copy to clipboard">
-          <mat-icon class="text-xs">content_copy</mat-icon>
+      <div class="mt-3 flex items-center gap-1 border-t border-border-subtle pt-2 text-xs text-text-muted">
+        <button mat-icon-button class="!h-9 !w-9" (click)="copyContentToClipboard(message.content)" matTooltip="Copy to clipboard" aria-label="Copy response to clipboard">
+          <mat-icon>content_copy</mat-icon>
         </button>
-        <button mat-icon-button class="p-1" (click)="onRegenerate()" matTooltip="Regenerate">
-          <mat-icon class="text-xs">refresh</mat-icon>
+        <button mat-icon-button class="!h-9 !w-9" (click)="onRegenerate()" matTooltip="Regenerate" aria-label="Regenerate response">
+          <mat-icon>refresh</mat-icon>
         </button>
         @if (message.total_duration !== undefined) {
-          <span>Time spent: {{ message.total_duration | timeSpent }}</span>
+          <span class="ml-1">Time spent: {{ message.total_duration | timeSpent }}</span>
         }
       </div>
     }

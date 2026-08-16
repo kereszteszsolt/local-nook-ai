@@ -20,6 +20,7 @@
                 (blur)="saveFolderName(folder)"
                 (click)="$event.stopPropagation()"
                 class="w-full"
+                aria-label="Folder name"
               />
               <button mat-icon-button (click)="$event.stopPropagation(); saveFolderName(folder)"
                       matTooltip="Save folder name">
@@ -32,7 +33,7 @@
           </button>
         </mat-expansion-panel-header>
         <!-- Button Row for Folder Actions -->
-        <div class="flex justify-end gap-2 p-2 border-t">
+        <div class="flex flex-wrap justify-end gap-2 border-t border-border-subtle p-2">
           <button mat-button (click)="toggleAllActive(folder, true)">
             <mat-icon>check_circle</mat-icon>
             Activate All
@@ -49,7 +50,7 @@
         <!-- Prompts -->
         @for (prompt of systemPrompts; track prompt.sys_msg_id; let i = $index) {
           @if (prompt.folder === folder) {
-            <div class="p-2 border-b last:border-0">
+            <div class="border-b border-border-subtle p-2 last:border-0">
               <div class="flex justify-between items-center">
                 <div class="flex-1">
                   @if (prompt.editing) {
@@ -57,14 +58,14 @@
                       matInput
                       [(ngModel)]="prompt.content"
                       placeholder="Type something..."
-                      class="w-full p-2 border rounded"
+                      class="w-full rounded-panel border border-border-subtle p-2"
                       (blur)="savePrompt(i)"
                       autofocus
                     ></textarea>
                   } @else {
                     <p class="whitespace-pre-wrap">{{ prompt.content }}</p>
                   }
-                  <span class="text-sm text-gray-500">{{ prompt.active ? 'Active' : 'Inactive' }}</span>
+                  <span class="text-sm text-text-muted">{{ prompt.active ? 'Active' : 'Inactive' }}</span>
                 </div>
                 <div>
                   @if (!prompt.editing) {
@@ -95,7 +96,7 @@
     }
   </mat-accordion>
 </mat-dialog-content>
-<mat-dialog-actions align="end">
+<mat-dialog-actions align="end" class="flex flex-wrap gap-1">
   <button mat-button color="primary" (click)="addNewPromptFolder()">
     <mat-icon>add</mat-icon>
     New Folder

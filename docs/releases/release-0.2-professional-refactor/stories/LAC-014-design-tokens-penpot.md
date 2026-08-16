@@ -2,7 +2,7 @@
 
 ## Status
 
-In progress
+Implemented
 
 ## User story
 
@@ -14,13 +14,18 @@ As a designer or frontend maintainer, I want semantic Tailwind tokens and an opt
 - [x] Use semantic token utilities in the primary chat composer, chat page, and response treatment.
 - [x] Document local Penpot MCP setup and safe inspection-first usage.
 - [x] Configure Penpot as an optional, non-blocking project MCP server.
-- [ ] Complete a focused pass over remaining legacy raw palette and one-off styling.
-- [ ] Record the final mapping between any maintained Penpot tokens and code tokens.
+- [x] Complete a focused pass over remaining legacy raw palette and one-off styling.
+- [x] Record the final mapping between any maintained Penpot tokens and code tokens.
 
-## Current evidence and remaining work
+## Implementation evidence
 
-- Current work establishes the token contract without redesigning every existing screen.
+- The final mapping is recorded in `docs/design-system.md`.
 
 ## Verification
 
 Run focused tests for changed behavior, `npm run build`, and `npm test -- --watch=false --browsers=ChromeHeadless`. Report environment-only limitations explicitly.
+
+## Comments
+
+- The `LocalNook Semantic` Penpot token set maps directly to the code token contract.
+- The focused UI test bundle compiles, but this container has no ChromeHeadless binary.
