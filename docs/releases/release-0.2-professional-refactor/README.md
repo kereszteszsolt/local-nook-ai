@@ -17,7 +17,7 @@ This release improves the supplied MVP without turning it into a backend-heavy o
 | [LAC-014](stories/LAC-014-design-tokens-penpot.md) | Introduce semantic design tokens and Penpot workflow | Implemented |
 | [LAC-015](stories/LAC-015-quality-agent-workflow.md) | Add a focused AI-assisted repository workflow | Implemented |
 | [LAC-016](stories/LAC-016-brand-configuration.md) | Centralize product branding | Implemented |
-| [LAC-017](stories/LAC-017-dependency-modernization.md) | Modernize library versions deliberately | Planned |
+| [LAC-017](stories/LAC-017-dependency-modernization.md) | Modernize library versions deliberately | Implemented |
 
 ## Ordering
 
