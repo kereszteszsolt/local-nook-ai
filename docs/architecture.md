@@ -31,8 +31,10 @@ flowchart TB
     subgraph INFRA[Infrastructure]
       OCLIENT[OllamaClientService]
       PREPO[SystemPromptRepository]
+      CREPO[ConversationRepository]
       SDK[ollama/browser]
       LS[(localStorage)]
+      IDB[(IndexedDB)]
       OLLAMA[(Local Ollama)]
     end
 
@@ -44,11 +46,12 @@ flowchart TB
     FACADE --> CONTEXT
     FACADE --> OCLIENT
     FACADE --> PREPO
+    FACADE --> CREPO --> IDB
     OCLIENT --> SDK --> OLLAMA
     PREPO --> LS
 ```
 
-Conversation messages are in memory. System prompts use a versioned, brand-independent localStorage key and validate parsed data before use.
+Conversation messages use a versioned, brand-independent IndexedDB database through `ConversationRepository`. System prompts use a versioned, brand-independent localStorage key and validate parsed data before use.
 
 ## Release 0.2 target
 

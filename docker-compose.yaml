@@ -8,4 +8,5 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    command: sh -c "npm ci && npm start -- --host 0.0.0.0 --port 4201"
     restart: unless-stopped

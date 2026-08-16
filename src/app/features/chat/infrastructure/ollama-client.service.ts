@@ -38,7 +38,9 @@ export class OllamaClientService {
 
   async listModels(): Promise<AiModelDto[]> {
     const response = await this.createClient().list();
-    return response.models.map(({ name, model }) => ({ name, model }));
+    return response.models
+      .filter((model) => supportsChat(model as OllamaModelWithCapabilities))
+      .map(({ name, model }) => ({ name, model }));
   }
 
   async *streamChat(request: OllamaChatRequest): AsyncGenerator<OllamaChatChunk> {
@@ -87,4 +89,12 @@ export class OllamaClientService {
       totalDuration: part.done ? part.total_duration : undefined,
     };
   }
+}
+
+type OllamaModelWithCapabilities = {
+  readonly capabilities?: readonly string[];
+};
+
+function supportsChat(model: OllamaModelWithCapabilities): boolean {
+  return model.capabilities === undefined || model.capabilities.includes('completion');
 }

@@ -48,10 +48,23 @@ describe('OllamaClientService', () => {
   });
 
   it('maps the official model response to the application model contract', async () => {
-    list.and.callFake(async () => ({ models: [{ name: 'qwen3:8b', model: 'qwen3:8b' }] }));
+    list.and.callFake(async () => ({
+      models: [
+        { name: 'qwen3:8b', model: 'qwen3:8b', capabilities: ['completion'] },
+        { name: 'qwen3-embedding:0.6b', model: 'qwen3-embedding:0.6b', capabilities: ['embedding'] },
+      ],
+    }));
 
     await expectAsync(service.listModels()).toBeResolvedTo([
       { name: 'qwen3:8b', model: 'qwen3:8b' },
+    ]);
+  });
+
+  it('keeps models from older Ollama servers that do not advertise capabilities', async () => {
+    list.and.callFake(async () => ({ models: [{ name: 'llama3.1:8b', model: 'llama3.1:8b' }] }));
+
+    await expectAsync(service.listModels()).toBeResolvedTo([
+      { name: 'llama3.1:8b', model: 'llama3.1:8b' },
     ]);
   });
 

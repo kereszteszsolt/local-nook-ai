@@ -10,7 +10,7 @@ This release improves the supplied MVP without turning it into a backend-heavy o
 |---|---|---|
 | [LAC-008](stories/LAC-008-official-ollama-client.md) | Adopt the official Ollama browser client | Implemented |
 | [LAC-009](stories/LAC-009-chat-architecture-refactor.md) | Refactor chat responsibilities | Implemented |
-| [LAC-010](stories/LAC-010-indexeddb-conversations.md) | Persist conversations in IndexedDB | Planned |
+| [LAC-010](stories/LAC-010-indexeddb-conversations.md) | Persist conversations in IndexedDB | Implemented |
 | [LAC-011](stories/LAC-011-conversation-management.md) | Add conversation reopen and deletion controls | Planned |
 | [LAC-012](stories/LAC-012-context-builder.md) | Build deterministic model context | Implemented |
 | [LAC-013](stories/LAC-013-streaming-error-handling.md) | Harden streaming and error state | Implemented |

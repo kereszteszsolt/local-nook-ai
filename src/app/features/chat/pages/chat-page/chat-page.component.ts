@@ -28,6 +28,7 @@ export class ChatPageComponent implements AfterViewChecked, OnInit {
 
   ngOnInit(): void {
     this.chatFacade.loadSystemPrompts();
+    void this.chatFacade.restoreConversation();
   }
 
   onSendMessage(message: ChatSubmitEvent): void {

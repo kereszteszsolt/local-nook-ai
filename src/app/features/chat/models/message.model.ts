@@ -11,6 +11,7 @@ export interface ReqMessage extends ModelContextMessage {
 }
 
 export interface Message extends ReqMessage {
+  id?: string;
   req_id?: string;
   ref_id?: string;
   total_duration?: number;

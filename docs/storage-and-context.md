@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Conversation messages live in `ChatFacade` memory and reset on page reload.
+- Conversation messages are stored in IndexedDB through `ConversationRepository` and the active conversation is restored on reload.
 - System prompts are stored in localStorage through `SystemPromptRepository`.
 - Malformed prompt data returns an empty list instead of breaking startup.
 - A legacy prompt key is read and migrated to `local-ai-client.system-prompts.v1`.
@@ -19,9 +19,9 @@ Only `role` and `content` are copied. Request IDs, response references, duration
 
 Regeneration truncates history after the selected original user message, then generates a replacement assistant message without adding the same user message again.
 
-## Planned IndexedDB scope
+## IndexedDB scope
 
-Release 0.2 adds browser-local conversation persistence with:
+Release 0.2 provides browser-local conversation persistence with:
 
 - stable conversation IDs and timestamps;
 - messages linked to one conversation;

@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatButton } from '@angular/material/button';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatIcon } from '@angular/material/icon';
 import { ChatFacade } from '../../../features/chat/application/chat-facade.service';
@@ -11,7 +11,6 @@ import { BRAND_CONFIG } from '../../../core/config/brand.config';
   selector: 'ollama-chat-nav',
   imports: [
     MatIcon,
-    MatIconButton,
     MatToolbar,
     MatMenu,
     MatMenuItem,

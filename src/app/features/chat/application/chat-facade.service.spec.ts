@@ -12,8 +12,9 @@ import {
   OllamaClientService,
 } from '../infrastructure/ollama-client.service';
 import { SystemPromptRepository } from '../infrastructure/system-prompt.repository';
+import { ConversationRepository, StoredConversation } from '../infrastructure/conversation.repository';
 import { AiModelDto } from '../models/ai-model.model';
-import { SystemMessage } from '../models/message.model';
+import { Message, SystemMessage } from '../models/message.model';
 
 class FakeOllamaClientService {
   responseNumber = 0;
@@ -84,18 +85,71 @@ class FakePromptRepository {
   clear(): void {}
 }
 
+class FakeConversationRepository {
+  activeConversation: StoredConversation | null = null;
+  failWrites = false;
+  private nextConversation = 0;
+
+  async create(messages: readonly Message[]): Promise<StoredConversation> {
+    this.throwWhenWritesFail();
+    const now = Date.now();
+    this.activeConversation = {
+      id: `conversation-${++this.nextConversation}`,
+      createdAt: now,
+      updatedAt: now,
+      messages: this.withMessageIds(messages),
+    };
+    return this.activeConversation;
+  }
+
+  async update(id: string, messages: readonly Message[]): Promise<StoredConversation | null> {
+    this.throwWhenWritesFail();
+    if (this.activeConversation?.id !== id) {
+      return null;
+    }
+    this.activeConversation = {
+      ...this.activeConversation,
+      updatedAt: Date.now(),
+      messages: this.withMessageIds(messages),
+    };
+    return this.activeConversation;
+  }
+
+  async readActive(): Promise<StoredConversation | null> {
+    return this.activeConversation;
+  }
+
+  async clearActive(): Promise<void> {
+    this.throwWhenWritesFail();
+    this.activeConversation = null;
+  }
+
+  private withMessageIds(messages: readonly Message[]): Message[] {
+    return messages.map((message, index) => ({ ...message, id: message.id ?? `message-${index}` }));
+  }
+
+  private throwWhenWritesFail(): void {
+    if (this.failWrites) {
+      throw new Error('Storage unavailable');
+    }
+  }
+}
+
 describe('ChatFacade', () => {
   let facade: ChatFacade;
   let client: FakeOllamaClientService;
+  let conversationRepository: FakeConversationRepository;
 
   beforeEach(() => {
     client = new FakeOllamaClientService();
+    conversationRepository = new FakeConversationRepository();
     TestBed.configureTestingModule({
       providers: [
         ChatFacade,
         ChatContextBuilder,
         { provide: OllamaClientService, useValue: client },
         { provide: SystemPromptRepository, useClass: FakePromptRepository },
+        { provide: ConversationRepository, useValue: conversationRepository },
       ],
     });
     facade = TestBed.inject(ChatFacade);
@@ -109,6 +163,21 @@ describe('ChatFacade', () => {
     expect(client.requests).toEqual([]);
   });
 
+  it('restores only the active persisted conversation after reload', async () => {
+    conversationRepository.activeConversation = {
+      id: 'active-conversation',
+      createdAt: 1,
+      updatedAt: 2,
+      messages: [{ id: 'message-1', role: 'user', content: 'Saved locally' }],
+    };
+
+    await facade.restoreConversation();
+
+    expect(facade.messageHistoryList()).toEqual([
+      { id: 'message-1', role: 'user', content: 'Saved locally' },
+    ]);
+  });
+
   it('stores a completed assistant response after the stream finishes', async () => {
     await facade.loadModels();
     await facade.sendChatMessage('Hello', true);
@@ -118,6 +187,18 @@ describe('ChatFacade', () => {
       { role: 'assistant', content: 'response-1' },
     ]);
     expect(client.requests[0].think).toBeTrue();
+    expect(conversationRepository.activeConversation?.messages).toHaveSize(2);
+  });
+
+  it('surfaces storage failures without sending the request', async () => {
+    conversationRepository.failWrites = true;
+    await facade.loadModels();
+
+    await facade.sendChatMessage('Hello');
+
+    expect(facade.messageHistoryList()).toEqual([]);
+    expect(facade.errorMessage()).toContain('Could not save browser-local conversation history.');
+    expect(client.requests).toEqual([]);
   });
 
   it('regenerates from the original user message without duplicating it', async () => {

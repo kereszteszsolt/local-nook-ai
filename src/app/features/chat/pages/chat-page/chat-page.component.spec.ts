@@ -16,6 +16,7 @@ describe('ChatPageComponent', () => {
     isLoadingResponse: ReturnType<typeof signal>;
     errorMessage: ReturnType<typeof signal>;
     loadSystemPrompts: jasmine.Spy;
+    restoreConversation: jasmine.Spy;
     sendChatMessage: jasmine.Spy;
     abortChatMessage: jasmine.Spy;
     newChat: jasmine.Spy;
@@ -30,6 +31,7 @@ describe('ChatPageComponent', () => {
       isLoadingResponse: signal(false),
       errorMessage: signal<string | null>(null),
       loadSystemPrompts: jasmine.createSpy('loadSystemPrompts'),
+      restoreConversation: jasmine.createSpy('restoreConversation').and.resolveTo(),
       sendChatMessage: jasmine.createSpy('sendChatMessage').and.resolveTo(),
       abortChatMessage: jasmine.createSpy('abortChatMessage'),
       newChat: jasmine.createSpy('newChat'),
@@ -51,6 +53,7 @@ describe('ChatPageComponent', () => {
 
   it('loads browser-local prompts when the page starts', () => {
     expect(facade.loadSystemPrompts).toHaveBeenCalledOnceWith();
+    expect(facade.restoreConversation).toHaveBeenCalledOnceWith();
   });
 
   it('passes the typed composer event to the facade', () => {
