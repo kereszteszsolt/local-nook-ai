@@ -104,11 +104,26 @@ describe('ChatMessageComponent', () => {
 
     const preview: HTMLElement | null = fixture.nativeElement.querySelector('.thinking-preview');
     const initialPreviewText: HTMLElement | null = fixture.nativeElement.querySelector('.thinking-preview-text');
+    const previewToggle: HTMLButtonElement | null = fixture.nativeElement.querySelector(
+      'button[aria-label="Expand thinking preview"]',
+    );
     const scrollTo = spyOn(preview as HTMLDivElement, 'scrollTo');
 
     expect(preview?.textContent).toContain('Latest thought is visible.');
     expect(fixture.nativeElement.querySelector('.thinking-content')).toBeNull();
-    expect(fixture.nativeElement.querySelector('button[aria-label="Expand thinking"]')).toBeNull();
+    expect(previewToggle?.getAttribute('aria-expanded')).toBe('false');
+    expect(fixture.nativeElement.querySelector('.thinking-ellipsis')).not.toBeNull();
+
+    previewToggle?.click();
+    fixture.detectChanges();
+
+    expect(component.showStreamingThinkingExpanded).toBeTrue();
+    expect(preview?.classList).toContain('thinking-preview-expanded');
+    expect(
+      (fixture.nativeElement.querySelector(
+        'button[aria-label="Reduce thinking preview"]',
+      ) as HTMLButtonElement | null)?.getAttribute('aria-expanded'),
+    ).toBe('true');
 
     fixture.componentRef.setInput('message', {
       role: 'assistant',

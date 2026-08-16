@@ -11,8 +11,26 @@
           <div class="flex min-w-0 items-center gap-2">
             <mat-icon class="shrink-0 !text-[18px] text-accent" aria-hidden="true">psychology_alt</mat-icon>
             <h3 class="truncate text-sm font-medium text-text-primary">Thinking</h3>
+            @if (isStreaming) {
+              <span class="thinking-ellipsis" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </span>
+              <span class="sr-only">Thinking in progress</span>
+            }
           </div>
-          @if (!isStreaming) {
+          @if (isStreaming) {
+            <button
+              mat-icon-button
+              class="!h-9 !w-9 shrink-0"
+              type="button"
+              (click)="toggleStreamingThinkingVisibility()"
+              [attr.aria-expanded]="showStreamingThinkingExpanded"
+              [attr.aria-label]="showStreamingThinkingExpanded ? 'Reduce thinking preview' : 'Expand thinking preview'"
+              [matTooltip]="showStreamingThinkingExpanded ? 'Reduce thinking preview' : 'Expand thinking preview'"
+            >
+              <mat-icon>{{ showStreamingThinkingExpanded ? 'unfold_less' : 'unfold_more' }}</mat-icon>
+            </button>
+          } @else {
             <button
               mat-icon-button
               class="!h-9 !w-9 shrink-0"
@@ -27,7 +45,7 @@
           }
         </div>
         @if (isStreaming) {
-          <div #thinkingPreview class="thinking-preview border-t border-border-subtle bg-surface-raised px-3 py-2" aria-label="Current thinking preview">
+          <div #thinkingPreview class="thinking-preview border-t border-border-subtle bg-surface-raised px-3 py-2" [class.thinking-preview-expanded]="showStreamingThinkingExpanded" aria-label="Current thinking preview">
             <p class="thinking-preview-text whitespace-pre-wrap break-words text-sm leading-6 text-text-primary">{{ message.thinking }}</p>
           </div>
         } @else if (showThinkingExpanded) {

@@ -33,6 +33,7 @@ export class ChatMessageComponent implements AfterViewChecked, OnInit {
   @Output() regenerate: EventEmitter<string> = new EventEmitter<string>();
 
   showThinkingExpanded = false;
+  showStreamingThinkingExpanded = false;
 
   ngOnInit(): void {
     const prismWindow = window as Window & {
@@ -57,6 +58,10 @@ export class ChatMessageComponent implements AfterViewChecked, OnInit {
 
   toggleThinkingVisibility(): void {
     this.showThinkingExpanded = !this.showThinkingExpanded;
+  }
+
+  toggleStreamingThinkingVisibility(): void {
+    this.showStreamingThinkingExpanded = !this.showStreamingThinkingExpanded;
   }
 
   async copyContentToClipboard(content: string): Promise<void> {
