@@ -25,13 +25,13 @@
     } @else {
       <div class="flex min-w-0 gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-x-hidden lg:overflow-y-auto" role="list" aria-label="Saved conversations">
         @for (conversation of conversations(); track conversation.id) {
-          <div class="flex min-w-0 shrink-0 items-center border border-border-subtle bg-surface-muted lg:w-full">
+          <div class="conversation-card group flex min-w-0 shrink-0 items-center border border-border-subtle bg-surface-muted transition-colors hover:bg-surface focus-within:border-accent focus-within:bg-surface lg:w-full" role="listitem">
             <button
-              mat-button
+              type="button"
               (click)="onOpenConversation(conversation.id)"
               [disabled]="isLoading()"
               [attr.aria-current]="activeConversation() === conversation.id ? 'page' : null"
-              class="!h-14 !min-w-0 !max-w-56 !flex-1 !justify-start !px-3 !normal-case lg:!max-w-none"
+              class="flex h-14 min-w-0 max-w-56 flex-1 items-center justify-start px-3 text-left text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-60 lg:max-w-none"
             >
               <span class="flex min-w-0 flex-col items-start text-left">
                 <span class="max-w-44 truncate text-sm lg:max-w-48">{{ conversation.title }}</span>
@@ -76,6 +76,7 @@
                 thinking: partialThinking()
               }"
               [hideToolbar]="isLoading()"
+              [isStreaming]="isLoading()"
             />
           }
         </div>

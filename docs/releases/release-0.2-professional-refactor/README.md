@@ -20,6 +20,7 @@ This release improves the supplied MVP without turning it into a backend-heavy o
 | [LAC-017](stories/LAC-017-dependency-modernization.md) | Modernize library versions deliberately | Implemented |
 | [LAC-018](stories/LAC-018-model-thinking-capabilities.md) | Respect model thinking capabilities | Implemented |
 | [LAC-019](stories/LAC-019-conversation-deletion-confirmation.md) | Confirm conversation deletion | Implemented |
+| [LAC-020](stories/LAC-020-thinking-display.md) | Refine the thinking display | Implemented |
 
 ## Ordering
 

@@ -1,8 +1,20 @@
-.thinking-box {
-  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
-  background: var(--color-accent-soft);
+.thinking-content {
+  scrollbar-color: var(--color-border-subtle) transparent;
 }
 
-.thinking-title {
-  color: var(--color-accent);
+.thinking-preview {
+  height: 5.5rem;
+  overflow-y: auto;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+}
+
+.thinking-preview::-webkit-scrollbar {
+  display: none;
+}
+
+.thinking-preview-text {
+  margin: 0;
 }

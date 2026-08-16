@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { AfterViewChecked, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIconButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -22,7 +22,6 @@ import type { ConversationSummary } from '../../infrastructure/conversation.repo
     ChatInputComponent,
     ChatMessageComponent,
     DatePipe,
-    MatButton,
     MatIconButton,
     MatIcon,
     MatTooltip,
@@ -96,8 +95,19 @@ export class ChatPageComponent implements AfterViewChecked, OnInit {
 
   private scrollToBottom(): void {
     const element = this.scrollContainer?.nativeElement;
-    if (element) {
-      element.scrollTop = element.scrollHeight;
+    if (!element) {
+      return;
+    }
+
+    const nextScrollTop = Math.max(0, element.scrollHeight - element.clientHeight);
+    if (Math.abs(element.scrollTop - nextScrollTop) < 1) {
+      return;
+    }
+
+    if (this.isLoading()) {
+      element.scrollTo({ top: nextScrollTop, behavior: 'smooth' });
+    } else {
+      element.scrollTop = nextScrollTop;
     }
   }
 

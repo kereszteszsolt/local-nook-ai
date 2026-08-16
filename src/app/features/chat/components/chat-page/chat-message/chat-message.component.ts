@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, EventEmitter, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Message } from '../../../models/message.model';
 import { NgClass } from '@angular/common';
 import { MarkdownComponent } from 'ngx-markdown';
@@ -21,14 +21,18 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './chat-message.component.html',
   styleUrl: './chat-message.component.scss'
 })
-export class ChatMessageComponent implements OnInit {
+export class ChatMessageComponent implements AfterViewChecked, OnInit {
+  @ViewChild('thinkingPreview') thinkingPreviewElement?: ElementRef<HTMLDivElement>;
+
   private readonly snackBar = inject(MatSnackBar);
+  private lastThinkingPreview = '';
 
   @Input({ required: true }) message!: Message;
   @Input({ required: true }) hideToolbar: boolean = false;
+  @Input() isStreaming = false;
   @Output() regenerate: EventEmitter<string> = new EventEmitter<string>();
 
-  showThinkingExpanded = true;
+  showThinkingExpanded = false;
 
   ngOnInit(): void {
     const prismWindow = window as Window & {
@@ -38,6 +42,17 @@ export class ChatMessageComponent implements OnInit {
     if (autoloader) {
       autoloader.languages_path = 'prismjs-components/';
     }
+  }
+
+  ngAfterViewChecked(): void {
+    const thinking = this.message.thinking ?? '';
+    const preview = this.thinkingPreviewElement?.nativeElement;
+    if (!this.isStreaming || !preview || thinking === this.lastThinkingPreview) {
+      return;
+    }
+
+    this.lastThinkingPreview = thinking;
+    preview.scrollTo({ top: preview.scrollHeight, behavior: 'smooth' });
   }
 
   toggleThinkingVisibility(): void {

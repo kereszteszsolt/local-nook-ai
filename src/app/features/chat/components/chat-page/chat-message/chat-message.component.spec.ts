@@ -63,4 +63,64 @@ describe('ChatMessageComponent', () => {
       { duration: 3000 },
     );
   });
+
+  it('keeps thinking collapsed until the user expands it', () => {
+    fixture.componentRef.setInput('message', {
+      role: 'assistant',
+      content: 'The answer is 2.',
+      thinking: 'I added one and one.',
+      ref_id: 'request-1',
+    });
+    fixture.detectChanges();
+
+    const toggleButton: HTMLButtonElement | null = fixture.nativeElement.querySelector(
+      'button[aria-label="Expand thinking"]',
+    );
+
+    expect(component.showThinkingExpanded).toBeFalse();
+    expect(fixture.nativeElement.querySelector('.thinking-content')).toBeNull();
+    expect(toggleButton?.getAttribute('aria-expanded')).toBe('false');
+
+    toggleButton?.click();
+    fixture.detectChanges();
+
+    expect(component.showThinkingExpanded).toBeTrue();
+    expect(fixture.nativeElement.querySelector('.thinking-content')).not.toBeNull();
+    expect(
+      (fixture.nativeElement.querySelector(
+        'button[aria-label="Collapse thinking"]',
+      ) as HTMLButtonElement | null)?.getAttribute('aria-expanded'),
+    ).toBe('true');
+  });
+
+  it('shows only the latest short thinking preview while streaming', () => {
+    fixture.componentRef.setInput('message', {
+      role: 'assistant',
+      content: '',
+      thinking: `${'Earlier detail. '.repeat(40)}Latest thought is visible.`,
+    });
+    fixture.componentRef.setInput('isStreaming', true);
+    fixture.detectChanges();
+
+    const preview: HTMLElement | null = fixture.nativeElement.querySelector('.thinking-preview');
+    const initialPreviewText: HTMLElement | null = fixture.nativeElement.querySelector('.thinking-preview-text');
+    const scrollTo = spyOn(preview as HTMLDivElement, 'scrollTo');
+
+    expect(preview?.textContent).toContain('Latest thought is visible.');
+    expect(fixture.nativeElement.querySelector('.thinking-content')).toBeNull();
+    expect(fixture.nativeElement.querySelector('button[aria-label="Expand thinking"]')).toBeNull();
+
+    fixture.componentRef.setInput('message', {
+      role: 'assistant',
+      content: '',
+      thinking: `${'Earlier detail. '.repeat(40)}A newer thought replaces the preview.`,
+    });
+    fixture.detectChanges();
+
+    const updatedPreviewText: HTMLElement | null = fixture.nativeElement.querySelector('.thinking-preview-text');
+
+    expect(updatedPreviewText?.textContent).toContain('A newer thought replaces the preview.');
+    expect(updatedPreviewText).toBe(initialPreviewText);
+    expect(scrollTo).toHaveBeenCalled();
+  });
 });

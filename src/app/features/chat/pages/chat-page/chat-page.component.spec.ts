@@ -110,4 +110,20 @@ describe('ChatPageComponent', () => {
 
     expect(facade.deleteConversation).not.toHaveBeenCalled();
   });
+
+  it('renders a full-card hover state for a saved conversation', () => {
+    facade.conversations.set([{
+      id: 'conversation-1',
+      title: 'Local chat',
+      createdAt: 1,
+      updatedAt: 2,
+    }]);
+    fixture.detectChanges();
+
+    const card: HTMLElement | null = fixture.nativeElement.querySelector('.conversation-card');
+    const openButton: HTMLButtonElement | null = card?.querySelector('button') ?? null;
+
+    expect(card?.classList).toContain('hover:bg-surface');
+    expect(openButton?.classList).toContain('focus-visible:ring-accent');
+  });
 });
