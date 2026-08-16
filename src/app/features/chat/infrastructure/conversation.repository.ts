@@ -7,7 +7,7 @@ import { Injectable } from '@angular/core';
 import { Message } from '../models/message.model';
 
 export const CONVERSATION_DATABASE_NAME = 'local-ai-client.conversations';
-export const CONVERSATION_DATABASE_VERSION = 2;
+export const CONVERSATION_DATABASE_VERSION = 3;
 const CONVERSATIONS_STORE = 'conversations';
 const MESSAGES_STORE = 'messages';
 const METADATA_STORE = 'metadata';
@@ -21,10 +21,13 @@ export interface ConversationSummary {
 }
 
 export interface StoredConversation extends ConversationSummary {
+  readonly modelId?: string;
   readonly messages: readonly Message[];
 }
 
-interface ConversationRecord extends ConversationSummary {}
+interface ConversationRecord extends ConversationSummary {
+  readonly modelId?: string;
+}
 
 interface MessageRecord extends Message {
   readonly id: string;
@@ -39,13 +42,15 @@ interface MetadataRecord {
 
 @Injectable({ providedIn: 'root' })
 export class ConversationRepository {
-  async create(messages: readonly Message[]): Promise<StoredConversation> {
+  async create(messages: readonly Message[], modelId?: string): Promise<StoredConversation> {
     const now = Date.now();
+    const normalizedModelId = normalizeModelId(modelId);
     const conversation: ConversationRecord = {
       id: crypto.randomUUID(),
       title: titleFromMessages(messages),
       createdAt: now,
       updatedAt: now,
+      ...(normalizedModelId ? { modelId: normalizedModelId } : {}),
     };
     const persistedMessages = withStableMessageIds(messages);
     const database = await this.openDatabase();
@@ -143,6 +148,35 @@ export class ConversationRepository {
     database.close();
 
     return { ...updated, messages: persistedMessages };
+  }
+
+  async updateModel(id: string, modelId: string): Promise<boolean> {
+    const normalizedModelId = normalizeModelId(modelId);
+    if (!normalizedModelId) {
+      return false;
+    }
+
+    const database = await this.openDatabase();
+    const readTransaction = database.transaction(CONVERSATIONS_STORE, 'readonly');
+    const existing = await requestResult<ConversationRecord | undefined>(
+      readTransaction.objectStore(CONVERSATIONS_STORE).get(id),
+    );
+    await transactionComplete(readTransaction);
+    if (!existing) {
+      database.close();
+      return false;
+    }
+
+    const updated: ConversationRecord = {
+      ...existing,
+      modelId: normalizedModelId,
+      updatedAt: Date.now(),
+    };
+    await completeTransaction(database.transaction(CONVERSATIONS_STORE, 'readwrite'), (stores) => {
+      stores[CONVERSATIONS_STORE].put(updated);
+    });
+    database.close();
+    return true;
   }
 
   async delete(id: string): Promise<void> {
@@ -277,6 +311,11 @@ function titleFromMessages(messages: readonly Message[]): string {
     (message) => message.role === 'user' && message.content.trim().length > 0,
   );
   return firstUserMessage?.content.trim().slice(0, 80) || 'Untitled conversation';
+}
+
+function normalizeModelId(modelId: string | undefined): string | undefined {
+  const normalizedModelId = modelId?.trim();
+  return normalizedModelId || undefined;
 }
 
 function requestResult<T>(request: IDBRequest<T>): Promise<T> {

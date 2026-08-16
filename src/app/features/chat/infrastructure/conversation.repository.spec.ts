@@ -25,7 +25,7 @@ describe('ConversationRepository', () => {
     const created = await repository.create([
       { role: 'user', content: 'First request', req_id: 'request-1' },
       { role: 'assistant', content: 'First response', ref_id: 'request-1' },
-    ]);
+    ], 'qwen3:8b');
     const reloaded = await new ConversationRepository().readActive();
 
     expect(reloaded).toEqual(created);
@@ -34,10 +34,11 @@ describe('ConversationRepository', () => {
       'First response',
     ]);
     expect(reloaded?.messages.every((message) => Boolean(message.id))).toBeTrue();
+    expect(reloaded?.modelId).toBe('qwen3:8b');
   });
 
   it('lists, updates, and deletes a conversation without leaving its active reference behind', async () => {
-    const created = await repository.create([{ role: 'user', content: 'Keep this ID' }]);
+    const created = await repository.create([{ role: 'user', content: 'Keep this ID' }], 'qwen3:8b');
     const updated = await repository.update(created.id, [
       ...created.messages,
       { role: 'assistant', content: 'A completed answer' },
@@ -46,6 +47,7 @@ describe('ConversationRepository', () => {
     expect((await repository.list()).map((conversation) => conversation.id)).toEqual([created.id]);
     expect(updated?.messages[0].id).toBe(created.messages[0].id);
     expect(updated?.messages).toHaveSize(2);
+    expect(updated?.modelId).toBe('qwen3:8b');
 
     await repository.delete(created.id);
 
@@ -77,6 +79,29 @@ describe('ConversationRepository', () => {
       createdAt: 1,
       updatedAt: 2,
     }]);
+  });
+
+  it('keeps version-two conversations without model metadata readable', async () => {
+    await createVersionTwoDatabase();
+
+    const conversation = await repository.read('version-two-conversation');
+
+    expect(conversation?.modelId).toBeUndefined();
+    expect(conversation?.messages.map((message) => message.content)).toEqual(['Legacy conversation']);
+  });
+
+  it('updates conversation model metadata without changing ordered messages', async () => {
+    const created = await repository.create([
+      { role: 'user', content: 'Keep this message' },
+      { role: 'assistant', content: 'Keep this response' },
+    ], 'qwen3:8b');
+
+    const updated = await repository.updateModel(created.id, 'llama3.1:8b');
+    const reloaded = await repository.read(created.id);
+
+    expect(updated).toBeTrue();
+    expect(reloaded?.modelId).toBe('llama3.1:8b');
+    expect(reloaded?.messages).toEqual(created.messages);
   });
 
   it('deletes all conversations and clears the active reference', async () => {
@@ -130,6 +155,37 @@ function createVersionOneDatabase(): Promise<void> {
         id: 'legacy-conversation',
         createdAt: 1,
         updatedAt: 2,
+      });
+    };
+    request.onsuccess = () => {
+      request.result.close();
+      resolve();
+    };
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function createVersionTwoDatabase(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(CONVERSATION_DATABASE_NAME, 2);
+    request.onupgradeneeded = () => {
+      const database = request.result;
+      database.createObjectStore('conversations', { keyPath: 'id' });
+      const messages = database.createObjectStore('messages', { keyPath: 'id' });
+      messages.createIndex('by-conversation-id', 'conversationId');
+      database.createObjectStore('metadata', { keyPath: 'key' });
+      request.transaction?.objectStore('conversations').add({
+        id: 'version-two-conversation',
+        title: 'Version two conversation',
+        createdAt: 1,
+        updatedAt: 2,
+      });
+      request.transaction?.objectStore('messages').add({
+        id: 'version-two-message',
+        conversationId: 'version-two-conversation',
+        sequence: 0,
+        role: 'user',
+        content: 'Legacy conversation',
       });
     };
     request.onsuccess = () => {

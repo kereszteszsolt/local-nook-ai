@@ -21,6 +21,7 @@ This release improves the supplied MVP without turning it into a backend-heavy o
 | [LAC-018](stories/LAC-018-model-thinking-capabilities.md) | Respect model thinking capabilities | Implemented |
 | [LAC-019](stories/LAC-019-conversation-deletion-confirmation.md) | Confirm conversation deletion | Implemented |
 | [LAC-020](stories/LAC-020-thinking-display.md) | Refine the thinking display | Implemented |
+| [LAC-021](stories/LAC-021-conversation-model-selection.md) | Persist conversation model selection | Implemented |
 
 ## Ordering
 

@@ -31,6 +31,6 @@ export class NavComponent implements OnInit {
   }
 
   onModelChange(model: AiModelDto): void {
-    this.chatFacade.setCurrentModel(model);
+    void this.chatFacade.setCurrentModel(model);
   }
 }

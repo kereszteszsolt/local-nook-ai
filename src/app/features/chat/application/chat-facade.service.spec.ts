@@ -17,6 +17,7 @@ import {
   ConversationSummary,
   StoredConversation,
 } from '../infrastructure/conversation.repository';
+import { ActiveModelRepository } from '../infrastructure/active-model.repository';
 import { AiModelDto } from '../models/ai-model.model';
 import { Message, SystemMessage } from '../models/message.model';
 
@@ -90,13 +91,29 @@ class FakePromptRepository {
   clear(): void {}
 }
 
+class FakeActiveModelRepository {
+  modelId: string | null = null;
+
+  load(): string | null {
+    return this.modelId;
+  }
+
+  save(modelId: string): void {
+    this.modelId = modelId;
+  }
+
+  clear(): void {
+    this.modelId = null;
+  }
+}
+
 class FakeConversationRepository {
   activeConversation: StoredConversation | null = null;
   failWrites = false;
   private nextConversation = 0;
   private readonly conversations = new Map<string, StoredConversation>();
 
-  async create(messages: readonly Message[]): Promise<StoredConversation> {
+  async create(messages: readonly Message[], modelId?: string): Promise<StoredConversation> {
     this.throwWhenWritesFail();
     const now = Date.now();
     this.activeConversation = {
@@ -104,6 +121,7 @@ class FakeConversationRepository {
       title: 'Test conversation',
       createdAt: now,
       updatedAt: now,
+      ...(modelId ? { modelId } : {}),
       messages: this.withMessageIds(messages),
     };
     this.conversations.set(this.activeConversation.id, this.activeConversation);
@@ -122,6 +140,25 @@ class FakeConversationRepository {
     };
     this.conversations.set(id, this.activeConversation);
     return this.activeConversation!;
+  }
+
+  async updateModel(id: string, modelId: string): Promise<boolean> {
+    this.throwWhenWritesFail();
+    const conversation = await this.read(id);
+    if (!conversation) {
+      return false;
+    }
+
+    const updated: StoredConversation = {
+      ...conversation,
+      modelId,
+      updatedAt: Date.now(),
+    };
+    this.conversations.set(id, updated);
+    if (this.activeConversation?.id === id) {
+      this.activeConversation = updated;
+    }
+    return true;
   }
 
   async list(): Promise<ConversationSummary[]> {
@@ -186,15 +223,18 @@ describe('ChatFacade', () => {
   let facade: ChatFacade;
   let client: FakeOllamaClientService;
   let conversationRepository: FakeConversationRepository;
+  let activeModelRepository: FakeActiveModelRepository;
 
   beforeEach(() => {
     client = new FakeOllamaClientService();
     conversationRepository = new FakeConversationRepository();
+    activeModelRepository = new FakeActiveModelRepository();
     TestBed.configureTestingModule({
       providers: [
         ChatFacade,
         ChatContextBuilder,
         { provide: OllamaClientService, useValue: client },
+        { provide: ActiveModelRepository, useValue: activeModelRepository },
         { provide: SystemPromptRepository, useClass: FakePromptRepository },
         { provide: ConversationRepository, useValue: conversationRepository },
       ],
@@ -224,6 +264,110 @@ describe('ChatFacade', () => {
     expect(facade.messageHistoryList()).toEqual([
       { id: 'message-1', role: 'user', content: 'Saved locally' },
     ]);
+  });
+
+  it('restores the latest browser-local model when no conversation model applies', async () => {
+    client.models = [
+      { name: 'qwen3:8b', model: 'qwen3:8b', supportsThinking: true },
+      { name: 'llama3.1:8b', model: 'llama3.1:8b', supportsThinking: false },
+    ];
+    activeModelRepository.modelId = 'llama3.1:8b';
+
+    await facade.loadModels();
+
+    expect(facade.currentModel()?.model).toBe('llama3.1:8b');
+  });
+
+  it('activates an available conversation model when opening a saved chat', async () => {
+    client.models = [
+      { name: 'qwen3:8b', model: 'qwen3:8b', supportsThinking: true },
+      { name: 'llama3.1:8b', model: 'llama3.1:8b', supportsThinking: false },
+    ];
+    const qwenConversation = await conversationRepository.create([
+      { role: 'user', content: 'Use Qwen' },
+    ], 'qwen3:8b');
+    const llamaConversation = await conversationRepository.create([
+      { role: 'user', content: 'Use Llama' },
+    ], 'llama3.1:8b');
+    await facade.loadModels();
+
+    await facade.openConversation(qwenConversation.id);
+    expect(facade.currentModel()?.model).toBe('qwen3:8b');
+    expect(activeModelRepository.modelId).toBe('qwen3:8b');
+
+    await facade.openConversation(llamaConversation.id);
+    expect(facade.currentModel()?.model).toBe('llama3.1:8b');
+    expect(activeModelRepository.modelId).toBe('llama3.1:8b');
+  });
+
+  it('reconciles an active restored conversation model after model discovery', async () => {
+    client.models = [
+      { name: 'qwen3:8b', model: 'qwen3:8b', supportsThinking: true },
+      { name: 'llama3.1:8b', model: 'llama3.1:8b', supportsThinking: false },
+    ];
+    conversationRepository.activeConversation = {
+      id: 'active-conversation',
+      title: 'Saved locally',
+      createdAt: 1,
+      updatedAt: 2,
+      modelId: 'llama3.1:8b',
+      messages: [{ id: 'message-1', role: 'user', content: 'Saved locally' }],
+    };
+
+    await facade.restoreConversation();
+    await facade.loadModels();
+
+    expect(facade.currentModel()?.model).toBe('llama3.1:8b');
+    expect(activeModelRepository.modelId).toBe('llama3.1:8b');
+  });
+
+  it('falls back without overwriting an unavailable conversation model', async () => {
+    client.models = [{ name: 'qwen3:8b', model: 'qwen3:8b', supportsThinking: true }];
+    conversationRepository.activeConversation = {
+      id: 'unavailable-model',
+      title: 'Saved locally',
+      createdAt: 1,
+      updatedAt: 2,
+      modelId: 'removed-model:latest',
+      messages: [{ id: 'message-1', role: 'user', content: 'Saved locally' }],
+    };
+    await facade.loadModels();
+
+    await facade.restoreConversation();
+
+    expect(facade.currentModel()?.model).toBe('qwen3:8b');
+    expect(conversationRepository.activeConversation?.modelId).toBe('removed-model:latest');
+    expect(activeModelRepository.modelId).toBe('qwen3:8b');
+    expect(facade.errorMessage()).toContain('unavailable');
+  });
+
+  it('keeps an unavailable conversation model after continuing with the fallback', async () => {
+    client.models = [{ name: 'qwen3:8b', model: 'qwen3:8b', supportsThinking: true }];
+    conversationRepository.activeConversation = {
+      id: 'unavailable-model',
+      title: 'Saved locally',
+      createdAt: 1,
+      updatedAt: 2,
+      modelId: 'removed-model:latest',
+      messages: [{ id: 'message-1', role: 'user', content: 'Saved locally' }],
+    };
+    await facade.loadModels();
+    await facade.restoreConversation();
+
+    await facade.sendChatMessage('Continue with the fallback');
+
+    expect(conversationRepository.activeConversation?.modelId).toBe('removed-model:latest');
+    expect(client.requests[0].model).toBe('qwen3:8b');
+  });
+
+  it('keeps the global model preference when a refresh returns no models', async () => {
+    activeModelRepository.modelId = 'qwen3:8b';
+    client.models = [];
+
+    await facade.loadModels();
+
+    expect(facade.currentModel()).toBeNull();
+    expect(activeModelRepository.modelId).toBe('qwen3:8b');
   });
 
   it('opens one stored conversation without mixing it with the active history', async () => {
@@ -278,6 +422,22 @@ describe('ChatFacade', () => {
     ]);
     expect(client.requests[0].think).toBeTrue();
     expect(conversationRepository.activeConversation?.messages).toHaveSize(2);
+    expect(conversationRepository.activeConversation?.modelId).toBe('qwen3:8b');
+  });
+
+  it('persists an explicit model change to the active conversation', async () => {
+    client.models = [
+      { name: 'qwen3:8b', model: 'qwen3:8b', supportsThinking: true },
+      { name: 'llama3.1:8b', model: 'llama3.1:8b', supportsThinking: false },
+    ];
+    await facade.loadModels();
+    await facade.sendChatMessage('Hello');
+
+    await facade.setCurrentModel(client.models[1]);
+
+    expect(facade.currentModel()?.model).toBe('llama3.1:8b');
+    expect(activeModelRepository.modelId).toBe('llama3.1:8b');
+    expect(conversationRepository.activeConversation?.modelId).toBe('llama3.1:8b');
   });
 
   it('does not request thinking from a model that does not support it', async () => {

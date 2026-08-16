@@ -7,13 +7,18 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { AiModelDto } from '../models/ai-model.model';
 import { Message, SystemMessage } from '../models/message.model';
 import { OllamaClientService } from '../infrastructure/ollama-client.service';
+import { ActiveModelRepository } from '../infrastructure/active-model.repository';
 import { SystemPromptRepository } from '../infrastructure/system-prompt.repository';
-import { ConversationRepository, ConversationSummary } from '../infrastructure/conversation.repository';
+import {
+  ConversationRepository,
+  ConversationSummary,
+} from '../infrastructure/conversation.repository';
 import { ChatContextBuilder } from './chat-context-builder';
 
 @Injectable({ providedIn: 'root' })
 export class ChatFacade {
   private readonly ollamaClient = inject(OllamaClientService);
+  private readonly activeModelRepository = inject(ActiveModelRepository);
   private readonly promptRepository = inject(SystemPromptRepository);
   private readonly conversationRepository = inject(ConversationRepository);
   private readonly contextBuilder = inject(ChatContextBuilder);
@@ -27,12 +32,14 @@ export class ChatFacade {
   private readonly systemPrompts = signal<SystemMessage[]>([]);
   private readonly lastError = signal<string | null>(null);
   private readonly activeConversationId = signal<string | null>(null);
+  private readonly activeConversationModelId = signal<string | null>(null);
   private readonly storedConversations = signal<ConversationSummary[]>([]);
   private readonly loadingConversations = signal(false);
   private conversationRestore: Promise<void> = Promise.resolve();
   private activeReferenceUpdate: Promise<void> = Promise.resolve();
   private generationSequence = 0;
   private activeGenerationId: number | null = null;
+  private modelsLoaded = false;
 
   readonly aiModels = this.availableModels.asReadonly();
   readonly currentModel = this.selectedModel.asReadonly();
@@ -52,15 +59,14 @@ export class ChatFacade {
     try {
       const models = await this.ollamaClient.listModels();
       this.availableModels.set(models);
-
-      const current = this.selectedModel();
-      const refreshedCurrent = current && models.find((model) => model.model === current.model);
-      this.selectedModel.set(refreshedCurrent ?? models[0] ?? null);
+      this.modelsLoaded = true;
+      this.reconcileSelectedModel(models);
 
       if (models.length === 0) {
         this.lastError.set('No local Ollama models are available. Pull a model and refresh the list.');
       }
     } catch (error: unknown) {
+      this.modelsLoaded = false;
       this.availableModels.set([]);
       this.selectedModel.set(null);
       this.lastError.set(toUserMessage(error, 'Could not connect to the local Ollama server.'));
@@ -88,9 +94,15 @@ export class ChatFacade {
     this.systemPrompts.set([]);
   }
 
-  setCurrentModel(model: AiModelDto | null): void {
-    this.selectedModel.set(model);
+  async setCurrentModel(model: AiModelDto | null): Promise<void> {
+    const selected = model && this.availableModels().find(
+      (availableModel) => availableModel.model === model.model,
+    );
     this.lastError.set(null);
+    this.activateModel(selected ?? null);
+    if (selected) {
+      await this.persistSelectedModelForActiveConversation(selected.model);
+    }
   }
 
   async restoreConversation(): Promise<void> {
@@ -113,7 +125,9 @@ export class ChatFacade {
       }
       this.activeConversationId.set(conversation.id);
       this.messageHistory.set([...conversation.messages]);
+      this.activeConversationModelId.set(conversation.modelId ?? null);
       this.lastError.set(null);
+      this.reconcileSelectedModel();
     } catch (error: unknown) {
       this.lastError.set(toUserMessage(error, 'Could not open browser-local conversation history.'));
     } finally {
@@ -131,6 +145,7 @@ export class ChatFacade {
       await this.conversationRepository.delete(id);
       if (this.activeConversationId() === id) {
         this.activeConversationId.set(null);
+        this.activeConversationModelId.set(null);
         this.messageHistory.set([]);
       }
       await this.loadConversations();
@@ -150,6 +165,7 @@ export class ChatFacade {
     try {
       await this.conversationRepository.deleteAll();
       this.activeConversationId.set(null);
+      this.activeConversationModelId.set(null);
       this.messageHistory.set([]);
       this.storedConversations.set([]);
     } catch (error: unknown) {
@@ -233,6 +249,7 @@ export class ChatFacade {
     this.abortChatMessage();
     this.messageHistory.set([]);
     this.activeConversationId.set(null);
+    this.activeConversationModelId.set(null);
     this.activeReferenceUpdate = this.clearActiveConversation();
     this.resetPartialState();
     this.lastError.set(null);
@@ -328,18 +345,40 @@ export class ChatFacade {
     try {
       await this.activeReferenceUpdate;
       const activeConversationId = this.activeConversationId();
+      const selectedModel = this.selectedModel();
+      if (!selectedModel) {
+        this.lastError.set('Select an available Ollama model before sending a message.');
+        return null;
+      }
+
       if (!activeConversationId) {
-        const conversation = await this.conversationRepository.create(messages);
+        const conversation = await this.conversationRepository.create(messages, selectedModel.model);
         this.activeConversationId.set(conversation.id);
+        this.activeConversationModelId.set(conversation.modelId ?? selectedModel.model);
         await this.loadConversations();
         return [...conversation.messages];
+      }
+
+      if (this.activeConversationModelId() === null) {
+        const modelUpdated = await this.conversationRepository.updateModel(
+          activeConversationId,
+          selectedModel.model,
+        );
+        if (!modelUpdated) {
+          this.activeConversationId.set(null);
+          this.activeConversationModelId.set(null);
+          return this.persistHistory(messages);
+        }
+        this.activeConversationModelId.set(selectedModel.model);
       }
 
       const conversation = await this.conversationRepository.update(activeConversationId, messages);
       if (!conversation) {
         this.activeConversationId.set(null);
+        this.activeConversationModelId.set(null);
         return this.persistHistory(messages);
       }
+      this.activeConversationModelId.set(conversation.modelId ?? selectedModel.model);
       await this.loadConversations();
       return [...conversation.messages];
     } catch (error: unknown) {
@@ -361,7 +400,9 @@ export class ChatFacade {
     try {
       const conversation = await this.conversationRepository.readActive();
       this.activeConversationId.set(conversation?.id ?? null);
+      this.activeConversationModelId.set(conversation?.modelId ?? null);
       this.messageHistory.set(conversation ? [...conversation.messages] : []);
+      this.reconcileSelectedModel();
       await this.loadConversations();
     } catch (error: unknown) {
       this.lastError.set(toUserMessage(error, 'Could not restore browser-local conversation history.'));
@@ -372,6 +413,76 @@ export class ChatFacade {
 
   private async loadConversations(): Promise<void> {
     this.storedConversations.set(await this.conversationRepository.list());
+  }
+
+  private reconcileSelectedModel(models = this.availableModels()): void {
+    if (!this.modelsLoaded) {
+      return;
+    }
+
+    const conversationModelId = this.activeConversationModelId();
+    if (conversationModelId) {
+      const conversationModel = models.find((model) => model.model === conversationModelId);
+      if (conversationModel) {
+        this.activateModel(conversationModel);
+        return;
+      }
+
+      const fallback = models[0] ?? null;
+      this.activateModel(fallback, fallback !== null);
+      if (fallback) {
+        this.lastError.set(`The saved conversation model is unavailable. Switched to ${fallback.name}.`);
+      }
+      return;
+    }
+
+    const savedModelId = this.loadSavedModelId();
+    const savedModel = models.find((model) => model.model === savedModelId);
+    const selected = savedModel ?? models[0] ?? null;
+    this.activateModel(selected, selected !== null);
+  }
+
+  private activateModel(model: AiModelDto | null, persistSelection = true): void {
+    this.selectedModel.set(model);
+    if (!persistSelection) {
+      return;
+    }
+
+    try {
+      if (model) {
+        this.activeModelRepository.save(model.model);
+      } else {
+        this.activeModelRepository.clear();
+      }
+    } catch (error: unknown) {
+      this.lastError.set(toUserMessage(error, 'Could not save the active model selection.'));
+    }
+  }
+
+  private loadSavedModelId(): string | null {
+    try {
+      return this.activeModelRepository.load();
+    } catch (error: unknown) {
+      this.lastError.set(toUserMessage(error, 'Could not restore the active model selection.'));
+      return null;
+    }
+  }
+
+  private async persistSelectedModelForActiveConversation(modelId: string): Promise<void> {
+    const activeConversationId = this.activeConversationId();
+    if (!activeConversationId || this.activeConversationModelId() === modelId) {
+      return;
+    }
+
+    try {
+      const updated = await this.conversationRepository.updateModel(activeConversationId, modelId);
+      if (updated && this.activeConversationId() === activeConversationId) {
+        this.activeConversationModelId.set(modelId);
+        await this.loadConversations();
+      }
+    } catch (error: unknown) {
+      this.lastError.set(toUserMessage(error, 'Could not save the selected model for this conversation.'));
+    }
   }
 }
 
