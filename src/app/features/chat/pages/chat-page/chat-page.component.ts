@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { AfterViewChecked, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import {
@@ -9,6 +10,11 @@ import {
 } from '../../components/chat-page/chat-input/chat-input.component';
 import { ChatFacade } from '../../application/chat-facade.service';
 import { ChatMessageComponent } from '../../components/chat-page/chat-message/chat-message.component';
+import {
+  ConversationDeleteConfirmationComponent,
+  ConversationDeleteConfirmationData,
+} from '../../dialogs/conversation-delete-confirmation/conversation-delete-confirmation.component';
+import type { ConversationSummary } from '../../infrastructure/conversation.repository';
 
 @Component({
   selector: 'ollama-chat-chat-page',
@@ -27,16 +33,17 @@ import { ChatMessageComponent } from '../../components/chat-page/chat-message/ch
 export class ChatPageComponent implements AfterViewChecked, OnInit {
   @ViewChild('scrollContainer') scrollContainer?: ElementRef<HTMLDivElement>;
 
+  private readonly dialog = inject(MatDialog);
   readonly chatFacade = inject(ChatFacade);
   readonly messages = this.chatFacade.messageHistoryList;
   readonly partialResponse = this.chatFacade.partialResponse;
   readonly isLoading = this.chatFacade.isLoadingResponse;
   readonly partialThinking = this.chatFacade.partialThinking;
+  readonly currentModelSupportsThinking = this.chatFacade.currentModelSupportsThinking;
   readonly errorMessage = this.chatFacade.errorMessage;
   readonly conversations = this.chatFacade.conversations;
   readonly activeConversation = this.chatFacade.activeConversation;
   readonly isLoadingConversations = this.chatFacade.isLoadingConversations;
-  confirmDeleteAll = false;
 
   ngAfterViewChecked(): void {
     this.scrollToBottom();
@@ -57,20 +64,26 @@ export class ChatPageComponent implements AfterViewChecked, OnInit {
 
   onNewChat(): void {
     this.chatFacade.newChat();
-    this.confirmDeleteAll = false;
   }
 
   onOpenConversation(id: string): void {
     void this.chatFacade.openConversation(id);
   }
 
-  onDeleteConversation(id: string): void {
-    void this.chatFacade.deleteConversation(id);
+  onRequestDeleteConversation(conversation: ConversationSummary): void {
+    this.confirmDeletion({
+      heading: 'Delete conversation?',
+      message: `Delete "${conversation.title}" and its messages?`,
+      confirmLabel: 'Delete',
+    }, () => this.chatFacade.deleteConversation(conversation.id));
   }
 
-  onConfirmDeleteAll(): void {
-    void this.chatFacade.deleteAllConversations();
-    this.confirmDeleteAll = false;
+  onRequestDeleteAll(): void {
+    this.confirmDeletion({
+      heading: 'Delete all conversations?',
+      message: 'Delete all saved conversations and their messages?',
+      confirmLabel: 'Delete all',
+    }, () => this.chatFacade.deleteAllConversations());
   }
 
   currentConversationTitle(): string {
@@ -86,5 +99,18 @@ export class ChatPageComponent implements AfterViewChecked, OnInit {
     if (element) {
       element.scrollTop = element.scrollHeight;
     }
+  }
+
+  private confirmDeletion(
+    data: ConversationDeleteConfirmationData,
+    deleteConversations: () => Promise<void>,
+  ): void {
+    this.dialog.open(ConversationDeleteConfirmationComponent, { data })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (confirmed === true) {
+          void deleteConversations();
+        }
+      });
   }
 }

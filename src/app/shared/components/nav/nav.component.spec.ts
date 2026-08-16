@@ -12,7 +12,7 @@ describe('NavComponent', () => {
   let loadModels: jasmine.Spy;
   let setCurrentModel: jasmine.Spy;
 
-  const models: AiModelDto[] = [{ name: 'qwen3:8b', model: 'qwen3:8b' }];
+  const models: AiModelDto[] = [{ name: 'qwen3:8b', model: 'qwen3:8b', supportsThinking: true }];
 
   beforeEach(async () => {
     loadModels = jasmine.createSpy('loadModels').and.callFake(async () => undefined);

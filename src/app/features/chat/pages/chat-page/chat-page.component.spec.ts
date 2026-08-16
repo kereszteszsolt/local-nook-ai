@@ -1,19 +1,22 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { provideMarkdown } from 'ngx-markdown';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { of } from 'rxjs';
 import { ChatFacade } from '../../application/chat-facade.service';
 import { ChatPageComponent } from './chat-page.component';
 
 describe('ChatPageComponent', () => {
   let component: ChatPageComponent;
   let fixture: ComponentFixture<ChatPageComponent>;
+  let afterClosed: jasmine.Spy;
   let facade: {
     messageHistoryList: ReturnType<typeof signal>;
     partialResponse: ReturnType<typeof signal>;
     partialThinking: ReturnType<typeof signal>;
     isLoadingResponse: ReturnType<typeof signal>;
+    currentModelSupportsThinking: ReturnType<typeof signal>;
     errorMessage: ReturnType<typeof signal>;
     conversations: ReturnType<typeof signal>;
     activeConversation: ReturnType<typeof signal>;
@@ -35,6 +38,7 @@ describe('ChatPageComponent', () => {
       partialResponse: signal(''),
       partialThinking: signal(''),
       isLoadingResponse: signal(false),
+      currentModelSupportsThinking: signal(false),
       errorMessage: signal<string | null>(null),
       conversations: signal([]),
       activeConversation: signal<string | null>(null),
@@ -49,12 +53,17 @@ describe('ChatPageComponent', () => {
       deleteConversation: jasmine.createSpy('deleteConversation').and.resolveTo(),
       deleteAllConversations: jasmine.createSpy('deleteAllConversations').and.resolveTo(),
     };
+    const dialogRef = jasmine.createSpyObj<MatDialogRef<unknown, boolean>>('MatDialogRef', ['afterClosed']);
+    afterClosed = dialogRef.afterClosed.and.returnValue(of(true));
+    const dialog = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
+    dialog.open.and.returnValue(dialogRef);
 
     await TestBed.configureTestingModule({
-      imports: [ChatPageComponent, MatDialogModule, NoopAnimationsModule],
+      imports: [ChatPageComponent, NoopAnimationsModule],
       providers: [
         provideMarkdown(),
         { provide: ChatFacade, useValue: facade },
+        { provide: MatDialog, useValue: dialog },
       ],
     }).compileComponents();
 
@@ -73,13 +82,32 @@ describe('ChatPageComponent', () => {
     expect(facade.sendChatMessage).toHaveBeenCalledOnceWith('Hello', true);
   });
 
-  it('delegates conversation controls to the facade', () => {
+  it('delegates modal-confirmed conversation controls to the facade', () => {
+    const conversation = {
+      id: 'conversation-1',
+      title: 'Delete me',
+      createdAt: 1,
+      updatedAt: 2,
+    };
+
     component.onOpenConversation('conversation-1');
-    component.onDeleteConversation('conversation-1');
-    component.onConfirmDeleteAll();
+    component.onRequestDeleteConversation(conversation);
+    component.onRequestDeleteAll();
 
     expect(facade.openConversation).toHaveBeenCalledOnceWith('conversation-1');
     expect(facade.deleteConversation).toHaveBeenCalledOnceWith('conversation-1');
     expect(facade.deleteAllConversations).toHaveBeenCalledOnceWith();
+  });
+
+  it('does not delete a conversation when its modal is dismissed', () => {
+    afterClosed.and.returnValue(of(undefined));
+    component.onRequestDeleteConversation({
+      id: 'conversation-1',
+      title: 'Keep me',
+      createdAt: 1,
+      updatedAt: 2,
+    });
+
+    expect(facade.deleteConversation).not.toHaveBeenCalled();
   });
 });

@@ -23,6 +23,7 @@ import { Message, SystemMessage } from '../models/message.model';
 class FakeOllamaClientService {
   responseNumber = 0;
   pauseFirstResponse = false;
+  models: AiModelDto[] = [{ name: 'qwen3:8b', model: 'qwen3:8b', supportsThinking: true }];
   readonly requests: OllamaChatRequest[] = [];
   nextResponse: readonly OllamaChatChunk[] | null = null;
 
@@ -31,7 +32,7 @@ class FakeOllamaClientService {
   private firstRequestStartedPromise: Promise<void> = Promise.resolve();
 
   async listModels(): Promise<AiModelDto[]> {
-    return [{ name: 'qwen3:8b', model: 'qwen3:8b' }];
+    return this.models;
   }
 
   async *streamChat(request: OllamaChatRequest): AsyncGenerator<OllamaChatChunk> {
@@ -277,6 +278,16 @@ describe('ChatFacade', () => {
     ]);
     expect(client.requests[0].think).toBeTrue();
     expect(conversationRepository.activeConversation?.messages).toHaveSize(2);
+  });
+
+  it('does not request thinking from a model that does not support it', async () => {
+    client.models = [{ name: 'llama3.1:8b', model: 'llama3.1:8b', supportsThinking: false }];
+    await facade.loadModels();
+
+    await facade.sendChatMessage('Hello', true);
+
+    expect(client.requests[0].think).toBeFalse();
+    expect(facade.messageHistoryList()[0].think).toBeFalse();
   });
 
   it('surfaces storage failures without sending the request', async () => {

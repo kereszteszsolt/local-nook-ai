@@ -12,21 +12,13 @@
         <button mat-icon-button (click)="onNewChat()" [disabled]="isLoading()" matTooltip="Start new chat" aria-label="Start new chat">
           <mat-icon>add</mat-icon>
         </button>
-        <button mat-icon-button (click)="confirmDeleteAll = true" [disabled]="isLoading() || isLoadingConversations() || conversations().length === 0" matTooltip="Delete all conversations" aria-label="Delete all conversations">
+        <button mat-icon-button (click)="onRequestDeleteAll()" [disabled]="isLoading() || isLoadingConversations() || conversations().length === 0" matTooltip="Delete all conversations" aria-label="Delete all conversations">
           <mat-icon>delete_sweep</mat-icon>
         </button>
       </div>
     </div>
 
-    @if (confirmDeleteAll) {
-      <div class="flex flex-wrap items-center justify-between gap-2 text-sm text-text-primary" role="alertdialog" aria-label="Confirm deleting all conversations">
-        <span>Delete all saved conversations?</span>
-        <div class="flex items-center gap-1">
-          <button mat-button (click)="confirmDeleteAll = false">Cancel</button>
-          <button mat-button (click)="onConfirmDeleteAll()" class="text-danger">Delete all</button>
-        </div>
-      </div>
-    } @else if (isLoadingConversations()) {
+    @if (isLoadingConversations()) {
       <span class="text-sm text-text-muted" role="status">Loading conversations...</span>
     } @else if (conversations().length === 0) {
       <span class="text-sm text-text-muted">No saved conversations.</span>
@@ -46,7 +38,7 @@
                 <span class="text-xs text-text-muted">{{ conversation.updatedAt | date:'short' }}</span>
               </span>
             </button>
-            <button mat-icon-button class="shrink-0" (click)="onDeleteConversation(conversation.id); $event.stopPropagation()" [disabled]="isLoading()" matTooltip="Delete conversation" [attr.aria-label]="'Delete ' + conversation.title">
+            <button mat-icon-button class="shrink-0" (click)="onRequestDeleteConversation(conversation); $event.stopPropagation()" [disabled]="isLoading()" matTooltip="Delete conversation" [attr.aria-label]="'Delete ' + conversation.title">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -96,6 +88,7 @@
 
     <ollama-chat-chat-input
       [isLoading]="isLoading()"
+      [supportsThinking]="currentModelSupportsThinking()"
       (sendMessage)="onSendMessage($event)"
       (abort)="onAbortMessage()"
     />

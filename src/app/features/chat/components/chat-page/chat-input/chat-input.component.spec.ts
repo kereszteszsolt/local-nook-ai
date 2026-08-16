@@ -15,6 +15,7 @@ describe('ChatInputComponent', () => {
     fixture = TestBed.createComponent(ChatInputComponent);
     component = fixture.componentInstance;
     component.isLoading = false;
+    component.supportsThinking = true;
     fixture.detectChanges();
   });
 
@@ -28,5 +29,13 @@ describe('ChatInputComponent', () => {
 
     expect(emitted).toEqual([{ content: 'Hello', think: true }]);
     expect(component.currentMessage).toBe('');
+  });
+
+  it('turns off thinking when the selected model does not support it', () => {
+    component.thinkEnabled = true;
+    component.supportsThinking = false;
+
+    expect(component.thinkEnabled).toBeFalse();
+    expect(component.thinkingSupported).toBeFalse();
   });
 });

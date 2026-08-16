@@ -28,6 +28,14 @@ export interface ChatSubmitEvent {
 })
 export class ChatInputComponent {
   @Input({ required: true }) isLoading = false;
+  @Input({ required: true })
+  set supportsThinking(value: boolean) {
+    this.thinkingSupported = value;
+    if (!value) {
+      this.thinkEnabled = false;
+    }
+  }
+
   @Output() readonly sendMessage = new EventEmitter<ChatSubmitEvent>();
   @Output() readonly abort = new EventEmitter<void>();
 
@@ -35,6 +43,7 @@ export class ChatInputComponent {
 
   currentMessage = '';
   thinkEnabled = false;
+  thinkingSupported = false;
 
   onSendCurrentMessage(): void {
     const content = this.currentMessage.trim();

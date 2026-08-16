@@ -40,7 +40,11 @@ export class OllamaClientService {
     const response = await this.createClient().list();
     return response.models
       .filter((model) => supportsChat(model as OllamaModelWithCapabilities))
-      .map(({ name, model }) => ({ name, model }));
+      .map((model) => ({
+        name: model.name,
+        model: model.model,
+        supportsThinking: (model as OllamaModelWithCapabilities).capabilities?.includes('thinking') === true,
+      }));
   }
 
   async *streamChat(request: OllamaChatRequest): AsyncGenerator<OllamaChatChunk> {

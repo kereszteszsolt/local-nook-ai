@@ -16,7 +16,7 @@
       <button mat-icon-button (click)="onClearInput()" [disabled]="isLoading || !currentMessage.trim()" matTooltip="Clear input">
         <mat-icon>close</mat-icon>
       </button>
-      <mat-slide-toggle color="primary" [(ngModel)]="thinkEnabled" [disabled]="isLoading" class="relative top-[3px]" matTooltip="Enable or disable model thinking">
+      <mat-slide-toggle color="primary" [(ngModel)]="thinkEnabled" [disabled]="isLoading || !thinkingSupported" class="relative top-[3px]" [matTooltip]="thinkingSupported ? 'Enable or disable model thinking' : 'The selected model does not support thinking'">
         Thinking
       </mat-slide-toggle>
     </div>

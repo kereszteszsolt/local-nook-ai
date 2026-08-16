@@ -1,4 +1,5 @@
 export interface AiModelDto {
-  name: string;
-  model: string;
+  readonly name: string;
+  readonly model: string;
+  readonly supportsThinking: boolean;
 }

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { AiModelDto } from '../models/ai-model.model';
 import { Message, SystemMessage } from '../models/message.model';
 import { OllamaClientService } from '../infrastructure/ollama-client.service';
@@ -36,6 +36,7 @@ export class ChatFacade {
 
   readonly aiModels = this.availableModels.asReadonly();
   readonly currentModel = this.selectedModel.asReadonly();
+  readonly currentModelSupportsThinking = computed(() => this.selectedModel()?.supportsThinking === true);
   readonly messageHistoryList = this.messageHistory.asReadonly();
   readonly partialResponse = this.currentResponse.asReadonly();
   readonly partialThinking = this.currentThinking.asReadonly();
@@ -53,8 +54,8 @@ export class ChatFacade {
       this.availableModels.set(models);
 
       const current = this.selectedModel();
-      const stillAvailable = current && models.some((model) => model.model === current.model);
-      this.selectedModel.set(stillAvailable ? current : (models[0] ?? null));
+      const refreshedCurrent = current && models.find((model) => model.model === current.model);
+      this.selectedModel.set(refreshedCurrent ?? models[0] ?? null);
 
       if (models.length === 0) {
         this.lastError.set('No local Ollama models are available. Pull a model and refresh the list.');
@@ -170,9 +171,10 @@ export class ChatFacade {
     }
 
     const requestId = crypto.randomUUID();
+    const requestThinking = think && this.currentModelSupportsThinking();
     const nextHistory: Message[] = [
       ...this.messageHistory(),
-      { role: 'user', content, req_id: requestId, think },
+      { role: 'user', content, req_id: requestId, think: requestThinking },
     ];
     const persistedHistory = await this.persistHistory(nextHistory);
     if (!persistedHistory) {
@@ -180,7 +182,7 @@ export class ChatFacade {
     }
 
     this.messageHistory.set(persistedHistory);
-    await this.generateResponse(persistedHistory, requestId, think);
+    await this.generateResponse(persistedHistory, requestId, requestThinking);
   }
 
   async regenerateResponse(requestId: string): Promise<void> {
@@ -209,7 +211,11 @@ export class ChatFacade {
     }
 
     this.messageHistory.set(persistedHistory);
-    await this.generateResponse(persistedHistory, requestId, userMessage.think === true);
+    await this.generateResponse(
+      persistedHistory,
+      requestId,
+      userMessage.think === true && this.currentModelSupportsThinking(),
+    );
   }
 
   abortChatMessage(): void {
