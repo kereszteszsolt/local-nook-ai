@@ -3,7 +3,7 @@
 ## Current state
 
 - Conversation messages are stored in IndexedDB through `ConversationRepository` and the active conversation is restored on reload.
-- Each saved conversation stores its selected Ollama model identifier in the same IndexedDB record.
+- Each saved conversation stores its selected Ollama model identifier and thinking-toggle state in the same IndexedDB record.
 - System prompts are stored in localStorage through `SystemPromptRepository`.
 - The last active model identifier is stored in localStorage through `ActiveModelRepository` when no available conversation model takes precedence.
 - Malformed prompt data returns an empty list instead of breaking startup.
@@ -26,7 +26,7 @@ Regeneration truncates history after the selected original user message, then ge
 Release 0.2 provides browser-local conversation persistence with:
 
 - stable conversation IDs and timestamps;
-- an optional model identifier for backward-compatible conversation selection;
+- an optional model identifier and thinking-toggle state for backward-compatible conversation selection;
 - messages linked to one conversation;
 - explicit schema versioning;
 - list/open/create/update operations;

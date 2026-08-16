@@ -17,6 +17,7 @@ As a user, I want each saved conversation and the model selector to retain the i
 - [x] Persist an explicit model change to the active saved conversation.
 - [x] Keep legacy conversations without a saved model readable.
 - [x] Cover storage migration, selection, fallback, and conversation switching with focused tests.
+- [x] Save and restore the per-conversation thinking toggle state in IndexedDB.
 
 ## Verification
 
@@ -26,3 +27,4 @@ Run focused tests for changed behavior, `npm run build`, and `npm test -- --watc
 
 - Conversation records keep Ollama's stable `model` identifier; the global last selection uses a separate brand-independent localStorage key.
 - Focused test bundles compile; runtime tests need ChromeHeadless, and the existing production bundle budget still fails.
+- Thinking state is preserved per conversation while unsupported models keep the control disabled.

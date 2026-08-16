@@ -7,7 +7,7 @@ import { Injectable } from '@angular/core';
 import { Message } from '../models/message.model';
 
 export const CONVERSATION_DATABASE_NAME = 'local-ai-client.conversations';
-export const CONVERSATION_DATABASE_VERSION = 3;
+export const CONVERSATION_DATABASE_VERSION = 4;
 const CONVERSATIONS_STORE = 'conversations';
 const MESSAGES_STORE = 'messages';
 const METADATA_STORE = 'metadata';
@@ -22,11 +22,13 @@ export interface ConversationSummary {
 
 export interface StoredConversation extends ConversationSummary {
   readonly modelId?: string;
+  readonly thinkingEnabled?: boolean;
   readonly messages: readonly Message[];
 }
 
 interface ConversationRecord extends ConversationSummary {
   readonly modelId?: string;
+  readonly thinkingEnabled?: boolean;
 }
 
 interface MessageRecord extends Message {
@@ -42,7 +44,11 @@ interface MetadataRecord {
 
 @Injectable({ providedIn: 'root' })
 export class ConversationRepository {
-  async create(messages: readonly Message[], modelId?: string): Promise<StoredConversation> {
+  async create(
+    messages: readonly Message[],
+    modelId?: string,
+    thinkingEnabled = false,
+  ): Promise<StoredConversation> {
     const now = Date.now();
     const normalizedModelId = normalizeModelId(modelId);
     const conversation: ConversationRecord = {
@@ -51,6 +57,7 @@ export class ConversationRepository {
       createdAt: now,
       updatedAt: now,
       ...(normalizedModelId ? { modelId: normalizedModelId } : {}),
+      thinkingEnabled,
     };
     const persistedMessages = withStableMessageIds(messages);
     const database = await this.openDatabase();
@@ -170,6 +177,30 @@ export class ConversationRepository {
     const updated: ConversationRecord = {
       ...existing,
       modelId: normalizedModelId,
+      updatedAt: Date.now(),
+    };
+    await completeTransaction(database.transaction(CONVERSATIONS_STORE, 'readwrite'), (stores) => {
+      stores[CONVERSATIONS_STORE].put(updated);
+    });
+    database.close();
+    return true;
+  }
+
+  async updateThinkingEnabled(id: string, thinkingEnabled: boolean): Promise<boolean> {
+    const database = await this.openDatabase();
+    const readTransaction = database.transaction(CONVERSATIONS_STORE, 'readonly');
+    const existing = await requestResult<ConversationRecord | undefined>(
+      readTransaction.objectStore(CONVERSATIONS_STORE).get(id),
+    );
+    await transactionComplete(readTransaction);
+    if (!existing) {
+      database.close();
+      return false;
+    }
+
+    const updated: ConversationRecord = {
+      ...existing,
+      thinkingEnabled,
       updatedAt: Date.now(),
     };
     await completeTransaction(database.transaction(CONVERSATIONS_STORE, 'readwrite'), (stores) => {

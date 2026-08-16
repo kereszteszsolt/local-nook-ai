@@ -35,14 +35,15 @@ export class ChatInputComponent {
       this.thinkEnabled = false;
     }
   }
+  @Input() thinkEnabled = false;
 
   @Output() readonly sendMessage = new EventEmitter<ChatSubmitEvent>();
   @Output() readonly abort = new EventEmitter<void>();
+  @Output() readonly thinkEnabledChange = new EventEmitter<boolean>();
 
   private readonly dialog = inject(MatDialog);
 
   currentMessage = '';
-  thinkEnabled = false;
   thinkingSupported = false;
 
   onSendCurrentMessage(): void {
@@ -64,6 +65,11 @@ export class ChatInputComponent {
 
   onClearInput(): void {
     this.currentMessage = '';
+  }
+
+  onThinkingEnabledChange(enabled: boolean): void {
+    this.thinkEnabled = enabled;
+    this.thinkEnabledChange.emit(enabled);
   }
 
   onAbort(): void {

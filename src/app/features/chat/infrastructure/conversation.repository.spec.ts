@@ -25,7 +25,7 @@ describe('ConversationRepository', () => {
     const created = await repository.create([
       { role: 'user', content: 'First request', req_id: 'request-1' },
       { role: 'assistant', content: 'First response', ref_id: 'request-1' },
-    ], 'qwen3:8b');
+    ], 'qwen3:8b', true);
     const reloaded = await new ConversationRepository().readActive();
 
     expect(reloaded).toEqual(created);
@@ -35,6 +35,7 @@ describe('ConversationRepository', () => {
     ]);
     expect(reloaded?.messages.every((message) => Boolean(message.id))).toBeTrue();
     expect(reloaded?.modelId).toBe('qwen3:8b');
+    expect(reloaded?.thinkingEnabled).toBeTrue();
   });
 
   it('lists, updates, and deletes a conversation without leaving its active reference behind', async () => {
@@ -101,6 +102,20 @@ describe('ConversationRepository', () => {
 
     expect(updated).toBeTrue();
     expect(reloaded?.modelId).toBe('llama3.1:8b');
+    expect(reloaded?.messages).toEqual(created.messages);
+  });
+
+  it('updates the thinking setting without changing ordered messages', async () => {
+    const created = await repository.create([
+      { role: 'user', content: 'Keep this message' },
+      { role: 'assistant', content: 'Keep this response' },
+    ], 'qwen3:8b');
+
+    const updated = await repository.updateThinkingEnabled(created.id, true);
+    const reloaded = await repository.read(created.id);
+
+    expect(updated).toBeTrue();
+    expect(reloaded?.thinkingEnabled).toBeTrue();
     expect(reloaded?.messages).toEqual(created.messages);
   });
 

@@ -38,4 +38,14 @@ describe('ChatInputComponent', () => {
     expect(component.thinkEnabled).toBeFalse();
     expect(component.thinkingSupported).toBeFalse();
   });
+
+  it('emits changes to the conversation-owned thinking setting', () => {
+    const changes: boolean[] = [];
+    component.thinkEnabledChange.subscribe((enabled) => changes.push(enabled));
+
+    component.onThinkingEnabledChange(true);
+
+    expect(component.thinkEnabled).toBeTrue();
+    expect(changes).toEqual([true]);
+  });
 });

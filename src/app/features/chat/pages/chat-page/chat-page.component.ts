@@ -39,6 +39,7 @@ export class ChatPageComponent implements AfterViewChecked, OnInit {
   readonly isLoading = this.chatFacade.isLoadingResponse;
   readonly partialThinking = this.chatFacade.partialThinking;
   readonly currentModelSupportsThinking = this.chatFacade.currentModelSupportsThinking;
+  readonly thinkingEnabled = this.chatFacade.thinkingEnabled;
   readonly errorMessage = this.chatFacade.errorMessage;
   readonly conversations = this.chatFacade.conversations;
   readonly activeConversation = this.chatFacade.activeConversation;
@@ -55,6 +56,10 @@ export class ChatPageComponent implements AfterViewChecked, OnInit {
 
   onSendMessage(message: ChatSubmitEvent): void {
     void this.chatFacade.sendChatMessage(message.content, message.think);
+  }
+
+  onThinkingEnabledChange(enabled: boolean): void {
+    void this.chatFacade.setThinkingEnabled(enabled);
   }
 
   onAbortMessage(): void {

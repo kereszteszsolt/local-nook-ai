@@ -33,6 +33,7 @@ export class ChatFacade {
   private readonly lastError = signal<string | null>(null);
   private readonly activeConversationId = signal<string | null>(null);
   private readonly activeConversationModelId = signal<string | null>(null);
+  private readonly activeConversationThinkingEnabled = signal(false);
   private readonly storedConversations = signal<ConversationSummary[]>([]);
   private readonly loadingConversations = signal(false);
   private conversationRestore: Promise<void> = Promise.resolve();
@@ -51,6 +52,7 @@ export class ChatFacade {
   readonly systemPromptsSignal = this.systemPrompts.asReadonly();
   readonly errorMessage = this.lastError.asReadonly();
   readonly activeConversation = this.activeConversationId.asReadonly();
+  readonly thinkingEnabled = this.activeConversationThinkingEnabled.asReadonly();
   readonly conversations = this.storedConversations.asReadonly();
   readonly isLoadingConversations = this.loadingConversations.asReadonly();
 
@@ -105,6 +107,31 @@ export class ChatFacade {
     }
   }
 
+  async setThinkingEnabled(enabled: boolean): Promise<void> {
+    const thinkingEnabled = enabled === true;
+    this.activeConversationThinkingEnabled.set(thinkingEnabled);
+
+    const activeConversationId = this.activeConversationId();
+    if (!activeConversationId) {
+      return;
+    }
+
+    const pendingUpdate = this.activeReferenceUpdate.then(async () => {
+      const updated = await this.conversationRepository.updateThinkingEnabled(
+        activeConversationId,
+        thinkingEnabled,
+      );
+      if (!updated && this.activeConversationId() === activeConversationId) {
+        this.activeConversationId.set(null);
+        this.activeConversationModelId.set(null);
+      }
+    }).catch((error: unknown) => {
+      this.lastError.set(toUserMessage(error, 'Could not save the conversation thinking setting.'));
+    });
+    this.activeReferenceUpdate = pendingUpdate;
+    await pendingUpdate;
+  }
+
   async restoreConversation(): Promise<void> {
     this.conversationRestore = this.restoreActiveConversation();
     return this.conversationRestore;
@@ -126,6 +153,7 @@ export class ChatFacade {
       this.activeConversationId.set(conversation.id);
       this.messageHistory.set([...conversation.messages]);
       this.activeConversationModelId.set(conversation.modelId ?? null);
+      this.activeConversationThinkingEnabled.set(conversation.thinkingEnabled === true);
       this.lastError.set(null);
       this.reconcileSelectedModel();
     } catch (error: unknown) {
@@ -146,6 +174,7 @@ export class ChatFacade {
       if (this.activeConversationId() === id) {
         this.activeConversationId.set(null);
         this.activeConversationModelId.set(null);
+        this.activeConversationThinkingEnabled.set(false);
         this.messageHistory.set([]);
       }
       await this.loadConversations();
@@ -166,6 +195,7 @@ export class ChatFacade {
       await this.conversationRepository.deleteAll();
       this.activeConversationId.set(null);
       this.activeConversationModelId.set(null);
+      this.activeConversationThinkingEnabled.set(false);
       this.messageHistory.set([]);
       this.storedConversations.set([]);
     } catch (error: unknown) {
@@ -250,7 +280,8 @@ export class ChatFacade {
     this.messageHistory.set([]);
     this.activeConversationId.set(null);
     this.activeConversationModelId.set(null);
-    this.activeReferenceUpdate = this.clearActiveConversation();
+    this.activeConversationThinkingEnabled.set(false);
+    this.activeReferenceUpdate = this.activeReferenceUpdate.then(() => this.clearActiveConversation());
     this.resetPartialState();
     this.lastError.set(null);
   }
@@ -352,7 +383,11 @@ export class ChatFacade {
       }
 
       if (!activeConversationId) {
-        const conversation = await this.conversationRepository.create(messages, selectedModel.model);
+        const conversation = await this.conversationRepository.create(
+          messages,
+          selectedModel.model,
+          this.activeConversationThinkingEnabled(),
+        );
         this.activeConversationId.set(conversation.id);
         this.activeConversationModelId.set(conversation.modelId ?? selectedModel.model);
         await this.loadConversations();
@@ -401,6 +436,7 @@ export class ChatFacade {
       const conversation = await this.conversationRepository.readActive();
       this.activeConversationId.set(conversation?.id ?? null);
       this.activeConversationModelId.set(conversation?.modelId ?? null);
+      this.activeConversationThinkingEnabled.set(conversation?.thinkingEnabled === true);
       this.messageHistory.set(conversation ? [...conversation.messages] : []);
       this.reconcileSelectedModel();
       await this.loadConversations();

@@ -11,8 +11,8 @@ npm test -- --watch=false --browsers=ChromeHeadless
 
 - `ChatContextBuilder`: active prompt ordering, narrow model fields, and empty/system-history filtering.
 - `OllamaClientService`: official model mapping, streamed content/thinking/duration, and client cancellation.
-- `ChatFacade`: selected-model guard, persisted active/conversation model selection and fallback, completed response storage, thinking-only completion rejection, regeneration without duplicate user messages, and stale-chunk isolation after abort.
-- `ConversationRepository`: schema migration, message order, metadata-only model updates, and active-record cleanup.
+- `ChatFacade`: selected-model guard, persisted active/conversation model and thinking-toggle selection, fallback, completed response storage, thinking-only completion rejection, regeneration without duplicate user messages, and stale-chunk isolation after abort.
+- `ConversationRepository`: schema migration, message order, metadata-only model/thinking updates, and active-record cleanup.
 - `ActiveModelRepository`: browser-local active model persistence.
 - `SystemPromptRepository`: malformed data, entry validation, and legacy-key migration.
 - `ChatInputComponent`: typed composer event instead of serialized component payloads.

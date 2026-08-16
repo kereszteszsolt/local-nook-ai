@@ -113,7 +113,11 @@ class FakeConversationRepository {
   private nextConversation = 0;
   private readonly conversations = new Map<string, StoredConversation>();
 
-  async create(messages: readonly Message[], modelId?: string): Promise<StoredConversation> {
+  async create(
+    messages: readonly Message[],
+    modelId?: string,
+    thinkingEnabled = false,
+  ): Promise<StoredConversation> {
     this.throwWhenWritesFail();
     const now = Date.now();
     this.activeConversation = {
@@ -122,6 +126,7 @@ class FakeConversationRepository {
       createdAt: now,
       updatedAt: now,
       ...(modelId ? { modelId } : {}),
+      thinkingEnabled,
       messages: this.withMessageIds(messages),
     };
     this.conversations.set(this.activeConversation.id, this.activeConversation);
@@ -152,6 +157,25 @@ class FakeConversationRepository {
     const updated: StoredConversation = {
       ...conversation,
       modelId,
+      updatedAt: Date.now(),
+    };
+    this.conversations.set(id, updated);
+    if (this.activeConversation?.id === id) {
+      this.activeConversation = updated;
+    }
+    return true;
+  }
+
+  async updateThinkingEnabled(id: string, thinkingEnabled: boolean): Promise<boolean> {
+    this.throwWhenWritesFail();
+    const conversation = await this.read(id);
+    if (!conversation) {
+      return false;
+    }
+
+    const updated: StoredConversation = {
+      ...conversation,
+      thinkingEnabled,
       updatedAt: Date.now(),
     };
     this.conversations.set(id, updated);
@@ -438,6 +462,20 @@ describe('ChatFacade', () => {
     expect(facade.currentModel()?.model).toBe('llama3.1:8b');
     expect(activeModelRepository.modelId).toBe('llama3.1:8b');
     expect(conversationRepository.activeConversation?.modelId).toBe('llama3.1:8b');
+  });
+
+  it('persists and restores the thinking setting for the active conversation', async () => {
+    await facade.loadModels();
+    await facade.setThinkingEnabled(true);
+    await facade.sendChatMessage('Think this through', true);
+
+    expect(conversationRepository.activeConversation?.thinkingEnabled).toBeTrue();
+
+    await facade.setThinkingEnabled(false);
+    await facade.restoreConversation();
+
+    expect(conversationRepository.activeConversation?.thinkingEnabled).toBeFalse();
+    expect(facade.thinkingEnabled()).toBeFalse();
   });
 
   it('does not request thinking from a model that does not support it', async () => {

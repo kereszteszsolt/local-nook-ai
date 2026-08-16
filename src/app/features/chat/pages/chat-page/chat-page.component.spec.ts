@@ -17,6 +17,7 @@ describe('ChatPageComponent', () => {
     partialThinking: ReturnType<typeof signal>;
     isLoadingResponse: ReturnType<typeof signal>;
     currentModelSupportsThinking: ReturnType<typeof signal>;
+    thinkingEnabled: ReturnType<typeof signal>;
     errorMessage: ReturnType<typeof signal>;
     conversations: ReturnType<typeof signal>;
     activeConversation: ReturnType<typeof signal>;
@@ -24,6 +25,7 @@ describe('ChatPageComponent', () => {
     loadSystemPrompts: jasmine.Spy;
     restoreConversation: jasmine.Spy;
     sendChatMessage: jasmine.Spy;
+    setThinkingEnabled: jasmine.Spy;
     abortChatMessage: jasmine.Spy;
     newChat: jasmine.Spy;
     regenerateResponse: jasmine.Spy;
@@ -39,6 +41,7 @@ describe('ChatPageComponent', () => {
       partialThinking: signal(''),
       isLoadingResponse: signal(false),
       currentModelSupportsThinking: signal(false),
+      thinkingEnabled: signal(false),
       errorMessage: signal<string | null>(null),
       conversations: signal([]),
       activeConversation: signal<string | null>(null),
@@ -46,6 +49,7 @@ describe('ChatPageComponent', () => {
       loadSystemPrompts: jasmine.createSpy('loadSystemPrompts'),
       restoreConversation: jasmine.createSpy('restoreConversation').and.resolveTo(),
       sendChatMessage: jasmine.createSpy('sendChatMessage').and.resolveTo(),
+      setThinkingEnabled: jasmine.createSpy('setThinkingEnabled').and.resolveTo(),
       abortChatMessage: jasmine.createSpy('abortChatMessage'),
       newChat: jasmine.createSpy('newChat'),
       regenerateResponse: jasmine.createSpy('regenerateResponse').and.resolveTo(),
@@ -80,6 +84,12 @@ describe('ChatPageComponent', () => {
   it('passes the typed composer event to the facade', () => {
     component.onSendMessage({ content: 'Hello', think: true });
     expect(facade.sendChatMessage).toHaveBeenCalledOnceWith('Hello', true);
+  });
+
+  it('delegates the conversation thinking setting to the facade', () => {
+    component.onThinkingEnabledChange(true);
+
+    expect(facade.setThinkingEnabled).toHaveBeenCalledOnceWith(true);
   });
 
   it('delegates modal-confirmed conversation controls to the facade', () => {

@@ -90,6 +90,8 @@
     <ollama-chat-chat-input
       [isLoading]="isLoading()"
       [supportsThinking]="currentModelSupportsThinking()"
+      [thinkEnabled]="thinkingEnabled() && currentModelSupportsThinking()"
+      (thinkEnabledChange)="onThinkingEnabledChange($event)"
       (sendMessage)="onSendMessage($event)"
       (abort)="onAbortMessage()"
     />
