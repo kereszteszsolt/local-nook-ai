@@ -8,7 +8,7 @@ import { AiModelDto } from '../models/ai-model.model';
 import { Message, SystemMessage } from '../models/message.model';
 import { OllamaClientService } from '../infrastructure/ollama-client.service';
 import { SystemPromptRepository } from '../infrastructure/system-prompt.repository';
-import { ConversationRepository } from '../infrastructure/conversation.repository';
+import { ConversationRepository, ConversationSummary } from '../infrastructure/conversation.repository';
 import { ChatContextBuilder } from './chat-context-builder';
 
 @Injectable({ providedIn: 'root' })
@@ -27,6 +27,8 @@ export class ChatFacade {
   private readonly systemPrompts = signal<SystemMessage[]>([]);
   private readonly lastError = signal<string | null>(null);
   private readonly activeConversationId = signal<string | null>(null);
+  private readonly storedConversations = signal<ConversationSummary[]>([]);
+  private readonly loadingConversations = signal(false);
   private conversationRestore: Promise<void> = Promise.resolve();
   private activeReferenceUpdate: Promise<void> = Promise.resolve();
   private generationSequence = 0;
@@ -40,6 +42,9 @@ export class ChatFacade {
   readonly isLoadingResponse = this.loadingResponse.asReadonly();
   readonly systemPromptsSignal = this.systemPrompts.asReadonly();
   readonly errorMessage = this.lastError.asReadonly();
+  readonly activeConversation = this.activeConversationId.asReadonly();
+  readonly conversations = this.storedConversations.asReadonly();
+  readonly isLoadingConversations = this.loadingConversations.asReadonly();
 
   async loadModels(): Promise<void> {
     this.lastError.set(null);
@@ -90,6 +95,67 @@ export class ChatFacade {
   async restoreConversation(): Promise<void> {
     this.conversationRestore = this.restoreActiveConversation();
     return this.conversationRestore;
+  }
+
+  async openConversation(id: string): Promise<void> {
+    if (this.loadingResponse()) {
+      return;
+    }
+
+    this.loadingConversations.set(true);
+    try {
+      const conversation = await this.conversationRepository.read(id);
+      if (!conversation || !await this.conversationRepository.setActive(id)) {
+        await this.loadConversations();
+        this.lastError.set('This conversation is no longer available.');
+        return;
+      }
+      this.activeConversationId.set(conversation.id);
+      this.messageHistory.set([...conversation.messages]);
+      this.lastError.set(null);
+    } catch (error: unknown) {
+      this.lastError.set(toUserMessage(error, 'Could not open browser-local conversation history.'));
+    } finally {
+      this.loadingConversations.set(false);
+    }
+  }
+
+  async deleteConversation(id: string): Promise<void> {
+    if (this.loadingResponse()) {
+      return;
+    }
+
+    this.loadingConversations.set(true);
+    try {
+      await this.conversationRepository.delete(id);
+      if (this.activeConversationId() === id) {
+        this.activeConversationId.set(null);
+        this.messageHistory.set([]);
+      }
+      await this.loadConversations();
+    } catch (error: unknown) {
+      this.lastError.set(toUserMessage(error, 'Could not delete browser-local conversation history.'));
+    } finally {
+      this.loadingConversations.set(false);
+    }
+  }
+
+  async deleteAllConversations(): Promise<void> {
+    if (this.loadingResponse()) {
+      return;
+    }
+
+    this.loadingConversations.set(true);
+    try {
+      await this.conversationRepository.deleteAll();
+      this.activeConversationId.set(null);
+      this.messageHistory.set([]);
+      this.storedConversations.set([]);
+    } catch (error: unknown) {
+      this.lastError.set(toUserMessage(error, 'Could not delete browser-local conversation history.'));
+    } finally {
+      this.loadingConversations.set(false);
+    }
   }
 
   async sendChatMessage(userInput: string, think = false): Promise<void> {
@@ -259,6 +325,7 @@ export class ChatFacade {
       if (!activeConversationId) {
         const conversation = await this.conversationRepository.create(messages);
         this.activeConversationId.set(conversation.id);
+        await this.loadConversations();
         return [...conversation.messages];
       }
 
@@ -267,6 +334,7 @@ export class ChatFacade {
         this.activeConversationId.set(null);
         return this.persistHistory(messages);
       }
+      await this.loadConversations();
       return [...conversation.messages];
     } catch (error: unknown) {
       this.lastError.set(toUserMessage(error, 'Could not save browser-local conversation history.'));
@@ -283,13 +351,21 @@ export class ChatFacade {
   }
 
   private async restoreActiveConversation(): Promise<void> {
+    this.loadingConversations.set(true);
     try {
       const conversation = await this.conversationRepository.readActive();
       this.activeConversationId.set(conversation?.id ?? null);
       this.messageHistory.set(conversation ? [...conversation.messages] : []);
+      await this.loadConversations();
     } catch (error: unknown) {
       this.lastError.set(toUserMessage(error, 'Could not restore browser-local conversation history.'));
+    } finally {
+      this.loadingConversations.set(false);
     }
+  }
+
+  private async loadConversations(): Promise<void> {
+    this.storedConversations.set(await this.conversationRepository.list());
   }
 }
 

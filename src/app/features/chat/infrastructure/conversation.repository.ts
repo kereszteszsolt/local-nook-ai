@@ -7,7 +7,7 @@ import { Injectable } from '@angular/core';
 import { Message } from '../models/message.model';
 
 export const CONVERSATION_DATABASE_NAME = 'local-ai-client.conversations';
-export const CONVERSATION_DATABASE_VERSION = 1;
+export const CONVERSATION_DATABASE_VERSION = 2;
 const CONVERSATIONS_STORE = 'conversations';
 const MESSAGES_STORE = 'messages';
 const METADATA_STORE = 'metadata';
@@ -15,6 +15,7 @@ const ACTIVE_CONVERSATION_KEY = 'active-conversation-id';
 
 export interface ConversationSummary {
   readonly id: string;
+  readonly title: string;
   readonly createdAt: number;
   readonly updatedAt: number;
 }
@@ -42,6 +43,7 @@ export class ConversationRepository {
     const now = Date.now();
     const conversation: ConversationRecord = {
       id: crypto.randomUUID(),
+      title: titleFromMessages(messages),
       createdAt: now,
       updatedAt: now,
     };
@@ -71,7 +73,7 @@ export class ConversationRepository {
     database.close();
 
     return records
-      .map(({ id, createdAt, updatedAt }) => ({ id, createdAt, updatedAt }))
+      .map(({ id, title, createdAt, updatedAt }) => ({ id, title, createdAt, updatedAt }))
       .sort((left, right) => right.updatedAt - left.updatedAt);
   }
 
@@ -123,7 +125,11 @@ export class ConversationRepository {
       return null;
     }
 
-    const updated: ConversationRecord = { ...existing, updatedAt: Date.now() };
+    const updated: ConversationRecord = {
+      ...existing,
+      title: titleFromMessages(messages),
+      updatedAt: Date.now(),
+    };
     const persistedMessages = withStableMessageIds(messages);
     await completeTransaction(database.transaction(
       [CONVERSATIONS_STORE, MESSAGES_STORE, METADATA_STORE],
@@ -177,6 +183,19 @@ export class ConversationRepository {
     database.close();
   }
 
+  async setActive(id: string): Promise<boolean> {
+    if (!await this.read(id)) {
+      return false;
+    }
+
+    const database = await this.openDatabase();
+    await completeTransaction(database.transaction(METADATA_STORE, 'readwrite'), (stores) => {
+      stores[METADATA_STORE].put({ key: ACTIVE_CONVERSATION_KEY, value: id });
+    });
+    database.close();
+    return true;
+  }
+
   async clearActive(): Promise<void> {
     const database = await this.openDatabase();
     await completeTransaction(database.transaction(METADATA_STORE, 'readwrite'), (stores) => {
@@ -189,7 +208,7 @@ export class ConversationRepository {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(CONVERSATION_DATABASE_NAME, CONVERSATION_DATABASE_VERSION);
       request.onerror = () => reject(request.error ?? new Error('Could not open conversation storage.'));
-      request.onupgradeneeded = () => {
+      request.onupgradeneeded = (event) => {
         const database = request.result;
         if (!database.objectStoreNames.contains(CONVERSATIONS_STORE)) {
           database.createObjectStore(CONVERSATIONS_STORE, { keyPath: 'id' });
@@ -200,6 +219,16 @@ export class ConversationRepository {
         }
         if (!database.objectStoreNames.contains(METADATA_STORE)) {
           database.createObjectStore(METADATA_STORE, { keyPath: 'key' });
+        }
+        if ((event as IDBVersionChangeEvent).oldVersion < 2) {
+          const conversations = request.transaction?.objectStore(CONVERSATIONS_STORE);
+          conversations?.openCursor().addEventListener('success', (event) => {
+            const cursor = (event.target as IDBRequest<IDBCursorWithValue | null>).result;
+            if (cursor) {
+              cursor.update({ ...cursor.value, title: 'Untitled conversation' });
+              cursor.continue();
+            }
+          });
         }
       };
       request.onsuccess = () => resolve(request.result);
@@ -241,6 +270,13 @@ function toMessage({ id, conversationId, sequence, ...message }: MessageRecord):
 
 function withStableMessageIds(messages: readonly Message[]): Message[] {
   return messages.map((message) => ({ ...message, id: message.id ?? crypto.randomUUID() }));
+}
+
+function titleFromMessages(messages: readonly Message[]): string {
+  const firstUserMessage = messages.find(
+    (message) => message.role === 'user' && message.content.trim().length > 0,
+  );
+  return firstUserMessage?.content.trim().slice(0, 80) || 'Untitled conversation';
 }
 
 function requestResult<T>(request: IDBRequest<T>): Promise<T> {

@@ -66,6 +66,19 @@ describe('ConversationRepository', () => {
     database.close();
   });
 
+  it('upgrades version-one conversations with a usable fallback title', async () => {
+    await createVersionOneDatabase();
+
+    const conversations = await repository.list();
+
+    expect(conversations).toEqual([{
+      id: 'legacy-conversation',
+      title: 'Untitled conversation',
+      createdAt: 1,
+      updatedAt: 2,
+    }]);
+  });
+
   it('deletes all conversations and clears the active reference', async () => {
     await repository.create([{ role: 'user', content: 'First conversation' }]);
     await repository.create([{ role: 'user', content: 'Second conversation' }]);
@@ -101,5 +114,28 @@ function deleteConversationDatabase(): Promise<void> {
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
     request.onblocked = () => reject(new Error('Conversation test database is still open.'));
+  });
+}
+
+function createVersionOneDatabase(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(CONVERSATION_DATABASE_NAME, 1);
+    request.onupgradeneeded = () => {
+      const database = request.result;
+      database.createObjectStore('conversations', { keyPath: 'id' });
+      const messages = database.createObjectStore('messages', { keyPath: 'id' });
+      messages.createIndex('by-conversation-id', 'conversationId');
+      database.createObjectStore('metadata', { keyPath: 'key' });
+      request.transaction?.objectStore('conversations').add({
+        id: 'legacy-conversation',
+        createdAt: 1,
+        updatedAt: 2,
+      });
+    };
+    request.onsuccess = () => {
+      request.result.close();
+      resolve();
+    };
+    request.onerror = () => reject(request.error);
   });
 }

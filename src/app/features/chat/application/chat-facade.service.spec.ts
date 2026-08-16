@@ -12,7 +12,11 @@ import {
   OllamaClientService,
 } from '../infrastructure/ollama-client.service';
 import { SystemPromptRepository } from '../infrastructure/system-prompt.repository';
-import { ConversationRepository, StoredConversation } from '../infrastructure/conversation.repository';
+import {
+  ConversationRepository,
+  ConversationSummary,
+  StoredConversation,
+} from '../infrastructure/conversation.repository';
 import { AiModelDto } from '../models/ai-model.model';
 import { Message, SystemMessage } from '../models/message.model';
 
@@ -89,16 +93,19 @@ class FakeConversationRepository {
   activeConversation: StoredConversation | null = null;
   failWrites = false;
   private nextConversation = 0;
+  private readonly conversations = new Map<string, StoredConversation>();
 
   async create(messages: readonly Message[]): Promise<StoredConversation> {
     this.throwWhenWritesFail();
     const now = Date.now();
     this.activeConversation = {
       id: `conversation-${++this.nextConversation}`,
+      title: 'Test conversation',
       createdAt: now,
       updatedAt: now,
       messages: this.withMessageIds(messages),
     };
+    this.conversations.set(this.activeConversation.id, this.activeConversation);
     return this.activeConversation;
   }
 
@@ -112,7 +119,23 @@ class FakeConversationRepository {
       updatedAt: Date.now(),
       messages: this.withMessageIds(messages),
     };
-    return this.activeConversation;
+    this.conversations.set(id, this.activeConversation);
+    return this.activeConversation!;
+  }
+
+  async list(): Promise<ConversationSummary[]> {
+    const conversations = new Map(this.conversations);
+    if (this.activeConversation) {
+      conversations.set(this.activeConversation.id, this.activeConversation);
+    }
+    return [...conversations.values()]
+      .map(({ id, title, createdAt, updatedAt }) => ({ id, title, createdAt, updatedAt }));
+  }
+
+  async read(id: string): Promise<StoredConversation | null> {
+    return this.activeConversation?.id === id
+      ? this.activeConversation
+      : (this.conversations.get(id) ?? null);
   }
 
   async readActive(): Promise<StoredConversation | null> {
@@ -121,6 +144,29 @@ class FakeConversationRepository {
 
   async clearActive(): Promise<void> {
     this.throwWhenWritesFail();
+    this.activeConversation = null;
+  }
+
+  async setActive(id: string): Promise<boolean> {
+    const conversation = await this.read(id);
+    if (!conversation) {
+      return false;
+    }
+    this.activeConversation = conversation;
+    return true;
+  }
+
+  async delete(id: string): Promise<void> {
+    this.throwWhenWritesFail();
+    this.conversations.delete(id);
+    if (this.activeConversation?.id === id) {
+      this.activeConversation = null;
+    }
+  }
+
+  async deleteAll(): Promise<void> {
+    this.throwWhenWritesFail();
+    this.conversations.clear();
     this.activeConversation = null;
   }
 
@@ -166,6 +212,7 @@ describe('ChatFacade', () => {
   it('restores only the active persisted conversation after reload', async () => {
     conversationRepository.activeConversation = {
       id: 'active-conversation',
+      title: 'Saved locally',
       createdAt: 1,
       updatedAt: 2,
       messages: [{ id: 'message-1', role: 'user', content: 'Saved locally' }],
@@ -175,6 +222,48 @@ describe('ChatFacade', () => {
 
     expect(facade.messageHistoryList()).toEqual([
       { id: 'message-1', role: 'user', content: 'Saved locally' },
+    ]);
+  });
+
+  it('opens one stored conversation without mixing it with the active history', async () => {
+    const first = await conversationRepository.create([
+      { role: 'user', content: 'First conversation' },
+    ]);
+    await conversationRepository.create([{ role: 'user', content: 'Second conversation' }]);
+    await facade.restoreConversation();
+
+    await facade.openConversation(first.id);
+
+    expect(facade.messageHistoryList().map((message) => message.content)).toEqual([
+      'First conversation',
+    ]);
+    expect(facade.conversations()).toHaveSize(2);
+  });
+
+  it('clears active state when deleting the active conversation or all conversations', async () => {
+    const first = await conversationRepository.create([{ role: 'user', content: 'First' }]);
+    await conversationRepository.create([{ role: 'user', content: 'Second' }]);
+    await facade.restoreConversation();
+
+    await facade.deleteConversation('conversation-2');
+    await facade.openConversation(first.id);
+    await facade.deleteAllConversations();
+
+    expect(facade.messageHistoryList()).toEqual([]);
+    expect(facade.activeConversation()).toBeNull();
+    expect(facade.conversations()).toEqual([]);
+  });
+
+  it('creates a new conversation without overwriting the previous one', async () => {
+    await facade.loadModels();
+    await facade.sendChatMessage('First conversation');
+    facade.newChat();
+    await facade.sendChatMessage('Second conversation');
+
+    expect(facade.conversations()).toHaveSize(2);
+    expect(facade.messageHistoryList().map((message) => message.content)).toEqual([
+      'Second conversation',
+      'response-2',
     ]);
   });
 

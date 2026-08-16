@@ -1,4 +1,8 @@
+import { DatePipe } from '@angular/common';
 import { AfterViewChecked, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
 import {
   ChatInputComponent,
   ChatSubmitEvent,
@@ -8,7 +12,15 @@ import { ChatMessageComponent } from '../../components/chat-page/chat-message/ch
 
 @Component({
   selector: 'ollama-chat-chat-page',
-  imports: [ChatInputComponent, ChatMessageComponent],
+  imports: [
+    ChatInputComponent,
+    ChatMessageComponent,
+    DatePipe,
+    MatButton,
+    MatIconButton,
+    MatIcon,
+    MatTooltip,
+  ],
   templateUrl: './chat-page.component.html',
   styleUrl: './chat-page.component.scss',
 })
@@ -21,6 +33,10 @@ export class ChatPageComponent implements AfterViewChecked, OnInit {
   readonly isLoading = this.chatFacade.isLoadingResponse;
   readonly partialThinking = this.chatFacade.partialThinking;
   readonly errorMessage = this.chatFacade.errorMessage;
+  readonly conversations = this.chatFacade.conversations;
+  readonly activeConversation = this.chatFacade.activeConversation;
+  readonly isLoadingConversations = this.chatFacade.isLoadingConversations;
+  confirmDeleteAll = false;
 
   ngAfterViewChecked(): void {
     this.scrollToBottom();
@@ -41,6 +57,20 @@ export class ChatPageComponent implements AfterViewChecked, OnInit {
 
   onNewChat(): void {
     this.chatFacade.newChat();
+    this.confirmDeleteAll = false;
+  }
+
+  onOpenConversation(id: string): void {
+    void this.chatFacade.openConversation(id);
+  }
+
+  onDeleteConversation(id: string): void {
+    void this.chatFacade.deleteConversation(id);
+  }
+
+  onConfirmDeleteAll(): void {
+    void this.chatFacade.deleteAllConversations();
+    this.confirmDeleteAll = false;
   }
 
   onRegenerateMessage(requestId: string): void {
