@@ -23,6 +23,7 @@ This release improves the supplied MVP without turning it into a backend-heavy o
 | [LAC-020](stories/LAC-020-thinking-display.md) | Refine the thinking display | Implemented |
 | [LAC-021](stories/LAC-021-conversation-model-selection.md) | Persist conversation model selection | Implemented |
 | [LAC-022](stories/LAC-022-vega-lite-visualizations.md) | Render Vega-Lite data visualizations | Implemented |
+| [LAC-023](stories/LAC-023-built-in-system-prompts.md) | Add a built-in rich-rendering prompt and migrate prompt storage | Implemented |
 
 ## Ordering
 

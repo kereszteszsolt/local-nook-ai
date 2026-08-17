@@ -4,17 +4,19 @@
 
 - Conversation messages are stored in IndexedDB through `ConversationRepository` and the active conversation is restored on reload.
 - Each saved conversation stores its selected Ollama model identifier and thinking-toggle state in the same IndexedDB record.
-- System prompts are stored in localStorage through `SystemPromptRepository`.
+- System prompts are stored through `SystemPromptRepository` in the dedicated, brand-independent `local-ai-client.system-prompts` IndexedDB database.
 - The last active model identifier is stored in localStorage through `ActiveModelRepository` when no available conversation model takes precedence.
-- Malformed prompt data returns an empty list instead of breaking startup.
-- A legacy prompt key is read and migrated to `local-ai-client.system-prompts.v1`.
-- The storage key is deliberately independent of the display brand.
+- A canonical LocalNook rich-response prompt is seeded active by default. Its activation may change, but its instructions cannot be edited, deleted, or replaced by an import.
+- Custom prompts retain folders, CRUD, import/export, and permanent deletion. The built-in prompt is not in a custom folder and is therefore unaffected by folder deletion.
+- The former `local-ai-client.system-prompts.v1` key is read once, falling back to `ollama-chat-system-prompts`; valid prompts retain their active state and order. Source keys are removed only after the IndexedDB transaction succeeds.
+- Prompt records have explicit positions: an active built-in prompt is first, followed by active custom prompts in stored order.
+- The database name, keys, and stable IDs are deliberately independent of the display brand.
 
 ## Model context
 
 `ChatContextBuilder` produces a new model request array for every generation:
 
-1. active, non-empty system prompts;
+1. active, non-empty system prompts, with the built-in prompt first when active;
 2. non-empty user and assistant messages from the current in-memory chat.
 
 Only `role` and `content` are copied. Request IDs, response references, durations, thinking toggles, editing state, folder metadata, and persistence metadata stay inside the application.

@@ -3,6 +3,7 @@ import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from '
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {SystemMessage} from '../../models/message.model';
 import {ChatFacade} from '../../application/chat-facade.service';
+import {BUILT_IN_SYSTEM_PROMPT_ID} from '../../infrastructure/system-prompt.repository';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatIcon} from '@angular/material/icon';
@@ -41,20 +42,59 @@ export class SystemPromptSettingsComponent implements OnInit {
   readonly chatFacade = inject(ChatFacade);
   readonly snackBar = inject(MatSnackBar);
   systemPrompts: (SystemMessage & { editing?: boolean })[] = [];
+  builtInPrompt: SystemMessage | null = null;
   folders: string[] = [];
   editedFolderName: string = '';
   folderEditing: Record<string, boolean> = {};
+  loading = false;
+  storageError: string | null = null;
+  showBuiltInInstructions = false;
+  private editingPromptId: string | null = null;
 
   @ViewChild('folderNameInput') folderNameInput?: ElementRef<HTMLInputElement>;
 
   ngOnInit(): void {
-    this.loadPrompts();
+    void this.loadPrompts();
   }
 
-  loadPrompts(): void {
-    this.chatFacade.loadSystemPrompts();
-    this.systemPrompts = [...this.chatFacade.systemPromptsSignal()].map(p => ({...p, editing: false}));
+  async loadPrompts(): Promise<void> {
+    this.loading = true;
+    this.storageError = null;
+    await this.chatFacade.loadSystemPrompts();
+    this.loading = false;
+    if (this.chatFacade.systemPromptStorageError()) {
+      this.storageError = this.chatFacade.systemPromptStorageError();
+      return;
+    }
+    this.syncFromFacade();
+  }
+
+  private syncFromFacade(): void {
+    const prompts = this.chatFacade.systemPromptsSignal();
+    this.builtInPrompt = prompts.find(prompt => prompt.sys_msg_id === BUILT_IN_SYSTEM_PROMPT_ID) ?? null;
+    this.systemPrompts = prompts
+      .filter(prompt => prompt.sys_msg_id !== BUILT_IN_SYSTEM_PROMPT_ID)
+      .map(prompt => ({...prompt, editing: prompt.sys_msg_id === this.editingPromptId}));
     this.updateFolders();
+  }
+
+  private persistPrompts(): void {
+    if (this.loading) {
+      return;
+    }
+    this.loading = true;
+    this.storageError = null;
+    const prompts = this.builtInPrompt ? [this.builtInPrompt, ...this.systemPrompts] : this.systemPrompts;
+    void this.chatFacade.saveSystemPrompts(prompts)
+      .then(() => this.syncFromFacade())
+      .catch(() => {
+        this.storageError = this.chatFacade.systemPromptStorageError() ?? 'Could not save browser-local system prompts.';
+        this.syncFromFacade();
+        this.snackBar.open(this.storageError, 'Close', {duration: 5000});
+      })
+      .finally(() => {
+        this.loading = false;
+      });
   }
 
   updateFolders(): void {
@@ -80,7 +120,7 @@ export class SystemPromptSettingsComponent implements OnInit {
       p.folder === oldFolder ? {...p, folder: newName} : p
     );
     this.updateFolders();
-    this.chatFacade.saveSystemPrompts(this.systemPrompts);
+    this.persistPrompts();
     this.folderEditing = {...this.folderEditing, [oldFolder]: false};
   }
 
@@ -97,8 +137,9 @@ export class SystemPromptSettingsComponent implements OnInit {
       editing: true,
     };
     this.systemPrompts = [...this.systemPrompts, newPrompt];
+    this.editingPromptId = newPrompt.sys_msg_id;
     this.updateFolders();
-    this.chatFacade.saveSystemPrompts(this.systemPrompts);
+    this.persistPrompts();
   }
 
   addNewPrompt(folder: string): void {
@@ -111,46 +152,77 @@ export class SystemPromptSettingsComponent implements OnInit {
       editing: true,
     };
     this.systemPrompts = [...this.systemPrompts, newPrompt];
-    this.chatFacade.saveSystemPrompts(this.systemPrompts);
+    this.editingPromptId = newPrompt.sys_msg_id;
+    this.persistPrompts();
   }
 
   editPrompt(index: number): void {
+    this.editingPromptId = this.systemPrompts[index]?.sys_msg_id ?? null;
     this.systemPrompts = this.systemPrompts.map((p, i) =>
       i === index ? {...p, editing: true} : p
     );
   }
 
   savePrompt(index: number): void {
+    if (this.systemPrompts[index]?.sys_msg_id === this.editingPromptId) {
+      this.editingPromptId = null;
+    }
     this.systemPrompts = this.systemPrompts.map((p, i) =>
       i === index ? {...p, editing: false} : p
     );
-    this.chatFacade.saveSystemPrompts(this.systemPrompts);
+    this.persistPrompts();
   }
 
   removePrompt(index: number): void {
     this.systemPrompts = this.systemPrompts.filter((_, i) => i !== index);
     this.updateFolders();
-    this.chatFacade.saveSystemPrompts(this.systemPrompts);
+    this.persistPrompts();
   }
 
   toggleActive(index: number): void {
     this.systemPrompts = this.systemPrompts.map((p, i) =>
       i === index ? {...p, active: !p.active} : p
     );
-    this.chatFacade.saveSystemPrompts(this.systemPrompts);
+    this.persistPrompts();
   }
 
   toggleAllActive(folder: string, active: boolean): void {
     this.systemPrompts = this.systemPrompts.map(p =>
       p.folder === folder ? {...p, active} : p
     );
-    this.chatFacade.saveSystemPrompts(this.systemPrompts);
+    this.persistPrompts();
   }
 
   clearFolder(folder: string): void {
     this.systemPrompts = this.systemPrompts.filter(p => p.folder !== folder);
     this.updateFolders();
-    this.chatFacade.saveSystemPrompts(this.systemPrompts);
+    this.persistPrompts();
+  }
+
+  toggleBuiltInActive(): void {
+    if (!this.builtInPrompt || this.loading) {
+      return;
+    }
+    this.builtInPrompt = {...this.builtInPrompt, active: !this.builtInPrompt.active};
+    this.persistPrompts();
+  }
+
+  restoreBuiltInInstructions(): void {
+    if (this.loading) {
+      return;
+    }
+    this.loading = true;
+    this.storageError = null;
+    void this.chatFacade.restoreBuiltInSystemPrompt()
+      .then(() => this.syncFromFacade())
+      .catch(() => {
+        this.storageError = this.chatFacade.systemPromptStorageError() ?? 'Could not restore the LocalNook default prompt.';
+        this.syncFromFacade();
+        this.snackBar.open(this.storageError, 'Close', {duration: 5000});
+      })
+      .finally(() => {
+        this.loading = false;
+      });
   }
 
   closeDialog(): void {
@@ -203,7 +275,7 @@ export class SystemPromptSettingsComponent implements OnInit {
     if (newPrompts.length) {
       this.systemPrompts = [...this.systemPrompts, ...newPrompts];
       this.updateFolders();
-      this.chatFacade.saveSystemPrompts(this.systemPrompts);
+      this.persistPrompts();
       this.snackBar.open(`Imported ${newPrompts.length} prompts.`, 'Close', {duration: 3000});
     } else {
       this.snackBar.open('No valid prompts found in CSV.', 'Close', {duration: 3000});
@@ -294,7 +366,7 @@ export class SystemPromptSettingsComponent implements OnInit {
       if (newPrompts.length) {
         this.systemPrompts = [...this.systemPrompts, ...newPrompts];
         this.updateFolders();
-        this.chatFacade.saveSystemPrompts(this.systemPrompts);
+        this.persistPrompts();
         this.snackBar.open(`Imported ${newPrompts.length} prompts.`, 'Close', {duration: 3000});
       } else {
         this.snackBar.open('No valid prompts found in JSON.', 'Close', {duration: 3000});

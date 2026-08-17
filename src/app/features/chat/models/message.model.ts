@@ -22,4 +22,8 @@ export interface SystemMessage extends ModelContextMessage {
   role: 'system';
   active: boolean;
   folder: string;
+  /** Browser-local persistence metadata; never included in an Ollama request. */
+  source?: 'built-in' | 'user';
+  /** Explicit model-context order for browser-local persistence. */
+  position?: number;
 }

@@ -27,6 +27,35 @@ describe('ChatContextBuilder', () => {
     ]);
   });
 
+  it('keeps the supplied built-in-first prompt order while excluding persistence metadata', () => {
+    const prompts: SystemMessage[] = [
+      {
+        sys_msg_id: 'localnook.rich-response-formats.v1',
+        role: 'system',
+        content: 'Use supported rich response formats.',
+        active: true,
+        folder: '',
+        source: 'built-in',
+        position: 0,
+      },
+      {
+        sys_msg_id: 'custom',
+        role: 'system',
+        content: 'Use concise prose.',
+        active: true,
+        folder: 'General',
+        source: 'user',
+        position: 1,
+      },
+    ];
+
+    expect(builder.build(prompts, [{ role: 'user', content: 'Hello' }])).toEqual([
+      { role: 'system', content: 'Use supported rich response formats.' },
+      { role: 'system', content: 'Use concise prose.' },
+      { role: 'user', content: 'Hello' },
+    ]);
+  });
+
   it('omits empty prompts and messages', () => {
     expect(builder.build(
       [{ sys_msg_id: 'empty', role: 'system', content: '  ', active: true, folder: 'General' }],

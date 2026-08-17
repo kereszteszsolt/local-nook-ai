@@ -33,7 +33,6 @@ flowchart TB
       PREPO[SystemPromptRepository]
       CREPO[ConversationRepository]
       SDK[ollama/browser]
-      LS[(localStorage)]
       IDB[(IndexedDB)]
       OLLAMA[(Local Ollama)]
     end
@@ -48,10 +47,10 @@ flowchart TB
     FACADE --> PREPO
     FACADE --> CREPO --> IDB
     OCLIENT --> SDK --> OLLAMA
-    PREPO --> LS
+    PREPO --> IDB
 ```
 
-Conversation messages use a versioned, brand-independent IndexedDB database through `ConversationRepository`. System prompts use a versioned, brand-independent localStorage key and validate parsed data before use.
+Conversation messages and system prompts use separate, versioned, brand-independent IndexedDB databases through their respective repositories. `SystemPromptRepository` performs a one-time migration from the former localStorage keys only after its IndexedDB transaction succeeds.
 
 ## Release 0.2 target
 
@@ -65,10 +64,10 @@ flowchart LR
     OC --> SDK[ollama/browser]
     SDK --> O[Local Ollama]
     F --> PR[SystemPromptRepository]
-    PR --> LS[(localStorage)]
+    PR --> PDB[(Prompt IndexedDB)]
 ```
 
-The first IndexedDB design stays intentionally small:
+The conversation IndexedDB design stays intentionally small:
 
 - one database with an explicit schema version;
 - conversations and messages owned by one repository boundary;

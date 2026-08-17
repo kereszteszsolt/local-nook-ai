@@ -8,6 +8,7 @@ const MAX_DATA_ROWS = 250;
 const MAX_DATA_FIELDS = 20;
 const MAX_STRING_LENGTH = 1_000;
 const SUPPORTED_MARKS = new Set(['area', 'bar', 'circle', 'line', 'point', 'rect', 'square', 'tick']);
+const SUPPORTED_MARK_OPTIONS = new Set(['point', 'type']);
 const SUPPORTED_CHANNELS = new Set(['color', 'shape', 'size', 'tooltip', 'x', 'y']);
 const SUPPORTED_FIELD_TYPES = new Set(['nominal', 'ordinal', 'quantitative', 'temporal']);
 const SUPPORTED_AGGREGATES = new Set(['average', 'count', 'max', 'median', 'min', 'sum']);
@@ -89,7 +90,7 @@ export function parseVegaLiteSpec(source: string): VegaLiteSpecResult {
     return invalid('Chart dimensions must be between 1 and 1200 pixels.');
   }
 
-  if (!SUPPORTED_MARKS.has(parsed['mark'] as string)) {
+  if (!isSupportedMark(parsed['mark'])) {
     return invalid('The chart mark is not supported.');
   }
 
@@ -126,6 +127,18 @@ function isOptionalText(value: unknown): value is string | undefined {
 
 function isBoundedDimension(value: unknown): boolean {
   return value === undefined || (typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 1200);
+}
+
+function isSupportedMark(value: unknown): boolean {
+  if (typeof value === 'string') {
+    return SUPPORTED_MARKS.has(value);
+  }
+
+  return isRecord(value)
+    && Object.keys(value).every((key) => SUPPORTED_MARK_OPTIONS.has(key))
+    && typeof value['type'] === 'string'
+    && SUPPORTED_MARKS.has(value['type'])
+    && (value['point'] === undefined || (value['type'] === 'line' && typeof value['point'] === 'boolean'));
 }
 
 function parseInlineRows(value: unknown): ChartRow[] | null {

@@ -41,6 +41,33 @@ describe('Vega-Lite rich content', () => {
     expect(result.rows).toEqual([{ month: 'January', requests: 32 }, { month: 'February', requests: 48 }]);
   });
 
+  it('accepts a line mark object with safe point overlays', () => {
+    const chart = JSON.stringify({
+      $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+      data: { values: [{ x: -1, y: 4 }, { x: 0, y: 1 }, { x: 1, y: 0 }] },
+      mark: { type: 'line', point: true },
+      encoding: {
+        x: { field: 'x', type: 'quantitative' },
+        y: { field: 'y', type: 'quantitative' },
+      },
+    });
+
+    expect(parseVegaLiteSpec(chart).valid).toBeTrue();
+  });
+
+  it('rejects mark options outside the bounded allowlist', () => {
+    const chart = JSON.stringify({
+      data: { values: [{ x: 1, y: 2 }] },
+      mark: { type: 'line', point: true, href: 'https://example.test' },
+      encoding: {
+        x: { field: 'x', type: 'quantitative' },
+        y: { field: 'y', type: 'quantitative' },
+      },
+    });
+
+    expect(parseVegaLiteSpec(chart).valid).toBeFalse();
+  });
+
   it('rejects network data and executable Vega-Lite features', () => {
     const remoteData = JSON.stringify({
       data: { url: 'https://example.test/data.json' },

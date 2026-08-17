@@ -83,12 +83,45 @@ class FakeOllamaClientService {
 }
 
 class FakePromptRepository {
-  load(): SystemMessage[] {
-    return [];
+  prompts: SystemMessage[] = [];
+  failLoad = false;
+  private delayedLoad: Promise<SystemMessage[]> | null = null;
+  private releaseDelayedLoad: (() => void) | null = null;
+
+  async load(): Promise<SystemMessage[]> {
+    if (this.failLoad) {
+      throw new Error('Prompt storage unavailable');
+    }
+    if (this.delayedLoad) {
+      return this.delayedLoad;
+    }
+    return this.prompts;
   }
 
-  save(): void {}
-  clear(): void {}
+  delayNextLoad(): () => void {
+    this.delayedLoad = new Promise<SystemMessage[]>((resolve) => {
+      this.releaseDelayedLoad = () => resolve(this.prompts);
+    });
+    return () => {
+      this.releaseDelayedLoad?.();
+      this.delayedLoad = null;
+      this.releaseDelayedLoad = null;
+    };
+  }
+
+  async save(prompts: readonly SystemMessage[]): Promise<SystemMessage[]> {
+    this.prompts = [...prompts];
+    return this.prompts;
+  }
+
+  async clear(): Promise<SystemMessage[]> {
+    this.prompts = [];
+    return this.prompts;
+  }
+
+  async restoreBuiltInPrompt(): Promise<SystemMessage[]> {
+    return this.prompts;
+  }
 }
 
 class FakeActiveModelRepository {
@@ -248,6 +281,7 @@ describe('ChatFacade', () => {
   let client: FakeOllamaClientService;
   let conversationRepository: FakeConversationRepository;
   let activeModelRepository: FakeActiveModelRepository;
+  let promptRepository: FakePromptRepository;
 
   beforeEach(() => {
     client = new FakeOllamaClientService();
@@ -264,6 +298,52 @@ describe('ChatFacade', () => {
       ],
     });
     facade = TestBed.inject(ChatFacade);
+    promptRepository = TestBed.inject(SystemPromptRepository) as unknown as FakePromptRepository;
+  });
+
+  it('loads browser-local system prompts asynchronously and retains the previous list on storage failure', async () => {
+    promptRepository.prompts = [{
+      sys_msg_id: 'custom',
+      role: 'system',
+      content: 'Use concise prose.',
+      active: true,
+      folder: 'General',
+    }];
+
+    await facade.loadSystemPrompts();
+    promptRepository.failLoad = true;
+    await facade.loadSystemPrompts();
+
+    expect(facade.systemPromptsSignal()).toEqual([jasmine.objectContaining({ sys_msg_id: 'custom' })]);
+    expect(facade.systemPromptStorageError()).toContain('Prompt storage unavailable');
+  });
+
+  it('waits for initial system-prompt loading before regenerating a response', async () => {
+    await facade.loadModels();
+    await facade.sendChatMessage('Hello');
+    const requestId = facade.messageHistoryList()[0].req_id!;
+    promptRepository.prompts = [{
+      sys_msg_id: 'built-in',
+      role: 'system',
+      content: 'Use rich response formats.',
+      active: true,
+      folder: '',
+      source: 'built-in',
+      position: 0,
+    }];
+    const releaseLoad = promptRepository.delayNextLoad();
+    const loadingPrompts = facade.loadSystemPrompts();
+    const regeneration = facade.regenerateResponse(requestId);
+
+    expect(client.requests).toHaveSize(1);
+    releaseLoad();
+    await loadingPrompts;
+    await regeneration;
+
+    expect(client.requests[1].messages[0]).toEqual({
+      role: 'system',
+      content: 'Use rich response formats.',
+    });
   });
 
   it('does not append an unsent user message when no model is selected', async () => {

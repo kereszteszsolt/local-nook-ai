@@ -30,6 +30,8 @@ export class ChatFacade {
   private readonly currentThinking = signal('');
   private readonly loadingResponse = signal(false);
   private readonly systemPrompts = signal<SystemMessage[]>([]);
+  private readonly loadingSystemPrompts = signal(false);
+  private readonly systemPromptError = signal<string | null>(null);
   private readonly lastError = signal<string | null>(null);
   private readonly activeConversationId = signal<string | null>(null);
   private readonly activeConversationModelId = signal<string | null>(null);
@@ -37,6 +39,7 @@ export class ChatFacade {
   private readonly storedConversations = signal<ConversationSummary[]>([]);
   private readonly loadingConversations = signal(false);
   private conversationRestore: Promise<void> = Promise.resolve();
+  private systemPromptRestore: Promise<void> = Promise.resolve();
   private activeReferenceUpdate: Promise<void> = Promise.resolve();
   private generationSequence = 0;
   private activeGenerationId: number | null = null;
@@ -50,6 +53,8 @@ export class ChatFacade {
   readonly partialThinking = this.currentThinking.asReadonly();
   readonly isLoadingResponse = this.loadingResponse.asReadonly();
   readonly systemPromptsSignal = this.systemPrompts.asReadonly();
+  readonly isLoadingSystemPrompts = this.loadingSystemPrompts.asReadonly();
+  readonly systemPromptStorageError = this.systemPromptError.asReadonly();
   readonly errorMessage = this.lastError.asReadonly();
   readonly activeConversation = this.activeConversationId.asReadonly();
   readonly thinkingEnabled = this.activeConversationThinkingEnabled.asReadonly();
@@ -75,25 +80,71 @@ export class ChatFacade {
     }
   }
 
-  loadSystemPrompts(): void {
-    this.systemPrompts.set(this.promptRepository.load());
+  loadSystemPrompts(): Promise<void> {
+    if (this.loadingSystemPrompts()) {
+      return this.systemPromptRestore;
+    }
+
+    this.loadingSystemPrompts.set(true);
+    this.systemPromptError.set(null);
+    const load = this.promptRepository.load()
+      .then((prompts) => {
+        this.systemPrompts.set(prompts);
+      })
+      .catch((error: unknown) => {
+        const message = toUserMessage(error, 'Could not load browser-local system prompts.');
+        this.systemPromptError.set(message);
+        this.lastError.set(message);
+      })
+      .finally(() => this.loadingSystemPrompts.set(false));
+    this.systemPromptRestore = load;
+    return load;
   }
 
-  saveSystemPrompts(prompts: readonly SystemMessage[]): void {
-    const normalized = prompts.map(({ sys_msg_id, role, content, active, folder }) => ({
-      sys_msg_id,
-      role,
-      content,
-      active,
-      folder,
-    }));
-    this.promptRepository.save(normalized);
-    this.systemPrompts.set(normalized);
+  async saveSystemPrompts(prompts: readonly SystemMessage[]): Promise<void> {
+    this.loadingSystemPrompts.set(true);
+    this.systemPromptError.set(null);
+    try {
+      const savedPrompts = await this.promptRepository.save(prompts);
+      this.systemPrompts.set(savedPrompts);
+    } catch (error: unknown) {
+      const message = toUserMessage(error, 'Could not save browser-local system prompts.');
+      this.systemPromptError.set(message);
+      this.lastError.set(message);
+      throw error;
+    } finally {
+      this.loadingSystemPrompts.set(false);
+    }
   }
 
-  clearSystemPrompts(): void {
-    this.promptRepository.clear();
-    this.systemPrompts.set([]);
+  async clearSystemPrompts(): Promise<void> {
+    this.loadingSystemPrompts.set(true);
+    this.systemPromptError.set(null);
+    try {
+      this.systemPrompts.set(await this.promptRepository.clear());
+    } catch (error: unknown) {
+      const message = toUserMessage(error, 'Could not clear browser-local system prompts.');
+      this.systemPromptError.set(message);
+      this.lastError.set(message);
+      throw error;
+    } finally {
+      this.loadingSystemPrompts.set(false);
+    }
+  }
+
+  async restoreBuiltInSystemPrompt(): Promise<void> {
+    this.loadingSystemPrompts.set(true);
+    this.systemPromptError.set(null);
+    try {
+      this.systemPrompts.set(await this.promptRepository.restoreBuiltInPrompt());
+    } catch (error: unknown) {
+      const message = toUserMessage(error, 'Could not restore the LocalNook default prompt.');
+      this.systemPromptError.set(message);
+      this.lastError.set(message);
+      throw error;
+    } finally {
+      this.loadingSystemPrompts.set(false);
+    }
   }
 
   async setCurrentModel(model: AiModelDto | null): Promise<void> {
@@ -206,6 +257,7 @@ export class ChatFacade {
   }
 
   async sendChatMessage(userInput: string, think = false): Promise<void> {
+    await this.systemPromptRestore;
     await this.conversationRestore;
     const content = userInput.trim();
     if (!content || this.loadingResponse()) {
@@ -232,6 +284,7 @@ export class ChatFacade {
   }
 
   async regenerateResponse(requestId: string): Promise<void> {
+    await this.systemPromptRestore;
     if (this.loadingResponse()) {
       return;
     }
