@@ -7,6 +7,8 @@ import { MatIcon } from '@angular/material/icon';
 import { TimeSpentPipe } from '../../../pipes/time-spent/time-spent.pipe';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { RichContentBlock, splitRichContent } from '../vega-lite-chart/vega-lite-spec';
+import { VegaLiteChartComponent } from '../vega-lite-chart/vega-lite-chart.component';
 
 @Component({
   selector: 'ollama-chat-chat-message',
@@ -16,7 +18,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatIconButton,
     MatIcon,
     TimeSpentPipe,
-    MatTooltip
+    MatTooltip,
+    VegaLiteChartComponent,
   ],
   templateUrl: './chat-message.component.html',
   styleUrl: './chat-message.component.scss'
@@ -26,6 +29,8 @@ export class ChatMessageComponent implements AfterViewChecked, OnInit {
 
   private readonly snackBar = inject(MatSnackBar);
   private lastThinkingPreview = '';
+  private lastAssistantContent = '';
+  private richContentBlocks: RichContentBlock[] = [];
 
   @Input({ required: true }) message!: Message;
   @Input({ required: true }) hideToolbar: boolean = false;
@@ -34,6 +39,15 @@ export class ChatMessageComponent implements AfterViewChecked, OnInit {
 
   showThinkingExpanded = false;
   showStreamingThinkingExpanded = false;
+
+  get assistantContentBlocks(): RichContentBlock[] {
+    if (this.message.content !== this.lastAssistantContent) {
+      this.lastAssistantContent = this.message.content;
+      this.richContentBlocks = splitRichContent(this.message.content);
+    }
+
+    return this.richContentBlocks;
+  }
 
   ngOnInit(): void {
     const prismWindow = window as Window & {

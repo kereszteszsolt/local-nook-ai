@@ -60,12 +60,27 @@
         }
       </section>
     }
-    <markdown
-      [data]="message.content"
-      katex
-      mermaid
-      [mermaidOptions]="{ theme: 'forest' }"
-    ></markdown>
+    @if (message.role === 'assistant') {
+      @for (block of assistantContentBlocks; track $index) {
+        @if (block.kind === 'vega-lite') {
+          <ollama-chat-vega-lite-chart [source]="block.source"></ollama-chat-vega-lite-chart>
+        } @else {
+          <markdown
+            [data]="block.content"
+            katex
+            mermaid
+            [mermaidOptions]="{ theme: 'forest' }"
+          ></markdown>
+        }
+      }
+    } @else {
+      <markdown
+        [data]="message.content"
+        katex
+        mermaid
+        [mermaidOptions]="{ theme: 'forest' }"
+      ></markdown>
+    }
     @if (message.role === 'assistant' && !hideToolbar) {
       <div class="mt-3 flex items-center gap-1 border-t border-border-subtle pt-2 text-xs text-text-muted">
         <button mat-icon-button class="!h-9 !w-9" (click)="copyContentToClipboard(message.content)" matTooltip="Copy to clipboard" aria-label="Copy response to clipboard">
