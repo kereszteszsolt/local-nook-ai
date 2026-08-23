@@ -21,4 +21,4 @@
 
 - [Release 0.1 — MVP](releases/release-0.1-mvp/README.md): seven implemented stories describing the supplied application.
 - [Release 0.2 — Professional refactor](releases/release-0.2-professional-refactor/README.md): sixteen implemented stories establishing the current application baseline.
-- [Release 0.3 — Local experience](releases/release-0.3-local-experience/README.md): the current packaging, compatibility, screenshot, documentation, and release-readiness plan.
+- [Release 0.3 — Local experience](releases/release-0.3-local-experience/README.md): seven implemented stories covering identity, startup, packaging, screenshots, documentation, design synchronization, and release presentation.
