@@ -10,7 +10,7 @@ As a local user, I want an optional Compose mode with a dedicated Ollama contain
 
 ## Context
 
-The current Compose stack serves Angular through its development server and has no Ollama service. Browser code must receive a host-reachable endpoint rather than a Docker-only service hostname.
+At the start of this story, the Compose stack served Angular through its development server and had no Ollama service. Browser code still had to receive a host-reachable endpoint rather than a Docker-only service hostname.
 
 ## Scope
 

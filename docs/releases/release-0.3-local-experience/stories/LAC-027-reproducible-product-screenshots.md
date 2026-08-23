@@ -10,7 +10,7 @@ As a maintainer, I want deterministic product screenshots generated from control
 
 ## Context
 
-The repository has no Playwright setup or screenshot gallery. Screenshot generation must be reproducible from WSL-compatible project commands and isolated from the user's Ollama data.
+At the start of this story, the repository had no Playwright setup or screenshot gallery. Screenshot generation had to be reproducible from WSL-compatible project commands and isolated from the user's Ollama data.
 
 ## Scope
 

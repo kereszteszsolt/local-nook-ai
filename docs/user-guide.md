@@ -231,7 +231,7 @@ Then pull a model explicitly with the full two-file `exec` command from the star
 
 ### WSL behaves differently
 
-Do not assume one WSL gateway name works everywhere. Verify the endpoint from the target browser. The implementation workstation reached host Ollama through `localhost`, but that is workstation-specific evidence, not a platform guarantee.
+Do not assume one WSL gateway name works everywhere. Depending on the host and networking mode, Ollama may be reachable through `localhost`, the Windows host address, or another configured interface. Verify the endpoint from the browser that runs LocalNook.
 
 ### Conversation or prompt storage fails
 

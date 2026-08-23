@@ -10,7 +10,7 @@ As a user with Ollama already installed, I want LocalNook to connect through a c
 
 ## Context
 
-LocalNook already uses the official browser SDK behind an application adapter and defaults to the local Ollama port. Release 0.3 must preserve that boundary while making runtime configuration and operational guidance explicit.
+At the start of this story, LocalNook already used the official browser SDK behind an application adapter and defaulted to the local Ollama port. Release 0.3 had to preserve that boundary while making runtime configuration and operational guidance explicit.
 
 ## Scope
 

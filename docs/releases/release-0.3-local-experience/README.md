@@ -13,7 +13,7 @@ Release 0.3 makes LocalNook easier to start, understand, verify, and present wit
 | [LAC-026](stories/LAC-026-containerized-ollama-startup.md) | Add an optional containerized Ollama startup mode | Implemented |
 | [LAC-027](stories/LAC-027-reproducible-product-screenshots.md) | Generate deterministic product screenshots | Implemented |
 | [LAC-028](stories/LAC-028-user-guide.md) | Publish an accurate user guide | Implemented |
-| [LAC-029](stories/LAC-029-penpot-design-synchronization.md) | Reconcile meaningful UI changes with Penpot | Implemented |
+| [LAC-029](stories/LAC-029-penpot-design-synchronization.md) | Audit Release 0.3 UI against Penpot and document the no-change decision | Implemented |
 | [LAC-030](stories/LAC-030-readme-and-release-presentation.md) | Present the project and release accurately in the README | Implemented |
 
 ## Delivery order
@@ -22,7 +22,7 @@ Stories are implemented in numeric order. The planning commit leaves every accep
 
 ## Release boundary
 
-This release covers project identity, local startup paths, a production container, deterministic screenshots, user documentation, focused design synchronization, and repository presentation. It does not add hosted services, authentication, telemetry, cloud synchronization, RAG, document ingestion, or model-management automation.
+This release covers project identity, local startup paths, a production container, deterministic screenshots, user documentation, focused design reconciliation, and repository presentation. It does not add hosted services, authentication, telemetry, cloud synchronization, RAG, document ingestion, or model-management automation.
 
 ## Result
 

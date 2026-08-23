@@ -17,13 +17,13 @@ The repository identity does not rewrite an existing Git remote. Maintainers may
 
 ```ts
 interface BrandConfig {
-  productName: string;
-  extendedProductName: string;
-  tagline: string;
-  repositoryName: string;
-  developer: {
-    name: string;
-    website: string;
+  readonly productName: string;
+  readonly extendedProductName: string;
+  readonly tagline: string;
+  readonly repositoryName: string;
+  readonly developer: {
+    readonly name: string;
+    readonly website: string;
   };
 }
 ```

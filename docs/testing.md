@@ -9,7 +9,7 @@ npm run build
 npm test -- --watch=false --browsers=ChromeHeadless
 ```
 
-## Current focused coverage
+## Selected test coverage
 
 - `ChatContextBuilder`: active prompt ordering, narrow model fields, and empty/system-history filtering.
 - `OllamaClientService`: endpoint default/validation/normalization, injected SDK routing, actionable network failures, completion-model filtering with legacy capability-less responses, streamed content/thinking/duration, and client cancellation.

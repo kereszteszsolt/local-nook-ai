@@ -10,13 +10,13 @@ sequenceDiagram
     participant F as ChatFacade
     participant A as OllamaClientService
     participant S as ollama/browser
-    participant O as Local Ollama
+    participant O as Configured Ollama endpoint
 
     UI->>F: sendChatMessage(content, think)
     F->>F: build model context
     F->>A: streamChat(request)
     A->>S: chat({ stream: true })
-    S->>O: local API request
+    S->>O: browser API request
     O-->>S: streamed parts
     loop response stream
       S-->>A: ChatResponse part
@@ -41,7 +41,7 @@ sequenceDiagram
 - validates that a model is selected;
 - owns loading, partial response, partial thinking, and error signals;
 - appends the user message only when a request can start;
-- stores a completed assistant message after a successful non-empty stream;
+- attempts to persist a completed assistant message after a successful non-empty stream and reports storage failures;
 - prevents regeneration from duplicating the original user message;
 - clears partial state after completion, failure, or cancellation.
 
@@ -118,9 +118,7 @@ See the [official Ollama Docker guide](https://docs.ollama.com/docker), [Ollama 
 
 ## WSL boundary
 
-During LAC-025 on the implementation workstation, WSL2 reached the Ollama API at `http://localhost:11434`; an origin probe for the then-running `http://localhost:4201` development endpoint received an allow-origin response, and a direct completion request succeeded. LAC-026 replaces that Docker development endpoint with the production Compose origin `http://127.0.0.1:4201`. The Ollama CLI was not available on the tested WSL or Windows command paths, so the existing-host CLI workflow is based on the official CLI contract rather than a local CLI run.
-
-This result is specific to that workstation and does not establish a universal hostname across WSL networking modes. Do not assume a gateway: configure `ollamaHost` with an origin the target browser can reach and set `OLLAMA_ORIGINS` for the page origin.
+WSL networking varies by host and mode, so do not assume that `localhost` or one gateway address always reaches Ollama. Verify the endpoint from the browser that runs LocalNook, configure `ollamaHost` with that reachable origin, and allow the LocalNook page origin through `OLLAMA_ORIGINS`.
 
 ## Testing
 

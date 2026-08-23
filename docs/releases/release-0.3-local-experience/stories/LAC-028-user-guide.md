@@ -10,7 +10,7 @@ As a LocalNook user, I want one accurate guide for setup, daily use, privacy, an
 
 ## Context
 
-Current engineering documents describe individual boundaries, but public guidance is fragmented and some repository presentation still describes obsolete in-memory behavior.
+At the start of this story, engineering documents described individual boundaries, but public guidance was fragmented and some repository presentation still described obsolete in-memory behavior.
 
 ## Scope
 

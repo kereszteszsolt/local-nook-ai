@@ -6,7 +6,7 @@
 ![ollama/browser 0.6.3](https://img.shields.io/badge/ollama%2Fbrowser-0.6.3-000000?logo=ollama&logoColor=white)
 [![Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-0B6E99)](LICENSE)
 
-**LocalNook**, with the extended product name **LocalNook AI**, is a lightweight Angular client for private, browser-local conversations with models served by a configured Ollama runtime. It has no application backend: the browser owns the conversation UI and storage, while the official `ollama/browser` client communicates directly with Ollama.
+**LocalNook**, with the extended product name **LocalNook AI**, is a lightweight Angular client for browser-local conversation management with models served by a configured Ollama runtime. It has no application backend: the browser owns the conversation UI and storage, while the official `ollama/browser` client communicates directly with Ollama.
 
 ![LocalNook desktop conversation showing browser-local history and a privacy-safe fixture response.](docs/screenshots/desktop-chat.png)
 
@@ -14,11 +14,9 @@ _The screenshot uses deterministic fixture content. See the [complete privacy-sa
 
 ## What LocalNook implements
 
-- Discovers completion-capable Ollama models, remembers the selected model, and restores conversation-specific model and thinking settings.
-- Streams assistant content and optional model thinking, with Stop, regenerate, copy, clear-input, and New chat controls.
-- Persists conversations and prompts in separate, brand-independent IndexedDB databases; the active-model fallback uses a brand-independent localStorage key.
-- Reopens saved conversations and provides confirmed permanent deletion for one conversation or all conversations. New chat does not delete history.
-- Manages custom prompt folders, activation, CSV/JSON import, JSON export, and a protected built-in rich-response prompt. Custom prompt and folder deletion is immediate.
+- Discovers chat-eligible Ollama models while remaining compatible with older model-list responses, and streams assistant content with optional thinking, cancellation, regeneration, and copy controls.
+- Persists and reopens conversations in IndexedDB, including their selected model and thinking state, with confirmed deletion for one or all conversations.
+- Manages custom prompt folders, activation, import/export, and a protected built-in rich-response prompt.
 - Renders Markdown, highlighted code, KaTeX, Mermaid, and a validated, bounded Vega-Lite subset with an accessible data-table view.
 - Builds intentional Ollama context from active prompts and the current conversation without sending UI identifiers, timestamps, durations, or storage metadata.
 
@@ -26,7 +24,7 @@ Browser-local storage is scoped to the exact application origin and is not encry
 
 ## Quick start
 
-LocalNook does not install Ollama or download models automatically. Choose one of the following modes; the [user guide](docs/user-guide.md) covers endpoint overrides, origin configuration, shutdown, and troubleshooting.
+LocalNook does not install Ollama or download models automatically. The [user guide](docs/user-guide.md) covers endpoint overrides, browser-origin configuration, shutdown, and troubleshooting.
 
 ### Existing Ollama installation
 
@@ -39,46 +37,23 @@ npm ci
 npm start
 ```
 
-Open `http://localhost:4200`. LocalNook uses `http://localhost:11434` by default. If the browser reports an origin error, configure Ollama's `OLLAMA_ORIGINS` for the exact LocalNook page origin and restart Ollama.
-
-To serve the production application through Docker while keeping Ollama on the host, run `docker compose up --build` and open `http://127.0.0.1:4201`.
+Open `http://localhost:4200`; LocalNook uses `http://localhost:11434` by default. To serve the production application through Docker while keeping Ollama on the host, run `docker compose up --build` and open `http://127.0.0.1:4201`.
 
 ### Optional containerized Ollama
 
-Prerequisite: Docker Engine with Docker Compose. Name both Compose files so the opt-in Ollama service is included:
+With Docker Engine and Docker Compose, start both services by naming both files:
 
 ```bash
-docker compose \
-  -f docker-compose.yaml \
-  -f docker-compose.ollama.yml \
-  up --build
+docker compose -f docker-compose.yaml -f docker-compose.ollama.yml up --build
 ```
 
 After Ollama is healthy, pull a model from another terminal:
 
 ```bash
-docker compose \
-  -f docker-compose.yaml \
-  -f docker-compose.ollama.yml \
-  exec ollama ollama pull <model-name>
+docker compose -f docker-compose.yaml -f docker-compose.ollama.yml exec ollama ollama pull <model-name>
 ```
 
-Open:
-
-```text
-http://127.0.0.1:4201/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
-```
-
-Normal shutdown preserves downloaded models:
-
-```bash
-docker compose \
-  -f docker-compose.yaml \
-  -f docker-compose.ollama.yml \
-  down
-```
-
-Do not add `--volumes` unless you intentionally want to delete the `ollama-models` volume and its downloaded models.
+Open `http://127.0.0.1:4201/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435`. Downloaded models remain in the named volume until you intentionally remove it; the full shutdown and reset commands are in the [user guide](docs/user-guide.md#optional-ollama-container).
 
 ## Architecture
 
@@ -97,79 +72,43 @@ Components render state and emit typed actions. `ChatFacade` owns application or
 
 ## Verification
 
-Install from the checked lockfile, then run the required build and unit suite:
+Install from the checked lockfile and run the relevant checks:
 
 ```bash
 npm ci
 npm run build
 npm test -- --watch=false --browsers=ChromeHeadless
-```
-
-Generate the five deterministic screenshots with the pinned Playwright version and browser:
-
-```bash
 npx playwright install chromium
 npm run screenshots
-```
-
-Validate the base and optional Ollama Compose configurations:
-
-```bash
 docker compose config --quiet
 docker compose -f docker-compose.yaml -f docker-compose.ollama.yml config --quiet
 ```
 
-A Chrome or Chromium executable discoverable by Karma is required for the ChromeHeadless suite, and Playwright Chromium must match the checked `@playwright/test` version. Unit tests and deterministic screenshots use controlled fakes and do not require a live Ollama model; real model discovery, streaming, cancellation, and browser-origin behavior remain manual smoke-test boundaries. If host Node or Chromium is unavailable, use the pinned Docker fallback in the [testing guide](docs/testing.md#matching-docker-fallback). Current Release 0.3 results and exact limitations are recorded in the [LAC-030 story](docs/releases/release-0.3-local-experience/stories/LAC-030-readme-and-release-presentation.md).
+The automated suites use controlled fakes; a live Ollama smoke test is still needed for real model discovery, streaming, cancellation, and browser-origin behavior. Browser requirements and the screenshot workflow's matching Docker fallback are documented in the [testing guide](docs/testing.md).
 
 ## Documentation and releases
 
 - [User guide](docs/user-guide.md) — setup, daily use, privacy, deletion, and troubleshooting.
-- [Documentation index](docs/README.md) — all user and engineering guides.
-- [Architecture](docs/architecture.md) — current application and persistence boundaries.
-- [Testing](docs/testing.md) — required checks, deterministic screenshots, and environment fallbacks.
-- [Screenshot gallery](docs/screenshots/README.md) — five approved privacy-safe product views.
-- [Release 0.1 — MVP](docs/releases/release-0.1-mvp/README.md) — seven implemented foundation stories.
-- [Release 0.2 — Professional refactor](docs/releases/release-0.2-professional-refactor/README.md) — sixteen implemented architecture and product-hardening stories.
-- [Release 0.3 — Local experience](docs/releases/release-0.3-local-experience/README.md) — seven implemented startup, packaging, evidence, documentation, and presentation stories.
+- [Documentation index](docs/README.md) — architecture, storage, Ollama integration, development, and testing.
+- [Screenshot gallery](docs/screenshots/README.md) — five deterministic, privacy-safe product views.
+- Release notes: [0.1 MVP](docs/releases/release-0.1-mvp/README.md), [0.2 Professional refactor](docs/releases/release-0.2-professional-refactor/README.md), and [0.3 Local experience](docs/releases/release-0.3-local-experience/README.md).
 
 ## Project identity
 
 | Property | Canonical value |
 | --- | --- |
-| Display name | `LocalNook` |
-| Extended product name | `LocalNook AI` |
-| Repository identity | `localnook-ai` |
-| Private npm package | `@localnook/app` (`0.1.0`) |
-| Angular application | `localnook-ai` |
-| Docker Compose project | `localnook` |
+| Product | `LocalNook` / `LocalNook AI` |
+| Repository / package | `localnook-ai` / `@localnook/app` (`0.1.0`) |
+| Angular / Compose project | `localnook-ai` / `localnook` |
 | Application image | `localnook-angular-app:0.3` |
 | Story prefix | `LAC-` |
-| Model provider/runtime | Ollama |
 | Developer | Keresztes Zsolt — [kereszteszsolt.hu](https://kereszteszsolt.hu/) |
-| License | Apache-2.0 |
 
-Product labels come from the typed [`BrandConfig`](src/app/core/config/brand.config.ts). Storage identifiers, package names, the Angular application, Docker identities, and the `LAC-` story prefix remain stable technical contracts rather than derivatives of the display name.
-
-Release 0.3 is a repository delivery milestone; it does not claim a published `0.3.0` npm package or Git tag.
+Product labels come from [`BrandConfig`](src/app/core/config/brand.config.ts); storage and technical identifiers remain brand-independent. Release 0.3 is a repository milestone, not a published npm package or Git tag.
 
 ## AI-assisted engineering
 
-The repository includes four focused, optional Codex agent roles:
-
-- [`architect`](.codex/agents/architect.toml) — plans boundary and cross-cutting changes.
-- [`implementation_worker`](.codex/agents/implementation-worker.toml) — owns one bounded implementation.
-- [`reviewer`](.codex/agents/reviewer.toml) — checks correctness, regression risk, privacy, and evidence.
-- [`design_reviewer`](.codex/agents/design-reviewer.toml) — reviews user-visible behavior, tokens, accessibility, and Penpot alignment.
-
-Five repository skills keep recurring work scoped:
-
-- [`angular-feature-delivery`](.agents/skills/angular-feature-delivery/SKILL.md)
-- [`conversation-context`](.agents/skills/conversation-context/SKILL.md)
-- [`ollama-integration`](.agents/skills/ollama-integration/SKILL.md)
-- [`release-evidence`](.agents/skills/release-evidence/SKILL.md)
-- [`ui-design`](.agents/skills/ui-design/SKILL.md)
-
-These files define development workflows; they are not runtime dependencies or an agent framework embedded in LocalNook. See the [Codex project setup](.codex/README.md) and repository [working agreements](AGENTS.md).
+Optional development roles — [`architect`](.codex/agents/architect.toml), [`implementation_worker`](.codex/agents/implementation-worker.toml), [`reviewer`](.codex/agents/reviewer.toml), and [`design_reviewer`](.codex/agents/design-reviewer.toml) — are supported by [`angular-feature-delivery`](.agents/skills/angular-feature-delivery/SKILL.md), [`conversation-context`](.agents/skills/conversation-context/SKILL.md), [`ollama-integration`](.agents/skills/ollama-integration/SKILL.md), [`release-evidence`](.agents/skills/release-evidence/SKILL.md), and [`ui-design`](.agents/skills/ui-design/SKILL.md). These development aids are not LocalNook runtime dependencies; see the [Codex setup](.codex/README.md) and [working agreements](AGENTS.md).
 
 ## License
 
@@ -188,7 +127,7 @@ Apache License 2.0. See [`LICENSE`](LICENSE).
 
 ## ☕ Ways to support
 
-**Explore the available ways to support the maintainer and this work.**
+**Explore ways to support the maintainer and their projects.**
 
 [https://kereszteszsolt.hu/en/ways-to-support/](https://kereszteszsolt.hu/en/ways-to-support/)
 

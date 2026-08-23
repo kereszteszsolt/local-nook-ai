@@ -10,7 +10,7 @@ As a maintainer, I want one coherent LocalNook identity and a bounded Release 0.
 
 ## Context
 
-The display brand is already LocalNook, but legacy technical names remain in package, Angular, Docker, BrandConfig, and documentation contracts. Historical LAC identifiers and browser-storage identifiers must remain stable.
+At the start of this story, the display brand was already LocalNook, but legacy technical names remained in package, Angular, Docker, BrandConfig, and documentation contracts. Historical LAC identifiers and browser-storage identifiers had to remain stable.
 
 ## Scope
 
@@ -33,7 +33,7 @@ Establish the Release 0.3 evidence structure, apply the approved identity contra
 
 - Isolated `npm ci --ignore-scripts` completed with the renamed package and lock file; npm reported the existing dependency audit findings separately.
 - `docker compose config --quiet` passed and resolves project name `localnook`.
-- The Angular development build passed and emitted `dist/localnook-ai`. The production build compiled but remains blocked by the pre-existing 1 MB initial-bundle budget (`4.69 MB` total).
+- The Angular development build passed and emitted `dist/localnook-ai`. At LAC-024 verification time, the production build compiled but failed the then-current 1 MB initial-bundle budget (`4.69 MB` total).
 - The focused BrandConfig/App ChromeHeadless suite passed `3/3`. The full suite reached `77/78`; the remaining unchanged `SystemPromptRepository` migration test fails independently of LAC-024.
 - Storage repository and Ollama runtime-config hashes, all stable database/key/record identifiers, ports, Angular selector prefix, and Git remote remained unchanged.
 - Semantic diff review was limited to the LAC-024 identity, workflow, and evidence files; the pre-existing CRLF-only working-tree changes remain unmodified.

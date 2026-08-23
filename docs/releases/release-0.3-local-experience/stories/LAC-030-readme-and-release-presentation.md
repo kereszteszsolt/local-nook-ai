@@ -10,7 +10,7 @@ As a prospective user or contributor, I want the root README to present the veri
 
 ## Context
 
-The current README predates implemented IndexedDB behavior and does not include the Release 0.3 startup, screenshot, user-guide, contact, or support presentation.
+At the start of this story, the README predated implemented IndexedDB behavior and did not include the Release 0.3 startup, screenshot, user-guide, contact, or support presentation.
 
 ## Scope
 
