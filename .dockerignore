@@ -3,9 +3,17 @@
 
 .git
 .angular
+.agents
+.codex
+.github
 .idea
 node_modules
 dist
 out-tsc
 coverage
+docs
+test-results
+docker-compose*.yml
+docker-compose*.yaml
+*.md
 *.log

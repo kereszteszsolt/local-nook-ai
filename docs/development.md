@@ -36,11 +36,61 @@ On the implementation workstation, WSL2 reached the Ollama API at `http://localh
 
 ## Docker
 
+### Existing host Ollama
+
+Build and start the production LocalNook image while keeping Ollama on the host:
+
 ```bash
 docker compose up --build
 ```
 
-The development container uses `npm ci`, the repository-local Angular CLI, and port `4201`. The bind mount supports local editing while the anonymous `node_modules` volume keeps container dependencies inside the container.
+Open `http://127.0.0.1:4201`. The browser keeps the default `http://localhost:11434` Ollama endpoint; if the host runtime rejects the page origin, configure its `OLLAMA_ORIGINS` for `http://127.0.0.1:4201` and restart Ollama.
+
+The multi-stage image builds Angular with Node.js and serves only the production output through Nginx on container port `8080`. There is no source bind mount or Angular development server in this path. Stop it with:
+
+```bash
+docker compose down
+```
+
+### Optional containerized Ollama
+
+Always name both files when using the Ollama overlay:
+
+```bash
+docker compose -f docker-compose.yaml -f docker-compose.ollama.yml up --build
+```
+
+No model is downloaded automatically. Pull one explicitly after the Ollama service is healthy:
+
+```bash
+docker compose -f docker-compose.yaml -f docker-compose.ollama.yml exec ollama ollama pull <model-name>
+```
+
+Open LocalNook with the browser-reachable published Ollama endpoint:
+
+```text
+http://127.0.0.1:4201/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
+```
+
+The overlay adds `http://127.0.0.1:4201` through `OLLAMA_ORIGINS`; it does not claim to remove Ollama's built-in allowed origins. The default configuration is CPU-only. GPU-vendor-specific devices, runtimes, and images are intentionally out of scope; see the [official Ollama Docker guide](https://docs.ollama.com/docker) when adding a local vendor-specific override.
+
+Normal shutdown preserves the `ollama-models` named volume and downloaded models:
+
+```bash
+docker compose -f docker-compose.yaml -f docker-compose.ollama.yml down
+```
+
+The following destructive variant permanently deletes that named volume and its downloaded models. Use it only when intentionally resetting local model data:
+
+```bash
+docker compose -f docker-compose.yaml -f docker-compose.ollama.yml down --volumes
+```
+
+Docker documents [Compose file merging](https://docs.docker.com/compose/how-tos/multiple-compose-files/merge/) and [`down --volumes`](https://docs.docker.com/reference/cli/docker/compose/down/).
+
+### Production bundle budget
+
+The initial production bundle budget is intentionally calibrated to warn above `4.5MB` and fail above `5MB`; the component-style budget is unchanged. The current approximately `4.69MB` initial bundle is expected to warn without crossing the error threshold, but the actual size and image build result must be verified by the release checks.
 
 ## Change workflow
 
