@@ -2,9 +2,9 @@
 
 ## Status
 
-In progress
+Implemented
 
-This release improves the supplied MVP without turning it into a backend-heavy or framework-heavy system. Completed stories already have code/configuration evidence; the broad dependency pass remains planned.
+This release improves the supplied MVP without turning it into a backend-heavy or framework-heavy system. All sixteen bounded stories are implemented; their story records preserve the verification evidence and limitations available when each story was completed. Release 0.3 owns the later packaging, compatibility, screenshot, user-documentation, and release-readiness work.
 
 | Story | Refactor | Status |
 |---|---|---|
@@ -25,6 +25,6 @@ This release improves the supplied MVP without turning it into a backend-heavy o
 | [LAC-022](stories/LAC-022-vega-lite-visualizations.md) | Render Vega-Lite data visualizations | Implemented |
 | [LAC-023](stories/LAC-023-built-in-system-prompts.md) | Add a built-in rich-rendering prompt and migrate prompt storage | Implemented |
 
-## Ordering
+## Result
 
-The current official SDK, application boundaries, deterministic context builder, stream state, brand config, and browser-local conversation workflow form the baseline. Complete the dependency modernization after the main architecture is stable enough to distinguish migration defects from refactor defects.
+The official SDK, application boundaries, deterministic context builder, stream state, brand config, dependency baseline, rich rendering, and browser-local conversation workflow now form the baseline for later releases. Any further dependency upgrade requires its own bounded story and verification evidence.

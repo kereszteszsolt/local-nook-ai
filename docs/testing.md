@@ -1,5 +1,7 @@
 # Testing
 
+See the [LocalNook user guide](user-guide.md) for user-facing behavior and troubleshooting.
+
 ## Required commands
 
 ```bash
@@ -10,9 +12,9 @@ npm test -- --watch=false --browsers=ChromeHeadless
 ## Current focused coverage
 
 - `ChatContextBuilder`: active prompt ordering, narrow model fields, and empty/system-history filtering.
-- `OllamaClientService`: official model mapping, streamed content/thinking/duration, and client cancellation.
-- `ChatFacade`: selected-model guard, persisted active/conversation model and thinking-toggle selection, fallback, completed response storage, thinking-only completion rejection, regeneration without duplicate user messages, and stale-chunk isolation after abort.
-- `ConversationRepository`: schema migration, message order, metadata-only model/thinking updates, and active-record cleanup.
+- `OllamaClientService`: endpoint default/validation/normalization, injected SDK routing, actionable network failures, completion-model filtering with legacy capability-less responses, streamed content/thinking/duration, and client cancellation.
+- `ChatFacade`: selected-model guard, persisted active/conversation model and thinking-toggle selection, fallback, completed response storage, aborted-stream cleanup, thinking-only completion rejection, regeneration without duplicate user messages, and stale-chunk isolation after abort.
+- `ConversationRepository`: schema migration, create/list/open/update/delete behavior, message order, metadata-only model/thinking updates, reload recovery, and active-record cleanup.
 - `ActiveModelRepository`: browser-local active model persistence.
 - `SystemPromptRepository`: malformed data, entry validation, and legacy-key migration.
 - `ChatInputComponent`: typed composer event instead of serialized component payloads.
@@ -24,9 +26,9 @@ npm test -- --watch=false --browsers=ChromeHeadless
 
 Unit tests replace the injected Ollama SDK client; they must not require a live model server. Manual smoke testing covers actual browser origin configuration, local model availability, real streaming, cancellation latency, and rendering with representative content.
 
-## Planned persistence coverage
+## Persistence and context boundary
 
-LAC-010 and LAC-011 should add deterministic IndexedDB tests for create/list/open, append, reload recovery, delete-one, delete-all, schema migration, and failure recovery. Context tests must prove that one conversation never contributes messages to another.
+The conversation repository tests use deterministic IndexedDB fixtures for create/list/open, append/update, reload recovery, delete-one, delete-all, schema migration, and active-reference cleanup. `ChatContextBuilder` tests keep prompt ordering and conversation messages explicit, while facade tests cover restoring and switching active conversations. Together these tests guard against one conversation contributing messages to another request.
 
 Do not keep tests that only instantiate a class when a meaningful behavior can be asserted instead.
 

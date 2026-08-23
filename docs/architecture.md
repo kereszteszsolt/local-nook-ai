@@ -32,9 +32,12 @@ flowchart TB
       OCLIENT[OllamaClientService]
       PREPO[SystemPromptRepository]
       CREPO[ConversationRepository]
+      AREPO[ActiveModelRepository]
       SDK[ollama/browser]
-      IDB[(IndexedDB)]
-      OLLAMA[(Local Ollama)]
+      PIDB[(Prompt IndexedDB)]
+      CIDB[(Conversation IndexedDB)]
+      LS[(localStorage)]
+      OLLAMA[(Configured Ollama)]
     end
 
     NAV --> FACADE
@@ -45,14 +48,17 @@ flowchart TB
     FACADE --> CONTEXT
     FACADE --> OCLIENT
     FACADE --> PREPO
-    FACADE --> CREPO --> IDB
+    FACADE --> CREPO --> CIDB
+    FACADE --> AREPO --> LS
     OCLIENT --> SDK --> OLLAMA
-    PREPO --> IDB
+    PREPO --> PIDB
 ```
 
-Conversation messages and system prompts use separate, versioned, brand-independent IndexedDB databases through their respective repositories. `SystemPromptRepository` performs a one-time migration from the former localStorage keys only after its IndexedDB transaction succeeds.
+Conversation messages and system prompts use separate, versioned, brand-independent IndexedDB databases through their respective repositories. The general active-model fallback uses a brand-independent localStorage key. `SystemPromptRepository` performs a one-time migration from the former prompt localStorage keys only after its IndexedDB transaction succeeds.
 
-## Release 0.2 target
+The configured Ollama endpoint defaults to the local machine, but a validated browser-reachable LAN, remote, proxied, or cloud-backed origin can be selected for the current page load. The application boundary therefore does not imply that model processing always stays on the LocalNook machine.
+
+## Implemented browser-local design
 
 ```mermaid
 flowchart LR
@@ -62,12 +68,12 @@ flowchart LR
     F --> CB[ChatContextBuilder]
     F --> OC[OllamaClientService]
     OC --> SDK[ollama/browser]
-    SDK --> O[Local Ollama]
+    SDK --> O[Configured Ollama]
     F --> PR[SystemPromptRepository]
     PR --> PDB[(Prompt IndexedDB)]
 ```
 
-The conversation IndexedDB design stays intentionally small:
+The conversation IndexedDB design is intentionally small:
 
 - one database with an explicit schema version;
 - conversations and messages owned by one repository boundary;
