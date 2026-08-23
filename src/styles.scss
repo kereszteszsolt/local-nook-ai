@@ -3,6 +3,10 @@
 // components according to the Material 3 design spec.
 // Learn more about theming and how to use it for your application's
 // custom components at https://material.angular.dev/guide/theming
+@use '@fontsource/material-icons' as materialIcons;
+@use '@fontsource/roboto/300.css' as roboto300;
+@use '@fontsource/roboto/400.css' as roboto400;
+@use '@fontsource/roboto/500.css' as roboto500;
 @use '@angular/material' as mat;
 @use "tailwindcss" as *;
 @use 'app/styles/ollama-chat-theme-colors' as ollamaChatTheme;
@@ -60,6 +64,22 @@ html, body {
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.material-icons {
+  direction: ltr;
+  display: inline-block;
+  font-family: 'Material Icons';
+  font-feature-settings: 'liga';
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  -webkit-font-smoothing: antialiased;
 }
 
 :root {

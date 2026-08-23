@@ -105,6 +105,16 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "*.woff*",
+                "input": "node_modules/@fontsource/roboto/files",
+                "output": "base/media"
+              },
+              {
+                "glob": "*.woff*",
+                "input": "node_modules/@fontsource/material-icons/files",
+                "output": "base/media"
               }
             ],
             "styles": [
