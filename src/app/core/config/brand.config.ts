@@ -7,6 +7,7 @@ import { InjectionToken } from '@angular/core';
 
 export interface BrandConfig {
   readonly productName: string;
+  readonly extendedProductName: string;
   readonly tagline: string;
   readonly repositoryName: string;
   readonly developer: {
@@ -17,8 +18,9 @@ export interface BrandConfig {
 
 export const DEFAULT_BRAND_CONFIG = {
   productName: 'LocalNook',
+  extendedProductName: 'LocalNook AI',
   tagline: 'Private local conversations with Ollama',
-  repositoryName: 'ng-ollama',
+  repositoryName: 'localnook-ai',
   developer: {
     name: 'Keresztes Zsolt',
     website: 'https://kereszteszsolt.hu',

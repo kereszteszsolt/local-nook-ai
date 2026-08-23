@@ -1,6 +1,6 @@
 # LocalNook
 
-**LocalNook** is the working product name of `ng-ollama`, a lightweight Angular client for private conversations with models served by Ollama on the user's machine.
+**LocalNook**, with the extended product name **LocalNook AI**, is a lightweight Angular client in the `localnook-ai` repository for private conversations with models served by Ollama on the user's machine.
 
 This repository keeps the supplied MVP features, replaces the improvised transport path with the official Ollama browser client, introduces typed application boundaries and central branding, and documents the remaining professional refactor as bounded user stories.
 
@@ -70,7 +70,7 @@ Unit tests use application-owned fakes at the Ollama boundary, so a live Ollama 
 
 ## Branding and ownership
 
-Change display metadata in `src/app/core/config/brand.config.ts`. The repository name, provider name, and browser-storage identifiers remain separate.
+Change display metadata in `src/app/core/config/brand.config.ts`. The canonical technical identities are repository `localnook-ai`, package `@localnook/app`, Angular application `localnook-ai`, and Docker Compose project `localnook`. The provider name and browser-storage identifiers remain separate.
 
 Developer: **Keresztes Zsolt** — `https://kereszteszsolt.hu`
 

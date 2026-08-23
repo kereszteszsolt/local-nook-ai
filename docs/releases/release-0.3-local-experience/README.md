@@ -2,13 +2,13 @@
 
 ## Status
 
-Planned
+In progress
 
 Release 0.3 makes LocalNook easier to start, understand, verify, and present without expanding the product into a hosted or backend-heavy system. The repository remains the source of truth for implemented behavior and verification evidence.
 
 | Story | Outcome | Status |
 | --- | --- | --- |
-| [LAC-024](stories/LAC-024-release-foundation-and-project-identity.md) | Establish the release foundation and canonical project identity | Planned |
+| [LAC-024](stories/LAC-024-release-foundation-and-project-identity.md) | Establish the release foundation and canonical project identity | Implemented |
 | [LAC-025](stories/LAC-025-external-ollama-startup.md) | Document and harden startup with an existing Ollama runtime | Planned |
 | [LAC-026](stories/LAC-026-containerized-ollama-startup.md) | Add an optional containerized Ollama startup mode | Planned |
 | [LAC-027](stories/LAC-027-reproducible-product-screenshots.md) | Generate deterministic product screenshots | Planned |

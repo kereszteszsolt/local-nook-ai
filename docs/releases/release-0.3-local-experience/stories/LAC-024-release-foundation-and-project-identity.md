@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned
+Implemented
 
 ## User story
 
@@ -18,20 +18,25 @@ Establish the Release 0.3 evidence structure, apply the approved identity contra
 
 ## Acceptance criteria
 
-- [ ] Use `LocalNook` as the display brand and `LocalNook AI` as the extended product name.
-- [ ] Use `localnook-ai` as the repository identity, `@localnook/app` as the package name, and `localnook-ai` as the Angular application ID.
-- [ ] Use `localnook` as the Docker Compose project name without changing Git remotes automatically.
-- [ ] Keep a typed central `BrandConfig` for product and developer metadata and update its focused consumers and tests.
-- [ ] Preserve all existing browser-storage database names, store names, keys, migrations, and stable record identifiers independently from the display brand.
-- [ ] Update `docs/brand-configuration.md` and other directly affected identity documentation to describe the implemented contract accurately.
-- [ ] Record the story-start and commit-approval workflow in `AGENTS.md` and `.codex/README.md`.
-- [ ] Keep exactly four focused custom agents: architect, implementation_worker, reviewer, and design_reviewer.
-- [ ] Keep exactly five focused repository skills: angular-feature-delivery, ollama-integration, conversation-context, ui-design, and release-evidence.
-- [ ] Verify package/lock consistency, Angular target references, Docker project naming, BrandConfig behavior, stable storage identifiers, and the absence of unintended semantic changes.
+- [x] Use `LocalNook` as the display brand and `LocalNook AI` as the extended product name.
+- [x] Use `localnook-ai` as the repository identity, `@localnook/app` as the package name, and `localnook-ai` as the Angular application ID.
+- [x] Use `localnook` as the Docker Compose project name without changing Git remotes automatically.
+- [x] Keep a typed central `BrandConfig` for product and developer metadata and update its focused consumers and tests.
+- [x] Preserve all existing browser-storage database names, store names, keys, migrations, and stable record identifiers independently from the display brand.
+- [x] Update `docs/brand-configuration.md` and other directly affected identity documentation to describe the implemented contract accurately.
+- [x] Record the story-start and commit-approval workflow in `AGENTS.md` and `.codex/README.md`.
+- [x] Keep exactly four focused custom agents: architect, implementation_worker, reviewer, and design_reviewer.
+- [x] Keep exactly five focused repository skills: angular-feature-delivery, ollama-integration, conversation-context, ui-design, and release-evidence.
+- [x] Verify package/lock consistency, Angular target references, Docker project naming, BrandConfig behavior, stable storage identifiers, and the absence of unintended semantic changes.
 
 ## Verification
 
-Inspect identity and storage constants, run focused BrandConfig tests, validate the package lock and Angular targets, run the required build/test commands, validate Compose configuration, and review the semantic Git diff and status.
+- Isolated `npm ci --ignore-scripts` completed with the renamed package and lock file; npm reported the existing dependency audit findings separately.
+- `docker compose config --quiet` passed and resolves project name `localnook`.
+- The Angular development build passed and emitted `dist/localnook-ai`. The production build compiled but remains blocked by the pre-existing 1 MB initial-bundle budget (`4.69 MB` total).
+- The focused BrandConfig/App ChromeHeadless suite passed `3/3`. The full suite reached `77/78`; the remaining unchanged `SystemPromptRepository` migration test fails independently of LAC-024.
+- Storage repository and Ollama runtime-config hashes, all stable database/key/record identifiers, ports, Angular selector prefix, and Git remote remained unchanged.
+- Semantic diff review was limited to the LAC-024 identity, workflow, and evidence files; the pre-existing CRLF-only working-tree changes remain unmodified.
 
 ## Out of scope
 
@@ -39,4 +44,7 @@ Git remote changes, storage-key renames, IndexedDB schema migrations, broad depe
 
 ## Implementation evidence
 
-None recorded in this planning commit. Evidence will be added during LAC-024 implementation.
+- Package and lock metadata use `@localnook/app`; the Angular project and build targets use `localnook-ai`; Compose declares project `localnook`.
+- `BrandConfig` centrally defines `LocalNook`, `LocalNook AI`, repository identity, tagline, and developer metadata, with focused consumer tests.
+- Identity and storage-separation rules are documented in `docs/brand-configuration.md`, while `AGENTS.md` and `.codex/README.md` define explicit story-start and commit-approval checkpoints.
+- The existing four custom agents and five repository skills remain the bounded AI-assisted engineering surface.

@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ollama-local-chat": {
+    "localnook-ai": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -81,10 +81,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "ollama-local-chat:build:production"
+              "buildTarget": "localnook-ai:build:production"
             },
             "development": {
-              "buildTarget": "ollama-local-chat:build:development"
+              "buildTarget": "localnook-ai:build:development"
             }
           },
           "defaultConfiguration": "development"
