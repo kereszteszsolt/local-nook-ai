@@ -171,6 +171,10 @@ Five repository skills keep recurring work scoped:
 
 These files define development workflows; they are not runtime dependencies or an agent framework embedded in LocalNook. See the [Codex project setup](.codex/README.md) and repository [working agreements](AGENTS.md).
 
+## License
+
+Apache License 2.0. See [`LICENSE`](LICENSE).
+
 ## Contact
 
 **Project maintainer: Keresztes Zsolt**
@@ -180,12 +184,22 @@ These files define development workflows; they are not runtime dependencies or a
 | Website | [kereszteszsolt.hu](https://kereszteszsolt.hu/) |
 | GitHub | [@kereszteszsolt](https://github.com/kereszteszsolt) |
 
+> The website is available in multiple languages: Hungarian (HU), English (EN), Romanian (RO), and German (DE).
+
 ## ☕ Ways to support
+
+**Explore the available ways to support the maintainer and this work.**
 
 [https://kereszteszsolt.hu/en/ways-to-support/](https://kereszteszsolt.hu/en/ways-to-support/)
 
-[Buy Me a Coffee](https://buymeacoffee.com/kereszteszsolt)
+<p align="center">
+  <a href="https://buymeacoffee.com/kereszteszsolt"><img src="readme-assets/orange-button.png" alt="Buy Me a Coffee" width="360"></a><br>
+  <strong>Every coffee counts! ☕❤️</strong>
+</p>
 
-## License
+---
 
-LocalNook is licensed under the [Apache License 2.0](LICENSE). The repository applies short SPDX headers only to new hand-authored source or configuration files that support comments; see the [licensing guide](docs/licensing.md).
+<p align="center">
+  <strong>Made with ❤️ by <a href="https://kereszteszsolt.hu/">Keresztes Zsolt</a></strong><br>
+  ⭐ Star this repository if you found it helpful!
+</p>
