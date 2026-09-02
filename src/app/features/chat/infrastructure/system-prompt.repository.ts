@@ -52,10 +52,10 @@ export class SystemPromptRepository {
       if (!migrated) {
         const legacyPrompts = this.readLegacyPrompts();
         await this.seedAndMigrate(database, legacyPrompts);
-        this.removeLegacyStorage();
       } else {
         await this.ensureBuiltInPrompt(database);
       }
+      this.removeLegacyStorage();
       return await this.readPrompts(database);
     } finally {
       database.close();
