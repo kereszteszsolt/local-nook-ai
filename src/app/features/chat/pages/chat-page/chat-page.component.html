@@ -1,31 +1,99 @@
-<div class="w-[789px] mx-auto py-5 gap-5 flex flex-col justify-center" style="height: calc(100vh - 64px);">
-  @if (messages().length > 0 || partialResponse() || partialThinking()) {
-    <div class="flex flex-1 overflow-hidden">
-      <div #scrollContainer class="flex-1 flex flex-col w-full overflow-y-auto gap-2.5 p-2.5">
-        @for (message of messages(); track message) {
-          <ollama-chat-chat-message
-            [message]="message"
-            [hideToolbar]="false"
-            (regenerate)="onRegenerateMessage($event)"
-          />
-        }
-        @if (partialResponse() || partialThinking()) {
-          <ollama-chat-chat-message
-            [message]="{
-                 role: 'assistant',
-                 content: partialResponse(),
-                 thinking: partialThinking()
-               }"
-            [hideToolbar]="isLoading()"/>
-        }
-      </div>
+<div class="mx-auto grid min-h-[calc(100dvh-64px)] w-full max-w-[1440px] gap-4 px-4 py-5 lg:grid-cols-[270px_minmax(0,1fr)]">
+  @if (errorMessage()) {
+    <div class="rounded-panel border border-danger/30 bg-danger-soft px-4 py-3 text-sm text-danger lg:col-span-2" role="alert">
+      {{ errorMessage() }}
     </div>
   }
-  <ollama-chat-chat-input
-    [isLoading]="isLoading()"
-    [hasHistory]="messages().length > 0"
-    (sendMessage)="onSendMessage($event)"
-    (abort)="onAbortMessage()"
-    (newChat)="onNewChat()"
-  />
+
+  <aside class="flex min-h-0 flex-col gap-3 rounded-panel border border-border-subtle bg-surface-raised p-3" aria-label="Conversations">
+    <div class="flex items-center justify-between gap-3">
+      <span class="text-sm font-medium text-text-primary">Conversations</span>
+      <div class="flex items-center gap-1">
+        <button mat-icon-button (click)="onNewChat()" [disabled]="isLoading()" matTooltip="Start new chat" aria-label="Start new chat">
+          <mat-icon>add</mat-icon>
+        </button>
+        <button mat-icon-button (click)="onRequestDeleteAll()" [disabled]="isLoading() || isLoadingConversations() || conversations().length === 0" matTooltip="Delete all conversations" aria-label="Delete all conversations">
+          <mat-icon>delete_sweep</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    @if (isLoadingConversations()) {
+      <span class="text-sm text-text-muted" role="status">Loading conversations...</span>
+    } @else if (conversations().length === 0) {
+      <span class="text-sm text-text-muted">No saved conversations.</span>
+    } @else {
+      <div class="flex min-w-0 gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-x-hidden lg:overflow-y-auto" role="list" aria-label="Saved conversations">
+        @for (conversation of conversations(); track conversation.id) {
+          <div class="conversation-card group flex min-w-0 shrink-0 items-center border border-border-subtle bg-surface-muted transition-colors hover:bg-surface focus-within:border-accent focus-within:bg-surface lg:w-full" role="listitem">
+            <button
+              type="button"
+              (click)="onOpenConversation(conversation.id)"
+              [disabled]="isLoading()"
+              [attr.aria-current]="activeConversation() === conversation.id ? 'page' : null"
+              class="flex h-14 min-w-0 max-w-56 flex-1 items-center justify-start px-3 text-left text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-60 lg:max-w-none"
+            >
+              <span class="flex min-w-0 flex-col items-start text-left">
+                <span class="max-w-44 truncate text-sm lg:max-w-48">{{ conversation.title }}</span>
+                <span class="text-xs text-text-muted">{{ conversation.updatedAt | date:'short' }}</span>
+              </span>
+            </button>
+            <button mat-icon-button class="shrink-0" (click)="onRequestDeleteConversation(conversation); $event.stopPropagation()" [disabled]="isLoading()" matTooltip="Delete conversation" [attr.aria-label]="'Delete ' + conversation.title">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="mt-auto border-t border-border-subtle pt-3 text-xs text-text-muted">
+      <p>Browser-local history</p>
+      <p>Stored only on this device</p>
+    </div>
+  </aside>
+
+  <main class="flex min-h-[calc(100dvh-104px)] min-w-0 flex-col gap-4 rounded-panel border border-border-subtle bg-surface-raised p-4">
+    <header class="flex items-center justify-between gap-3 border-b border-border-subtle pb-3">
+      <h1 class="min-w-0 truncate text-lg font-medium text-text-primary">{{ currentConversationTitle() }}</h1>
+      <span class="shrink-0 rounded-full bg-surface-muted px-3 py-1 text-xs text-text-muted">Saved locally</span>
+    </header>
+
+    @if (messages().length > 0 || partialResponse() || partialThinking()) {
+      <div class="flex min-h-0 flex-1 overflow-hidden">
+        <div #scrollContainer class="flex w-full flex-1 flex-col gap-2.5 overflow-y-auto p-2.5">
+          @for (message of messages(); track message.role + ':' + (message.req_id ?? message.ref_id ?? $index)) {
+            <ollama-chat-chat-message
+              [message]="message"
+              [hideToolbar]="false"
+              (regenerate)="onRegenerateMessage($event)"
+            />
+          }
+          @if (partialResponse() || partialThinking()) {
+            <ollama-chat-chat-message
+              [message]="{
+                role: 'assistant',
+                content: partialResponse(),
+                thinking: partialThinking()
+              }"
+              [hideToolbar]="isLoading()"
+              [isStreaming]="isLoading()"
+            />
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="flex flex-1 items-center justify-center text-sm text-text-muted">
+        Start a browser-local conversation.
+      </div>
+    }
+
+    <ollama-chat-chat-input
+      [isLoading]="isLoading()"
+      [supportsThinking]="currentModelSupportsThinking()"
+      [thinkEnabled]="thinkingEnabled() && currentModelSupportsThinking()"
+      (thinkEnabledChange)="onThinkingEnabledChange($event)"
+      (sendMessage)="onSendMessage($event)"
+      (abort)="onAbortMessage()"
+    />
+  </main>
 </div>

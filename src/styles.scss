@@ -3,9 +3,28 @@
 // components according to the Material 3 design spec.
 // Learn more about theming and how to use it for your application's
 // custom components at https://material.angular.dev/guide/theming
+@use '@fontsource/material-icons' as materialIcons;
+@use '@fontsource/roboto/300.css' as roboto300;
+@use '@fontsource/roboto/400.css' as roboto400;
+@use '@fontsource/roboto/500.css' as roboto500;
 @use '@angular/material' as mat;
 @use "tailwindcss" as *;
 @use 'app/styles/ollama-chat-theme-colors' as ollamaChatTheme;
+
+@theme {
+  --color-surface: #fef9ef;
+  --color-surface-raised: #ffffff;
+  --color-surface-muted: #f5f5f5;
+  --color-text-primary: #1d1c16;
+  --color-text-muted: #615e57;
+  --color-border-subtle: #e2e2e2;
+  --color-accent: #a43c12;
+  --color-on-accent: #fff8f6;
+  --color-accent-soft: #fff8f6;
+  --color-danger: #930006;
+  --color-danger-soft: #fff0ee;
+  --radius-panel: 0.75rem;
+}
 
 html {
   @include mat.theme((
@@ -45,30 +64,27 @@ html, body {
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  overflow: hidden;
+}
+
+.material-icons {
+  direction: ltr;
+  display: inline-block;
+  font-family: 'Material Icons';
+  font-feature-settings: 'liga';
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  -webkit-font-smoothing: antialiased;
 }
 
 :root {
-  --primray-color: coral;
-  --primary-caption-color: antiquewhite;
-  --neutral-color: whitesmoke;
-  --neutral-color-variant: floralwhite;
-
   @include mat.toolbar-overrides((
-    container-background-color: coral,
-    container-text-color: antiquewhite,
-  ));
-
-  @include mat.dialog-overrides((
-    container-min-width: 786px,
+    container-background-color: var(--color-accent),
+    container-text-color: var(--color-on-accent),
   ));
 }
-
-/**
-✔ What HEX color should be used to generate the M3 theme? It will represent your primary color palette. (ex. #ffffff) #ff7f50  /coral
-✔ What HEX color should be used represent the secondary color palette? (Leave blank to use generated colors from Material) #228b22 /forrestgreen
-✔ What HEX color should be used represent the tertiary color palette? (Leave blank to use generated colors from Material) #00bfff /deepskyblue
-✔ What HEX color should be used represent the neutral color palette? (Leave blank to use generated colors from Material) #fffaf0 /floralwhite
-✔ What HEX color should be used represent the neutral variant palette? (Leave blank to use generated colors from Material) #f5f5f5 /whitesmoke
-✔ What HEX color should be used represent the error palette? (Leave blank to use generated colors from Material) #ac1010 /darkred
- */

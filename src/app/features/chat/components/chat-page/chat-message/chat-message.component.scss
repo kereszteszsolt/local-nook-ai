@@ -1,7 +1,69 @@
-.thinking-box {
-  border: 1px solid rgba(255, 139, 98, 0.35); /* primary-70 accent, subtle */
-  background: #fff8f6; /* primary-98 */
+.thinking-content {
+  scrollbar-color: var(--color-border-subtle) transparent;
 }
-.thinking-title {
-  color: #a43c12; /* surface-tint / primary role */
+
+.thinking-preview {
+  height: 5.5rem;
+  overflow-y: auto;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  transition: height 180ms ease-out;
+  mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+}
+
+.thinking-preview-expanded {
+  height: 15rem;
+}
+
+.thinking-preview::-webkit-scrollbar {
+  display: none;
+}
+
+.thinking-preview-text {
+  margin: 0;
+}
+
+.thinking-ellipsis {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.thinking-ellipsis span {
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 999px;
+  background: var(--color-accent);
+  animation: thinking-ellipsis 1s ease-in-out infinite;
+}
+
+.thinking-ellipsis span:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.thinking-ellipsis span:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thinking-preview {
+    transition: none;
+  }
+
+  .thinking-ellipsis span {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+@keyframes thinking-ellipsis {
+  0%, 80%, 100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translateY(-0.125rem);
+  }
 }

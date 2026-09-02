@@ -1,12 +1,13 @@
 {
-  "name": "ollama-local-chat",
-  "version": "0.0.0",
+  "name": "@localnook/app",
+  "version": "0.1.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "screenshots": "playwright test --config=playwright.screenshots.config.ts"
   },
   "prettier": {
     "overrides": [
@@ -20,36 +21,51 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/cdk": "^20.1.6",
-    "@angular/common": "^20.0.0",
-    "@angular/compiler": "^20.0.0",
-    "@angular/core": "^20.0.0",
-    "@angular/forms": "^20.0.0",
-    "@angular/material": "^20.1.6",
-    "@angular/platform-browser": "^20.0.0",
-    "@angular/router": "^20.0.0",
-    "@tailwindcss/postcss": "^4.1.12",
-    "katex": "^0.16.22",
-    "mermaid": "^11.10.0",
-    "ngx-markdown": "^20.0.0",
-    "postcss": "^8.5.6",
+    "@angular/animations": "20.3.28",
+    "@angular/cdk": "20.2.14",
+    "@angular/common": "20.3.28",
+    "@angular/compiler": "20.3.28",
+    "@angular/core": "20.3.28",
+    "@angular/forms": "20.3.28",
+    "@angular/material": "20.2.14",
+    "@angular/platform-browser": "20.3.28",
+    "@angular/router": "20.3.28",
+    "@fontsource/material-icons": "5.3.0",
+    "@fontsource/roboto": "5.3.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "katex": "0.16.47",
+    "mermaid": "11.16.1",
+    "ngx-markdown": "20.1.0",
+    "ollama": "^0.6.3",
+    "postcss": "8.5.26",
     "prismjs": "^1.30.0",
     "rxjs": "~7.8.0",
-    "tailwindcss": "^4.1.12",
+    "tailwindcss": "4.3.3",
     "tslib": "^2.3.0",
+    "vega": "5.33.1",
+    "vega-embed": "6.29.0",
+    "vega-lite": "5.21.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "^20.0.4",
-    "@angular/cli": "^20.0.4",
-    "@angular/compiler-cli": "^20.0.0",
-    "@types/jasmine": "~5.1.0",
+    "@angular/build": "20.3.34",
+    "@angular/cli": "20.3.34",
+    "@angular/compiler-cli": "20.3.28",
+    "@playwright/test": "1.62.1",
+    "@types/jasmine": "5.1.15",
     "jasmine-core": "~5.7.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
+    "karma-jasmine-html-reporter": "2.2.0",
     "typescript": "~5.8.2"
-  }
+  },
+  "description": "LocalNook: a lightweight local-first Angular client for Ollama.",
+  "author": {
+    "name": "Keresztes Zsolt",
+    "url": "https://kereszteszsolt.hu"
+  },
+  "homepage": "https://kereszteszsolt.hu",
+  "license": "Apache-2.0"
 }

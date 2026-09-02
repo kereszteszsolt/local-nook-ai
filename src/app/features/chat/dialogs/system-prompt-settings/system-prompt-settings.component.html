@@ -1,14 +1,59 @@
 <h2 mat-dialog-title>System Prompts</h2>
 <mat-dialog-content class="max-w-[786px]">
-  <!-- Folders and Prompts -->
-  <mat-accordion>
+  @if (loading) {
+    <p class="py-6 text-sm text-text-muted" role="status">Loading prompts...</p>
+  } @else {
+    @if (storageError) {
+      <p class="mb-3 rounded-panel border border-danger/30 bg-danger-soft px-3 py-2 text-sm text-danger" role="alert">
+        {{ storageError }}
+      </p>
+    }
+
+    @if (builtInPrompt; as prompt) {
+      <section class="mb-4 rounded-panel border border-accent/50 bg-accent-soft p-4" aria-labelledby="localnook-default-heading">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-xs font-bold uppercase tracking-wide text-text-muted">LocalNook default</p>
+            <h3 id="localnook-default-heading" class="mt-1 text-base font-bold text-text-primary">Rich response formats</h3>
+            <p class="mt-1 text-sm text-text-muted">Markdown, KaTeX, and code blocks. Meaningful math or data questions use safe Vega-Lite plots; Mermaid is reserved for flow and relationship diagrams.</p>
+          </div>
+          <button
+            type="button"
+            class="rounded-full border border-accent px-3 py-1 text-sm font-medium text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-60"
+            role="switch"
+            [attr.aria-checked]="prompt.active"
+            [attr.aria-label]="prompt.active ? 'Deactivate LocalNook rich response formats' : 'Activate LocalNook rich response formats'"
+            [disabled]="loading"
+            (click)="toggleBuiltInActive()"
+          >
+            {{ prompt.active ? 'Active' : 'Inactive' }}
+          </button>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <button mat-button [disabled]="loading" (click)="showBuiltInInstructions = !showBuiltInInstructions">
+            <mat-icon>visibility</mat-icon>
+            {{ showBuiltInInstructions ? 'Hide instructions' : 'View instructions' }}
+          </button>
+          <button mat-button [disabled]="loading" (click)="restoreBuiltInInstructions()">
+            <mat-icon>restore</mat-icon>
+            Restore default
+          </button>
+        </div>
+        @if (showBuiltInInstructions) {
+          <pre class="mt-3 max-h-56 overflow-auto whitespace-pre-wrap rounded-panel border border-border-subtle bg-surface-raised p-3 text-xs text-text-primary">{{ prompt.content }}</pre>
+        }
+      </section>
+    }
+
+    <!-- Custom folders and prompts; the LocalNook default is intentionally excluded. -->
+    <mat-accordion>
     @for (folder of folders; track folder) {
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
             @if (!folderEditing[folder]) {
               <span>{{ folder }}</span>
-              <button mat-icon-button (click)="$event.stopPropagation(); startEditFolderName(folder)"
+              <button mat-icon-button [disabled]="loading" (click)="$event.stopPropagation(); startEditFolderName(folder)"
                       matTooltip="Edit folder name">
                 <mat-icon>edit</mat-icon>
               </button>
@@ -20,28 +65,29 @@
                 (blur)="saveFolderName(folder)"
                 (click)="$event.stopPropagation()"
                 class="w-full"
+                aria-label="Folder name"
               />
-              <button mat-icon-button (click)="$event.stopPropagation(); saveFolderName(folder)"
+              <button mat-icon-button [disabled]="loading" (click)="$event.stopPropagation(); saveFolderName(folder)"
                       matTooltip="Save folder name">
                 <mat-icon>save</mat-icon>
               </button>
             }
           </mat-panel-title>
-          <button mat-icon-button (click)="$event.stopPropagation(); clearFolder(folder)" matTooltip="Delete folder">
+          <button mat-icon-button [disabled]="loading" (click)="$event.stopPropagation(); clearFolder(folder)" matTooltip="Delete folder">
             <mat-icon>delete</mat-icon>
           </button>
         </mat-expansion-panel-header>
         <!-- Button Row for Folder Actions -->
-        <div class="flex justify-end gap-2 p-2 border-t">
-          <button mat-button (click)="toggleAllActive(folder, true)">
+        <div class="flex flex-wrap justify-end gap-2 border-t border-border-subtle p-2">
+          <button mat-button [disabled]="loading" (click)="toggleAllActive(folder, true)">
             <mat-icon>check_circle</mat-icon>
             Activate All
           </button>
-          <button mat-button (click)="toggleAllActive(folder, false)">
+          <button mat-button [disabled]="loading" (click)="toggleAllActive(folder, false)">
             <mat-icon>cancel</mat-icon>
             Inactivate All
           </button>
-          <button mat-button (click)="addNewPrompt(folder)">
+          <button mat-button [disabled]="loading" (click)="addNewPrompt(folder)">
             <mat-icon>add</mat-icon>
             Add Prompt
           </button>
@@ -49,7 +95,7 @@
         <!-- Prompts -->
         @for (prompt of systemPrompts; track prompt.sys_msg_id; let i = $index) {
           @if (prompt.folder === folder) {
-            <div class="p-2 border-b last:border-0">
+            <div class="border-b border-border-subtle p-2 last:border-0">
               <div class="flex justify-between items-center">
                 <div class="flex-1">
                   @if (prompt.editing) {
@@ -57,33 +103,34 @@
                       matInput
                       [(ngModel)]="prompt.content"
                       placeholder="Type something..."
-                      class="w-full p-2 border rounded"
+                      class="w-full rounded-panel border border-border-subtle p-2"
                       (blur)="savePrompt(i)"
                       autofocus
                     ></textarea>
                   } @else {
                     <p class="whitespace-pre-wrap">{{ prompt.content }}</p>
                   }
-                  <span class="text-sm text-gray-500">{{ prompt.active ? 'Active' : 'Inactive' }}</span>
+                  <span class="text-sm text-text-muted">{{ prompt.active ? 'Active' : 'Inactive' }}</span>
                 </div>
                 <div>
                   @if (!prompt.editing) {
-                    <button mat-icon-button matTooltip="Edit" (click)="$event.stopPropagation(); editPrompt(i)">
+                    <button mat-icon-button [disabled]="loading" matTooltip="Edit" (click)="$event.stopPropagation(); editPrompt(i)">
                       <mat-icon>edit</mat-icon>
                     </button>
                   }
                   @if (prompt.editing) {
-                    <button mat-icon-button matTooltip="Save" (click)="$event.stopPropagation(); savePrompt(i)">
+                    <button mat-icon-button [disabled]="loading" matTooltip="Save" (click)="$event.stopPropagation(); savePrompt(i)">
                       <mat-icon>save</mat-icon>
                     </button>
                   }
                   <button
                     mat-icon-button
+                    [disabled]="loading"
                     [matTooltip]="prompt.active ? 'Deactivate' : 'Activate'"
                     (click)="$event.stopPropagation(); toggleActive(i)">
                     <mat-icon>{{ prompt.active ? 'cancel' : 'check_circle' }}</mat-icon>
                   </button>
-                  <button mat-icon-button matTooltip="Remove" (click)="$event.stopPropagation(); removePrompt(i)">
+                  <button mat-icon-button [disabled]="loading" matTooltip="Remove" (click)="$event.stopPropagation(); removePrompt(i)">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </div>
@@ -93,14 +140,15 @@
         }
       </mat-expansion-panel>
     }
-  </mat-accordion>
+    </mat-accordion>
+  }
 </mat-dialog-content>
-<mat-dialog-actions align="end">
-  <button mat-button color="primary" (click)="addNewPromptFolder()">
+<mat-dialog-actions align="end" class="flex flex-wrap gap-1">
+  <button mat-button color="primary" [disabled]="loading" (click)="addNewPromptFolder()">
     <mat-icon>add</mat-icon>
     New Folder
   </button>
-  <button mat-button (click)="fileInputCSV.click()">
+  <button mat-button [disabled]="loading" (click)="fileInputCSV.click()">
     <mat-icon>upload</mat-icon>
     Import CSV
   </button>
@@ -109,10 +157,10 @@
     #fileInputCSV
     id="importCSV"
     (change)="importFromCSV($event)"
-    accept=".csv,.xlsx"
+    accept=".csv,text/csv"
     style="display: none;"
   />
-  <button mat-button (click)="fileInputJSON.click()">
+  <button mat-button [disabled]="loading" (click)="fileInputJSON.click()">
     <mat-icon>upload</mat-icon>
     Import JSON
   </button>
@@ -124,14 +172,12 @@
     accept=".json"
     style="display: none;"
   />
-  <button mat-button (click)="exportToJSON()">
+  <button mat-button [disabled]="loading" (click)="exportToJSON()">
     <mat-icon>download</mat-icon>
     Export JSON
   </button>
-  <label for="closeDialog">
-    <button mat-button (click)="closeDialog()">
-      <mat-icon>close</mat-icon>
-      Close
-    </button>
-  </label>
+  <button mat-button (click)="closeDialog()">
+    <mat-icon>close</mat-icon>
+    Close
+  </button>
 </mat-dialog-actions>

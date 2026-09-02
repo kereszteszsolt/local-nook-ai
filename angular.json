@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ollama-local-chat": {
+    "localnook-ai": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -58,8 +58,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "4.5MB",
+                  "maximumError": "5MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -81,10 +81,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "ollama-local-chat:build:production"
+              "buildTarget": "localnook-ai:build:production"
             },
             "development": {
-              "buildTarget": "ollama-local-chat:build:development"
+              "buildTarget": "localnook-ai:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -105,6 +105,16 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "*.woff*",
+                "input": "node_modules/@fontsource/roboto/files",
+                "output": "base/media"
+              },
+              {
+                "glob": "*.woff*",
+                "input": "node_modules/@fontsource/material-icons/files",
+                "output": "base/media"
               }
             ],
             "styles": [

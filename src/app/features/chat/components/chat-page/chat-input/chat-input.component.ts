@@ -1,12 +1,17 @@
-import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
-import {MatIconButton} from '@angular/material/button';
-import {MatIcon} from '@angular/material/icon';
-import {FormsModule} from '@angular/forms';
-import {CdkTextareaAutosize} from '@angular/cdk/text-field';
-import {MatTooltip} from '@angular/material/tooltip';
-import {SystemPromptSettingsComponent} from '../../../dialogs/system-prompt-settings/system-prompt-settings.component';
-import {MatDialog} from '@angular/material/dialog';
-import {MatSlideToggle} from '@angular/material/slide-toggle';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { FormsModule } from '@angular/forms';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { MatTooltip } from '@angular/material/tooltip';
+import { SystemPromptSettingsComponent } from '../../../dialogs/system-prompt-settings/system-prompt-settings.component';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+
+export interface ChatSubmitEvent {
+  readonly content: string;
+  readonly think: boolean;
+}
 
 @Component({
   selector: 'ollama-chat-chat-input',
@@ -16,57 +21,62 @@ import {MatSlideToggle} from '@angular/material/slide-toggle';
     FormsModule,
     CdkTextareaAutosize,
     MatTooltip,
-    MatSlideToggle
+    MatSlideToggle,
   ],
   templateUrl: './chat-input.component.html',
-  styleUrl: './chat-input.component.scss'
+  styleUrl: './chat-input.component.scss',
 })
 export class ChatInputComponent {
-  @Input({required: true}) isLoading: boolean = false;
-  @Input({required: true}) hasHistory: boolean = false;
-  @Output() sendMessage: EventEmitter<string> = new EventEmitter<string>();
-  @Output() abort: EventEmitter<void> = new EventEmitter<void>();
-  @Output() newChat: EventEmitter<void> = new EventEmitter<void>();
-  private dialog = inject(MatDialog);
-
-  currentMessage: string = '';
-  thinkEnabled: boolean = false;
-
-  onSendCurrentMessage() {
-    if (this.currentMessage.trim()) {
-      // Emit a JSON-encoded payload to preserve backward compatibility in event signature
-      // The parent will parse and route to service
-      this.sendMessage.emit(JSON.stringify({ content: this.currentMessage, think: this.thinkEnabled }));
-      this.currentMessage = '';
+  @Input({ required: true }) isLoading = false;
+  @Input({ required: true })
+  set supportsThinking(value: boolean) {
+    this.thinkingSupported = value;
+    if (!value) {
+      this.thinkEnabled = false;
     }
   }
+  @Input() thinkEnabled = false;
 
-  onKeyPress(event: KeyboardEvent) {
+  @Output() readonly sendMessage = new EventEmitter<ChatSubmitEvent>();
+  @Output() readonly abort = new EventEmitter<void>();
+  @Output() readonly thinkEnabledChange = new EventEmitter<boolean>();
+
+  private readonly dialog = inject(MatDialog);
+
+  currentMessage = '';
+  thinkingSupported = false;
+
+  onSendCurrentMessage(): void {
+    const content = this.currentMessage.trim();
+    if (!content || this.isLoading) {
+      return;
+    }
+
+    this.sendMessage.emit({ content, think: this.thinkEnabled });
+    this.currentMessage = '';
+  }
+
+  onKeyPress(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       this.onSendCurrentMessage();
     }
   }
 
-  onClearInput() {
+  onClearInput(): void {
     this.currentMessage = '';
   }
 
-  onAbort() {
+  onThinkingEnabledChange(enabled: boolean): void {
+    this.thinkEnabled = enabled;
+    this.thinkEnabledChange.emit(enabled);
+  }
+
+  onAbort(): void {
     this.abort.emit();
   }
 
-  onNewChat() {
-    this.newChat.emit();
-    this.onClearInput();
-  }
-
-  openSystemPromptSettings() {
-    const dialogRef = this.dialog.open(SystemPromptSettingsComponent, {
-      disableClose: false,
-      autoFocus: false,
-      restoreFocus: false
-    });
-    dialogRef.afterClosed().subscribe();
+  openSystemPromptSettings(): void {
+    this.dialog.open(SystemPromptSettingsComponent);
   }
 }

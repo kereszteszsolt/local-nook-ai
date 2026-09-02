@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: 2026 Keresztes Zsolt <https://kereszteszsolt.hu> -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>LocalNook</title>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#a43c12"/>
+  <path fill="#fff8f6" d="M13 12h38a7 7 0 0 1 7 7v24a7 7 0 0 1-7 7H33L20 58v-8h-7a7 7 0 0 1-7-7V19a7 7 0 0 1 7-7z"/>
+  <path fill="#1d1c16" d="M18 20h28a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6H33l-8 6v-6h-7a6 6 0 0 1-6-6V26a6 6 0 0 1 6-6z"/>
+  <circle cx="24" cy="31" r="2.5" fill="#fff8f6"/>
+  <circle cx="32" cy="31" r="2.5" fill="#fff8f6"/>
+  <circle cx="40" cy="31" r="2.5" fill="#fff8f6"/>
+</svg>
