@@ -120,9 +120,12 @@ Product labels come from [`BrandConfig`](src/app/core/config/brand.config.ts); s
 
 Optional development roles — [`architect`](.codex/agents/architect.toml), [`implementation_worker`](.codex/agents/implementation-worker.toml), [`reviewer`](.codex/agents/reviewer.toml), and [`design_reviewer`](.codex/agents/design-reviewer.toml) — are supported by [`angular-feature-delivery`](.agents/skills/angular-feature-delivery/SKILL.md), [`conversation-context`](.agents/skills/conversation-context/SKILL.md), [`ollama-integration`](.agents/skills/ollama-integration/SKILL.md), [`release-evidence`](.agents/skills/release-evidence/SKILL.md), and [`ui-design`](.agents/skills/ui-design/SKILL.md). These development aids are not LocalNook runtime dependencies; see the [Codex setup](.codex/README.md) and [working agreements](AGENTS.md).
 
-## License
+## License and author
 
-Apache License 2.0. See [`LICENSE`](LICENSE).
+Apache-2.0. Copyright © 2026 **Keresztes Zsolt** — [kereszteszsolt.hu](https://kereszteszsolt.hu).
+
+New hand-written source files use the two-line SPDX header defined in [AGENTS.md](AGENTS.md).
+
 
 ## Contact
 
