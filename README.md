@@ -126,7 +126,6 @@ Apache-2.0. Copyright © 2026 **Keresztes Zsolt** — [kereszteszsolt.hu](https:
 
 New hand-written source files use the two-line SPDX header defined in [AGENTS.md](AGENTS.md).
 
-
 ## Contact
 
 **Project maintainer: Keresztes Zsolt**
