@@ -1,28 +1,12 @@
 ---
 name: conversation-context
-description: Design or implement LocalNook model context and browser-local conversation lifecycle. Use for ContextBuilder changes, IndexedDB records, conversation CRUD/deletion, reload behavior, regeneration history, or cross-conversation isolation.
+description: Use for LocalNook ChatContextBuilder, browser IndexedDB conversation/prompt repositories, data deletion, migrations or message-history isolation.
 ---
 
-# Conversation context and persistence
+# Model context and browser persistence
 
-Treat stored records and model request context as separate contracts.
-
-```text
-Conversation records -> repository -> active conversation state -> ContextBuilder -> Ollama messages
-```
-
-## Invariants
-
-- Each persisted conversation has a stable technical ID.
-- Each message belongs to exactly one conversation.
-- Only the active conversation contributes conversation history.
-- Active system prompts are prepended explicitly and deterministically.
-- Ollama receives only intended model fields such as role and content.
-- UI IDs, timestamps, storage metadata, durations, and editing flags remain local.
-- Aborted or failed partial output is not stored as a completed assistant message.
-- Deleting a conversation removes its messages and active references.
-- Users can delete one conversation and all conversations.
-- Storage identifiers do not change when the display brand changes.
-- Storage failures become recoverable application errors rather than silent data loss.
-
-Keep the first IndexedDB implementation small: one database, explicit schema version, one repository, and focused CRUD/deletion tests.
+- Trace only the active conversation → repository → `ChatFacade` → `ChatContextBuilder` → Ollama request.
+- Build narrow model messages (`role`, `content`, explicitly selected prompts/history); exclude UI IDs, timestamps, durations, local editing fields and unrelated conversations.
+- Keep technical IDs and IndexedDB schema stable across display brand changes. Handle corrupted records or migrations explicitly, not by silent data loss.
+- Store a streamed assistant reply only after successful completion. Preserve reload, regenerate, delete-one and delete-all consistency.
+- Unit-test context isolation, storage errors, deletion and partial/cancelled streams; do not add remote sync, backend accounts or encryption claims implicitly.

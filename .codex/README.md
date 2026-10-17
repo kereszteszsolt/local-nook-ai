@@ -1,52 +1,18 @@
-# Codex project setup
+# Codex roles and skills
 
-This directory contains the small project-scoped Codex setup for **LocalNook** / **LocalNook AI** in the `localnook-ai` repository.
+Use the root `AGENTS.md` and **one active task/story**. The main session is the default writer; historical roles are optional tools, **not** a pipeline:
 
-- `config.toml` enables bounded subagent use and registers the optional local Penpot MCP endpoint.
-- `agents/` contains four narrow custom agents.
-- Root `AGENTS.md` defines the repository-wide working agreement.
-- Reusable task workflows live under `.agents/skills/`.
+| Agent | Trigger |
+| --- | --- |
+| `implementation_worker` | One approved delegated feature/fix (sole writer) |
+| `architect` | Read-only cross-boundary Angular/context/storage assessment |
+| `reviewer` | Read-only security/regression/test review of a risky diff |
+| `design_reviewer` | Read-only Penpot/token/accessibility review for an actual visual change |
 
-## Agent flow
+Select only matching skills (`angular-feature-delivery`, `ollama-integration`, `conversation-context`, `ui-design`, `release-evidence`). Their purpose is the **technical method**, not story-specific product logic. Do not load all skills, double-review simple changes or run tests twice.
 
-A full story may use:
+Before implementation and before commit, request separate approval. Never treat approval for one story as approval for a push or the next story.
 
-```text
-architect -> implementation_worker -> reviewer
-                         \-> design_reviewer (only for visual work)
-```
+## Optional Penpot MCP
 
-Do not invoke the whole set for small changes, and do not run multiple write-owning agents over the same files.
-
-## Approval checkpoints
-
-Before implementing a story, present its bounded scope, risks, planned changes, and verification, then ask the user for explicit approval to start. Before every commit, present the current story's implemented acceptance criteria, verification results and limitations, scoped diff, and proposed commit message, then ask for separate explicit commit approval. Story approval never implies commit approval or approval for the next story.
-
-Suggested Hungarian prompts:
-
-```text
-Kezdhetjük a LAC-NNN – <story title> user storyt?
-Engedélyezed a LAC-NNN változásainak commitolását ezzel az üzenettel: <commit message>?
-```
-
-## Local Penpot MCP
-
-Start the local server:
-
-```bash
-npx -y @penpot/mcp@stable
-```
-
-Codex connects to:
-
-```text
-http://localhost:4401/mcp
-```
-
-In Penpot, load the plugin manifest from:
-
-```text
-http://localhost:4400/manifest.json
-```
-
-Open the relevant design and connect the plugin. Begin with read-only inspection; design writes should be small and reversible. Penpot is optional for non-visual implementation and verification work.
+`.codex/config.toml` preserves the optional local `http://localhost:4401/mcp` connection. Use it only for Penpot design tasks. In Penpot, connect the plugin via `http://localhost:4400/manifest.json` after starting `npx -y @penpot/mcp@stable`. Start with read-only inspection, approve reversible design writes and do not require MCP for unrelated work.

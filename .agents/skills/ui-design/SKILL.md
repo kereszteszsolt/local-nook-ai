@@ -1,19 +1,12 @@
 ---
 name: ui-design
-description: Design, implement, or review LocalNook UI with semantic Tailwind tokens and optional Penpot MCP. Use for layout, styling, interaction states, accessibility, responsive behavior, or design-to-code work.
+description: Use for LocalNook Angular Material/Tailwind components, semantic design tokens, responsive UI, accessibility and optional Penpot design inspection.
 ---
 
-# UI design workflow
+# Angular UI and design tokens
 
-1. Read `docs/design-system.md` and `docs/brand-configuration.md`.
-2. When a relevant Penpot design is connected, inspect the focused page before editing.
-3. Begin MCP work with read-only inspection; describe intended design writes and keep them reversible.
-4. Use `BrandConfig` for product/developer labels.
-5. Use top-level Tailwind `@theme` variables for reusable color and radius decisions.
-6. Prefer semantic utilities such as `bg-surface-raised`, `text-text-muted`, and `border-border-subtle` over raw palette values in product UI.
-7. Reuse Angular Material where it supplies correct semantics and keyboard behavior.
-8. Implement default, hover/focus-visible, disabled, loading, empty, and error states where relevant.
-9. Check responsive layout and keyboard navigation.
-10. Keep visual changes within the story scope.
-
-Penpot is a design aid, not a runtime dependency and not a blocker for non-visual work.
+1. Inspect only the touched component and `docs/design-system.md`; use `docs/brand-configuration.md` when changing labels.
+2. Use semantic Tailwind `@theme` utilities and Angular Material behavior; avoid hardcoded duplicate palettes, focus traps and ad hoc interactive markup.
+3. Cover keyboard/focus-visible, screen-reader labels, disabled/loading/empty/error states, and narrow-width layout.
+4. Penpot MCP is optional: inspect the relevant frame only, and request approval before reversible design writes.
+5. Run build/component checks and targeted Playwright screenshots only when visual behavior changed. Do not require UI redesign for backend/stream fixes.
