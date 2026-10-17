@@ -1,4 +1,4 @@
-# LocalNook
+# LocalNook AI
 
 [![Release 0.3](https://img.shields.io/badge/release-0.3-A43C12)](docs/releases/release-0.3-local-experience/README.md)
 ![Angular 20.3.28](https://img.shields.io/badge/Angular-20.3.28-DD0031?logo=angular&logoColor=white)
@@ -6,7 +6,7 @@
 ![ollama/browser 0.6.3](https://img.shields.io/badge/ollama%2Fbrowser-0.6.3-000000?logo=ollama&logoColor=white)
 [![Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-0B6E99)](LICENSE)
 
-**LocalNook**, with the extended product name **LocalNook AI**, is a lightweight Angular client for browser-local conversation management with models served by a configured Ollama runtime. It has no application backend: the browser owns the conversation UI and storage, while the official `ollama/browser` client communicates directly with Ollama.
+**LocalNook AI** (also called **LocalNook**) is an Angular chat client for Ollama that can run locally or be self-hosted. It supports streaming conversations, model switching, configurable system prompts, and rich responses. Conversations are stored in the browser; the official `ollama/browser` SDK connects directly to a configured Ollama runtime, without a separate application backend.
 
 ![LocalNook desktop conversation showing browser-local history and a privacy-safe fixture response.](docs/screenshots/desktop-chat.png)
 
@@ -21,6 +21,16 @@ _The screenshot uses deterministic fixture content. See the [complete privacy-sa
 - Builds intentional Ollama context from active prompts and the current conversation without sending UI identifiers, timestamps, durations, or storage metadata.
 
 Browser-local storage is scoped to the exact application origin and is not encrypted by LocalNook. Requests are processed by the configured Ollama endpoint, which may be local, on a trusted LAN, or remote. Read the [privacy and storage boundaries](docs/user-guide.md#privacy-and-storage-boundaries) before sending sensitive content.
+
+## Tech stack
+
+| Area | Technologies |
+| --- | --- |
+| Frontend | Angular · TypeScript · RxJS · Angular Material · Tailwind CSS |
+| LLM integration | Ollama · official `ollama/browser` SDK · streaming chat |
+| Browser storage | IndexedDB · localStorage |
+| Rich responses | Markdown · Prism.js · KaTeX · Mermaid · Vega-Lite |
+| Build, testing and deployment | Angular CLI · Jasmine/Karma · Playwright · Docker Compose |
 
 ## Quick start
 
