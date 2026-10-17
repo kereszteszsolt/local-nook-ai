@@ -1,24 +1,12 @@
 ---
 name: release-evidence
-description: Maintain LocalNook release plans and LAC user stories. Use when adding or reconciling story status, acceptance criteria, architecture links, implementation notes, or verification evidence; skip for ordinary code-only changes.
+description: Use for LocalNook LAC story status, reproducible verification, release documentation, README links and accurate evidence records.
 ---
 
-# Release evidence
+# Story and verification evidence
 
-Use the repository story structure:
-
-1. Status
-2. User story
-3. Acceptance criteria
-4. Implementation evidence or notes when useful
-5. Verification
-
-Rules:
-
-- Story IDs use the stable `LAC-` prefix, independent of the display brand.
-- `Implemented` requires code or configuration evidence for the stated behavior.
-- `In progress` means only part of the acceptance contract is present.
-- `Planned` is a target, not a claim.
-- Keep criteria observable and bounded; do not mirror low-level task lists.
-- Keep cross-cutting decisions in the topic docs rather than repeating them in every story.
-- Record missing build/test evidence explicitly instead of checking criteria optimistically.
+- Read one active `LAC-*` story and its release map, not all historical stories.
+- Scope acceptance criteria to observable behavior; `Planned` does not imply code, and `Implemented` needs actual tests or explicit evidence.
+- Report precise commands/results, skipped checks, runtime requirements and limitations. Preserve historical release claims and story IDs.
+- Keep program behavior and user-guide terminology aligned without duplicating release text in source comments.
+- Ask separately for implementation, commit, push and next-story approvals. No automatic transition from verification to commit.

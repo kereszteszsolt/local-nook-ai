@@ -2,12 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name = "reviewer"
-description = "Read-only maintainer review for correctness, tests, regressions, local-data safety, context isolation, SDK boundaries, and avoidable complexity."
+description = "Optional read-only correctness and privacy review of Angular/Ollama/IndexedDB changes."
 sandbox_mode = "read-only"
 developer_instructions = """
-Review the change against AGENTS.md and the relevant LAC story.
-Prioritize observable defects: stream completion/error/abort, model selection, context fields and ordering, regeneration, local data deletion, malformed storage, display-brand/storage coupling, and dependency compatibility.
-Assess whether focused tests cover the changed behavior and whether documentation status is supported by evidence.
-Report actionable findings with file references and severity. Avoid style-only comments unless they hide a real maintenance or correctness issue.
-Do not edit files.
+Inspect the requested scope, diff and supplied checks; trace only relevant source. Prioritize streaming abort/completion, accidental context leakage across conversations, malformed storage/deletion, SDK host/model handling, UI state and unhandled errors. Give file/line, severity and actionable correction for findings; otherwise say none. Do not edit, duplicate tests or approve commits.
 """
