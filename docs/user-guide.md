@@ -27,9 +27,17 @@ This path requires Docker Engine with Docker Compose; it does not require host N
 docker compose up --build
 ```
 
-Open `http://127.0.0.1:4201`. This mode serves the production Angular output through Nginx while the browser still connects to the host Ollama endpoint at `http://localhost:11434`.
+Open `http://127.0.0.1:33060`. This mode serves the production Angular output through Nginx while the browser still connects to the host Ollama endpoint at `http://localhost:11434`.
 
 Stop the application with `docker compose down`.
+
+### Local-only access
+
+Compose publishes the application only on `127.0.0.1:33060`. Open `http://localhost:33060` or `http://127.0.0.1:33060` on the same machine. The configuration does not publish the application on a LAN interface.
+
+The optional Ollama container publishes only on `127.0.0.1:11435`; its `OLLAMA_ORIGINS` includes `http://127.0.0.1:33060` and `http://localhost:33060`. `OLLAMA_HOST=0.0.0.0:11434` is its internal container listener and does not change the loopback host binding. A separately managed Ollama runtime keeps its own network configuration.
+
+Changing the application origin, including its hostname or port, selects a separate browser store. Existing conversations and settings remain under the previous origin; LocalNook does not automatically migrate between origins.
 
 ### Optional Ollama container
 
@@ -48,7 +56,7 @@ docker compose -f docker-compose.yaml -f docker-compose.ollama.yml exec ollama o
 No model is downloaded automatically. Open the application with the container's browser-reachable endpoint:
 
 ```text
-http://127.0.0.1:4201/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
+http://127.0.0.1:33060/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
 ```
 
 Normal shutdown preserves models in the `ollama-models` named volume:

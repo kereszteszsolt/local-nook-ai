@@ -47,7 +47,7 @@ npm ci
 npm start
 ```
 
-Open `http://localhost:4200`; LocalNook uses `http://localhost:11434` by default. To serve the production application through Docker while keeping Ollama on the host, run `docker compose up --build` and open `http://127.0.0.1:4201`.
+Open `http://localhost:4200`; LocalNook uses `http://localhost:11434` by default. To serve the production application through Docker while keeping Ollama on the host, run `docker compose up --build` and open `http://127.0.0.1:33060`.
 
 ### Optional containerized Ollama
 
@@ -63,7 +63,7 @@ After Ollama is healthy, pull a model from another terminal:
 docker compose -f docker-compose.yaml -f docker-compose.ollama.yml exec ollama ollama pull <model-name>
 ```
 
-Open `http://127.0.0.1:4201/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435`. Downloaded models remain in the named volume until you intentionally remove it; the full shutdown and reset commands are in the [user guide](docs/user-guide.md#optional-ollama-container).
+Open `http://127.0.0.1:33060/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435`. Downloaded models remain in the named volume until you intentionally remove it; the full shutdown and reset commands are in the [user guide](docs/user-guide.md#optional-ollama-container).
 
 ## Architecture
 
@@ -115,6 +115,14 @@ The automated suites use controlled fakes; a live Ollama smoke test is still nee
 | Developer | Keresztes Zsolt — [kereszteszsolt.hu](https://kereszteszsolt.hu/) |
 
 Product labels come from [`BrandConfig`](src/app/core/config/brand.config.ts); storage and technical identifiers remain brand-independent. Release 0.3 is a repository milestone, not a published npm package or Git tag.
+
+## Branding and About
+
+[`brand/branding.json`](brand/branding.json) owns displayed app and author names, descriptions, links and artwork paths. Angular imports it at build time and packages the existing favicon, icon and poster from `brand/assets/`. Rebuild the web app after changing it. The sidebar shows the current-year author copyright with an inline license link and the author's website domain as a direct link.
+
+The header's **About** button opens an Angular Material dialog with the large existing LocalNook poster, description and filled project/author link buttons. Buy me a Coffee and Ways to support sit together, followed by the voluntary-support note and copyright. Speech-bubble tooltips appear on hover or keyboard focus, explain each destination and show the full URL; website/support tooltips also list hu | en | ro | de. Escape dismisses a visible tooltip before closing About; closing About returns focus to its button and preserves the conversation draft. See the [branding guide](brand/README.md).
+
+Docker publishes the application on **127.0.0.1:33060**, for local access only. Open `http://localhost:33060` or `http://127.0.0.1:33060` on the same machine. The optional Ollama container also publishes only on loopback. See [local-only access](docs/user-guide.md#local-only-access). Browser history belongs to the exact application origin; history from port 4201 stays under that previous origin.
 
 ## AI-assisted engineering
 

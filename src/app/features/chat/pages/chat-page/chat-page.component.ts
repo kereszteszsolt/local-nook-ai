@@ -15,6 +15,7 @@ import {
   ConversationDeleteConfirmationData,
 } from '../../dialogs/conversation-delete-confirmation/conversation-delete-confirmation.component';
 import type { ConversationSummary } from '../../infrastructure/conversation.repository';
+import { BrandAttributionComponent } from '../../../../shared/components/brand-attribution/brand-attribution.component';
 
 @Component({
   selector: 'ollama-chat-chat-page',
@@ -25,6 +26,7 @@ import type { ConversationSummary } from '../../infrastructure/conversation.repo
     MatIconButton,
     MatIcon,
     MatTooltip,
+    BrandAttributionComponent,
   ],
   templateUrl: './chat-page.component.html',
   styleUrl: './chat-page.component.scss',

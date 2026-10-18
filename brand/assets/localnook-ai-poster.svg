@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 480" role="img" aria-labelledby="title desc">
+  <title id="title">LocalNook AI project poster</title>
+  <desc id="desc">LocalNook AI in cream on terracotta, with a laptop showing two real words, Hello and Hi, in opposing chat bubbles.</desc>
+  <rect width="780" height="480" rx="24" fill="#a43c12"/>
+  <g font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
+    <text x="390" y="88" fill="#fff8f6" font-size="62" font-weight="800" letter-spacing="-2">LocalNook AI</text>
+    <text x="390" y="132" fill="#ffdbcf" font-size="28" font-weight="500">Your models. Your machine. Your chat.</text>
+  </g>
+  <rect x="211" y="181" width="358" height="239" rx="21" fill="#5c1a00" stroke="#ffdbcf" stroke-width="10"/>
+  <path d="M181 420h418l-16 24a17 17 0 0 1-14 8H211a17 17 0 0 1-14-8Z" fill="#ffdbcf"/>
+  <path d="M350 420h80l-9 10h-62Z" fill="#a43c12"/>
+  <path d="M248 214h192a13 13 0 0 1 13 13v59a13 13 0 0 1-13 13H275l-27 19v-19a13 13 0 0 1-13-13v-59a13 13 0 0 1 13-13Z" fill="#fff8f6"/>
+  <text x="343" y="273" fill="#5c1a00" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="700" text-anchor="middle">Hello!</text>
+  <path d="M383 317h139a12 12 0 0 1 12 12v46a12 12 0 0 1-12 12v17l-24-17H383a12 12 0 0 1-12-12v-46a12 12 0 0 1 12-12Z" fill="#ff8b62"/>
+  <text x="453" y="370" fill="#5c1a00" font-family="Arial, Helvetica, sans-serif" font-size="46" font-weight="700" text-anchor="middle">Hi!</text>
+</svg>

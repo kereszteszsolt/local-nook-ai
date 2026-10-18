@@ -43,7 +43,9 @@ Build and start the production LocalNook image while keeping Ollama on the host:
 docker compose up --build
 ```
 
-Open `http://127.0.0.1:4201`. The browser keeps the default `http://localhost:11434` Ollama endpoint; if the host runtime rejects the page origin, configure its `OLLAMA_ORIGINS` for `http://127.0.0.1:4201` and restart Ollama.
+Open `http://127.0.0.1:33060`. The browser keeps the default `http://localhost:11434` Ollama endpoint; if the host runtime rejects the page origin, configure its `OLLAMA_ORIGINS` for `http://127.0.0.1:33060` and restart Ollama.
+
+Compose binds host port `33060` only on `127.0.0.1`, so the application is available locally. See [local-only access](user-guide.md#local-only-access). The optional overlay also publishes Ollama only on loopback and allows the two local application origins.
 
 The multi-stage image builds Angular with Node.js and serves only the production output through Nginx on container port `8080`. There is no source bind mount or Angular development server in this path. Stop it with:
 
@@ -68,10 +70,10 @@ docker compose -f docker-compose.yaml -f docker-compose.ollama.yml exec ollama o
 Open LocalNook with the browser-reachable published Ollama endpoint:
 
 ```text
-http://127.0.0.1:4201/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
+http://127.0.0.1:33060/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
 ```
 
-The overlay adds `http://127.0.0.1:4201` through `OLLAMA_ORIGINS`; it does not claim to remove Ollama's built-in allowed origins. The default configuration is CPU-only. GPU-vendor-specific devices, runtimes, and images are intentionally out of scope; see the [official Ollama Docker guide](https://docs.ollama.com/docker) when adding a local vendor-specific override.
+The overlay adds `http://127.0.0.1:33060` and `http://localhost:33060` through `OLLAMA_ORIGINS`; it does not claim to remove Ollama's built-in allowed origins. The default configuration is CPU-only. GPU-vendor-specific devices, runtimes, and images are intentionally out of scope; see the [official Ollama Docker guide](https://docs.ollama.com/docker) when adding a local vendor-specific override.
 
 Normal shutdown preserves the `ollama-models` named volume and downloaded models:
 

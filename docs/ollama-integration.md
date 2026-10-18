@@ -57,7 +57,7 @@ http://localhost:4200/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
 
 The override must be an absolute `http` or `https` origin. Credentials, paths, query strings, and fragments are rejected, and accepted values are normalized to their URL origin. An invalid explicit override produces recoverable guidance before an SDK client is created.
 
-For browser access, the Ollama installation must permit the LocalNook page origin. Configure `OLLAMA_ORIGINS` for the exact application origin, such as `http://localhost:4200` for host development or `http://127.0.0.1:4201` for the production Compose application, then restart Ollama. A remote or LAN endpoint must also bind to a browser-reachable interface through `OLLAMA_HOST` or a correctly configured proxy; expose it only on a trusted network. The [official Ollama FAQ](https://docs.ollama.com/faq) documents host binding, additional origins, and platform-specific environment configuration.
+For browser access, the Ollama installation must permit the LocalNook page origin. Configure `OLLAMA_ORIGINS` for the exact application origin, such as `http://localhost:4200` for host development or `http://127.0.0.1:33060` for the production Compose application, then restart Ollama. A remote or LAN endpoint must also bind to a browser-reachable interface through `OLLAMA_HOST` or a correctly configured proxy; expose it only on a trusted network. The [official Ollama FAQ](https://docs.ollama.com/faq) documents host binding, additional origins, and platform-specific environment configuration.
 
 A browser reports offline, unreachable-host, and blocked-origin failures through similar fetch errors. LocalNook therefore shows one actionable message: start Ollama, confirm the configured endpoint, and check `OLLAMA_ORIGINS`. Specific SDK errors such as a missing model remain unchanged.
 
@@ -81,7 +81,7 @@ The [official CLI reference](https://docs.ollama.com/cli) covers model and serve
 
 ## Containerized startup
 
-The base Compose file serves the production LocalNook build at `http://127.0.0.1:4201` and keeps the existing host Ollama path. Start it with:
+The base Compose file serves the production LocalNook build at `http://127.0.0.1:33060` and keeps the existing host Ollama path. Start it with:
 
 ```bash
 docker compose up --build
@@ -97,10 +97,10 @@ docker compose -f docker-compose.yaml -f docker-compose.ollama.yml exec ollama o
 No model is pulled during image build or container startup. Open the application with the published browser endpoint:
 
 ```text
-http://127.0.0.1:4201/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
+http://127.0.0.1:33060/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
 ```
 
-The overlay sets `OLLAMA_ORIGINS=http://127.0.0.1:4201` to add the intended LocalNook page origin without claiming that Ollama's built-in origins become exclusive. It stores models in the `ollama-models` named volume. The default is CPU-only; GPU-vendor configuration is out of scope.
+Both Compose services publish their host ports only on `127.0.0.1`. The overlay sets `OLLAMA_ORIGINS=http://127.0.0.1:33060,http://localhost:33060` to add the two local application origins without claiming that Ollama's built-in origins become exclusive. Its `OLLAMA_HOST=0.0.0.0:11434` listens inside the container; the loopback host-port binding controls external reachability. It stores models in the `ollama-models` named volume. The default is CPU-only; GPU-vendor configuration is out of scope.
 
 Normal shutdown preserves downloaded models:
 

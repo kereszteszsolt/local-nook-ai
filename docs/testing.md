@@ -20,7 +20,8 @@ npm test -- --watch=false --browsers=ChromeHeadless
 - `ChatInputComponent`: typed composer event instead of serialized component payloads.
 - `SystemPromptSettingsComponent`: quoted CSV fields and JSON import validation.
 - `ChatMessageComponent`: regeneration ID routing and non-blocking clipboard failure feedback.
-- `App` and `NavComponent`: BrandConfig browser/title usage and model loading/selection.
+- `App`, `NavComponent` and `AboutComponent`: injected metadata/artwork/destinations, empty optional links, browser title/favicon, model loading/selection and opening About.
+- Branding Playwright checks: desktop/mobile About, author/support URLs and tooltip descriptions, keyboard focus, Escape priority, preserved composer draft and sidebar attribution.
 
 ## Test boundaries
 
@@ -34,7 +35,7 @@ Do not keep tests that only instantiate a class when a meaningful behavior can b
 
 ## Deterministic product screenshots
 
-The screenshot gallery is generated from five independent Playwright tests with fresh browser contexts. The tests use fixed time, UTC timezone, `en-US` locale, light color scheme, reduced motion, fixed viewports, device scale factor `1`, self-hosted Roboto and Material Icons fonts, and disabled animations, transitions, smooth scrolling, and carets.
+The screenshot gallery is generated from five independent gallery tests and two branding checks with fresh browser contexts. The tests use fixed time, UTC timezone, `en-US` locale, light color scheme, reduced motion, fixed viewports, device scale factor `1`, self-hosted Roboto and Material Icons fonts, and disabled animations, transitions, smooth scrolling, and carets.
 
 ### Native prerequisites and generation
 
@@ -54,7 +55,9 @@ npm run screenshots
 - `rich-response.png` — 1440 × 1200;
 - `mobile-chat.png` — 390 × 844.
 
-Each test reads the generated PNG IHDR and fails unless its dimensions match exactly. If the pinned browser executable is unavailable, Playwright must fail instead of silently using another browser; install Chromium as shown above or use the matching container fallback. Do not approve partial or stale output from a failed run.
+The branding checks save About screenshots as per-test artifacts under ignored `e2e/test-output/screenshots/`; they do not add or replace gallery assets.
+
+Each capture reads the generated PNG IHDR and fails unless its dimensions match exactly. If the pinned browser executable is unavailable, Playwright must fail instead of silently using another browser; install Chromium as shown above or use the matching container fallback. Do not approve partial or stale output from a failed run.
 
 The missing-browser failure path can be checked explicitly with an empty browser directory:
 

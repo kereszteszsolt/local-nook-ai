@@ -4,4 +4,23 @@
 
 .ollama-toolbar {
   color: var(--color-on-accent);
+  min-height: 64px;
+  height: auto;
+  flex-wrap: wrap;
+  gap: .5rem;
+  padding-block: .5rem;
+}
+
+.brand-name, .toolbar-actions { display: flex; align-items: center; gap: .5rem; min-width: 0; }
+.toolbar-actions { flex-wrap: wrap; }
+.toolbar-actions button { color: inherit; max-width: min(60vw, 24rem); }
+.toolbar-actions button:disabled { color: inherit; opacity: .65; }
+
+@media (max-width: 480px) {
+  .example-spacer { display: none; }
+  .ollama-toolbar { justify-content: space-between; }
+  .brand-name { font-size: 1rem; }
+  .toolbar-actions { display: contents; }
+  .toolbar-actions button { max-width: calc(100vw - 32px); }
+  .about-button { margin-left: auto; }
 }

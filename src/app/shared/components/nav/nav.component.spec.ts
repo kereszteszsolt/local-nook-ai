@@ -1,6 +1,7 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MatDialog } from '@angular/material/dialog';
 import { BRAND_CONFIG, DEFAULT_BRAND_CONFIG } from '../../../core/config/brand.config';
 import { ChatFacade } from '../../../features/chat/application/chat-facade.service';
 import { AiModelDto } from '../../../features/chat/models/ai-model.model';
@@ -13,6 +14,8 @@ describe('NavComponent', () => {
   let setCurrentModel: jasmine.Spy;
 
   const models: AiModelDto[] = [{ name: 'qwen3:8b', model: 'qwen3:8b', supportsThinking: true }];
+
+  afterEach(() => TestBed.inject(MatDialog).closeAll());
 
   beforeEach(async () => {
     loadModels = jasmine.createSpy('loadModels').and.callFake(async () => undefined);
@@ -45,5 +48,17 @@ describe('NavComponent', () => {
   it('delegates model selection to the facade', () => {
     component.onModelChange(models[0]);
     expect(setCurrentModel).toHaveBeenCalledOnceWith(models[0]);
+  });
+
+  it('opens the About dialog from the header without changing the model', async () => {
+    const button = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.about-button');
+    button?.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const dialog = document.querySelector('[role="dialog"]');
+    expect(dialog?.textContent).toContain('About LocalNook AI');
+    expect(dialog?.querySelector('img')?.getAttribute('src')).toBe(DEFAULT_BRAND_CONFIG.poster);
+    expect(setCurrentModel).not.toHaveBeenCalled();
   });
 });
