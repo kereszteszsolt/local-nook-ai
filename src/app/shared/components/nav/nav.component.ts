@@ -40,8 +40,10 @@ export class NavComponent implements OnInit {
   openAbout(): void {
     this.dialog.open(AboutComponent, {
       width: '680px',
-      maxWidth: 'calc(100vw - 24px)',
+      // Match the tooltip overlay's 8px viewport margin to avoid clipped bubbles.
+      maxWidth: 'calc(100vw - 16px)',
       maxHeight: 'calc(100dvh - 24px)',
+      backdropClass: ['cdk-overlay-dark-backdrop', 'about-backdrop'],
       autoFocus: '[aria-label="Close about"]',
     });
   }

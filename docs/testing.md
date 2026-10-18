@@ -21,7 +21,7 @@ npm test -- --watch=false --browsers=ChromeHeadless
 - `SystemPromptSettingsComponent`: quoted CSV fields and JSON import validation.
 - `ChatMessageComponent`: regeneration ID routing and non-blocking clipboard failure feedback.
 - `App`, `NavComponent` and `AboutComponent`: injected metadata/artwork/destinations, empty optional links, browser title/favicon, model loading/selection and opening About.
-- Branding Playwright checks: desktop/mobile About, author/support URLs and tooltip descriptions, keyboard focus, Escape priority, preserved composer draft and sidebar attribution.
+- Branding Playwright checks: configured SVG/ICO artwork equivalence, desktop/mobile About with a blurred backdrop, author/support URLs, single-line desktop tooltip descriptions, mobile tooltip bounds, keyboard focus, Escape priority, preserved composer draft and sidebar attribution.
 
 ## Test boundaries
 
@@ -35,7 +35,7 @@ Do not keep tests that only instantiate a class when a meaningful behavior can b
 
 ## Deterministic product screenshots
 
-The screenshot gallery is generated from five independent gallery tests and two branding checks with fresh browser contexts. The tests use fixed time, UTC timezone, `en-US` locale, light color scheme, reduced motion, fixed viewports, device scale factor `1`, self-hosted Roboto and Material Icons fonts, and disabled animations, transitions, smooth scrolling, and carets.
+The screenshot gallery is generated from five independent gallery tests and three branding checks with fresh browser contexts. The tests use fixed time, UTC timezone, `en-US` locale, light color scheme, reduced motion, fixed viewports, device scale factor `1`, self-hosted Roboto and Material Icons fonts, and disabled animations, transitions, smooth scrolling, and carets.
 
 ### Native prerequisites and generation
 

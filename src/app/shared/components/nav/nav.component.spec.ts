@@ -59,6 +59,7 @@ describe('NavComponent', () => {
     const dialog = document.querySelector('[role="dialog"]');
     expect(dialog?.textContent).toContain('About LocalNook AI');
     expect(dialog?.querySelector('img')?.getAttribute('src')).toBe(DEFAULT_BRAND_CONFIG.poster);
+    expect(document.querySelector('.about-backdrop')).not.toBeNull();
     expect(setCurrentModel).not.toHaveBeenCalled();
   });
 });

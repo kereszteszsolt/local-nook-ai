@@ -28,6 +28,8 @@ Use a semantic token when a visual decision is reused or belongs to the product 
 
 Angular Material remains the semantic component base for toolbar, menus, dialog, buttons, icons, expansion panels, tooltips, and form controls. Tailwind handles layout and product-level styling; it should not replace accessible component behavior.
 
+Brand-link speech bubbles can grow to 560 px while staying within the viewport on narrow screens. The description and full destination URL are separated by a line break; descriptions fit on one desktop line and wrap naturally on mobile. About leaves 8 px per horizontal viewport edge to match Material tooltip positioning and avoid clipped mobile bubbles. Only About opts into the 4 px blurred backdrop; other dialogs keep their standard Material backdrop.
+
 ## Penpot workflow
 
 Penpot MCP is optional and intended for relevant design work:
