@@ -4,6 +4,7 @@
  */
 
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { BRAND_CONFIG } from '../../../core/config/brand.config';
 import { AiModelDto } from '../models/ai-model.model';
 import { Message, SystemMessage } from '../models/message.model';
 import { OllamaClientService } from '../infrastructure/ollama-client.service';
@@ -17,6 +18,7 @@ import { ChatContextBuilder } from './chat-context-builder';
 
 @Injectable({ providedIn: 'root' })
 export class ChatFacade {
+  private readonly brand = inject(BRAND_CONFIG);
   private readonly ollamaClient = inject(OllamaClientService);
   private readonly activeModelRepository = inject(ActiveModelRepository);
   private readonly promptRepository = inject(SystemPromptRepository);
@@ -138,7 +140,7 @@ export class ChatFacade {
     try {
       this.systemPrompts.set(await this.promptRepository.restoreBuiltInPrompt());
     } catch (error: unknown) {
-      const message = toUserMessage(error, 'Could not restore the LocalNook default prompt.');
+      const message = toUserMessage(error, `Could not restore the ${this.brand.productName} default prompt.`);
       this.systemPromptError.set(message);
       this.lastError.set(message);
       throw error;

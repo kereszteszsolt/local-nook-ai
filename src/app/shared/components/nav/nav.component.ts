@@ -39,7 +39,7 @@ export class NavComponent implements OnInit {
 
   openAbout(): void {
     this.dialog.open(AboutComponent, {
-      width: '680px',
+      width: '780px',
       // Match the tooltip overlay's 8px viewport margin to avoid clipped bubbles.
       maxWidth: 'calc(100vw - 16px)',
       maxHeight: 'calc(100dvh - 24px)',

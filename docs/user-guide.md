@@ -1,14 +1,14 @@
-# LocalNook user guide
+# LocalNook AI user guide
 
-LocalNook is a browser application for conversations with an Ollama runtime. Conversations and prompts are stored in the current browser profile; Ollama remains a separate service that you install, start, and manage yourself.
+LocalNook AI is a browser application for conversations with an Ollama runtime. Conversations and prompts are stored in the current browser profile; Ollama remains a separate service that you install, start, and manage yourself.
 
 See the [product screenshot gallery](screenshots/README.md) for the desktop, mobile, model-selection, prompt-management, and rich-response views described below.
 
-## Start LocalNook
+## Start LocalNook AI
 
 ### Existing Ollama on the host
 
-Prerequisites are Node.js 22, npm, a running Ollama installation, and at least one chat-capable model. LocalNook does not install Ollama or download models from its UI.
+Prerequisites are Node.js 22, npm, a running Ollama installation, and at least one chat-capable model. LocalNook AI does not install Ollama or download models from its UI.
 
 ```bash
 ollama list
@@ -33,11 +33,13 @@ Stop the application with `docker compose down`.
 
 ### Local-only access
 
+The Docker Compose group is `local-nook-ai`. Both services use `restart: "no"`: after an exit or Docker restart, start them explicitly with Compose.
+
 Compose publishes the application only on `127.0.0.1:33060`. Open `http://localhost:33060` or `http://127.0.0.1:33060` on the same machine. The configuration does not publish the application on a LAN interface.
 
 The optional Ollama container publishes only on `127.0.0.1:11435`; its `OLLAMA_ORIGINS` includes `http://127.0.0.1:33060` and `http://localhost:33060`. `OLLAMA_HOST=0.0.0.0:11434` is its internal container listener and does not change the loopback host binding. A separately managed Ollama runtime keeps its own network configuration.
 
-Changing the application origin, including its hostname or port, selects a separate browser store. Existing conversations and settings remain under the previous origin; LocalNook does not automatically migrate between origins.
+Changing the application origin, including its hostname or port, selects a separate browser store. Existing conversations and settings remain under the previous origin; LocalNook AI does not automatically migrate between origins.
 
 ### Optional Ollama container
 
@@ -79,20 +81,20 @@ Use the `ollamaHost` query parameter when the browser must reach another endpoin
 http://localhost:4200/?ollamaHost=http%3A%2F%2F192.168.1.20%3A11434
 ```
 
-An invalid override is rejected before the Ollama SDK is called. A remote endpoint must listen on a browser-reachable interface, and Ollama must allow the exact LocalNook page origin through `OLLAMA_ORIGINS` when its defaults do not already allow it.
+An invalid override is rejected before the Ollama SDK is called. A remote endpoint must listen on a browser-reachable interface, and Ollama must allow the exact LocalNook AI page origin through `OLLAMA_ORIGINS` when its defaults do not already allow it.
 
 ## Discover and select models
 
-LocalNook requests the model list when the navigation bar loads. The model menu:
+LocalNook AI requests the model list when the navigation bar loads. The model menu:
 
 - includes models advertising the `completion` capability;
 - excludes models that advertise only capabilities such as `embedding`;
 - retains models from older Ollama responses that do not include a capabilities list;
 - enables Thinking only when the selected model explicitly advertises the `thinking` capability.
 
-The first eligible model is selected when no saved eligible choice exists. A selection is remembered in localStorage as the general fallback and, after a conversation exists, in that conversation's IndexedDB record. Reopening a conversation restores its model when still available. If that model is unavailable, LocalNook reports the fallback and selects the first available model without silently rewriting the stored conversation model.
+The first eligible model is selected when no saved eligible choice exists. A selection is remembered in localStorage as the general fallback and, after a conversation exists, in that conversation's IndexedDB record. Reopening a conversation restores its model when still available. If that model is unavailable, LocalNook AI reports the fallback and selects the first available model without silently rewriting the stored conversation model.
 
-There is no model-refresh button. After `ollama pull <model-name>`, reload LocalNook to request the model list again.
+There is no model-refresh button. After `ollama pull <model-name>`, reload LocalNook AI to request the model list again.
 
 ## Chat controls
 
@@ -120,13 +122,13 @@ Delete actions are permanent:
 - deleting the active conversation also clears the active reference and visible history;
 - New chat is not deletion.
 
-IndexedDB failures are shown as recoverable page errors. If saving the initial user message fails, LocalNook does not start the model request. If saving an otherwise completed assistant response fails, the response may remain visible in the current page together with the error, but it is not durable and may disappear after reload. A failed model/thinking update can likewise leave the previous durable setting in storage. Check browser storage permissions and available space, then retry the action or reload the last durable state. Avoid clearing site data unless you intend to remove browser-local conversations and prompts.
+IndexedDB failures are shown as recoverable page errors. If saving the initial user message fails, LocalNook AI does not start the model request. If saving an otherwise completed assistant response fails, the response may remain visible in the current page together with the error, but it is not durable and may disappear after reload. A failed model/thinking update can likewise leave the previous durable setting in storage. Check browser storage permissions and available space, then retry the action or reload the last durable state. Avoid clearing site data unless you intend to remove browser-local conversations and prompts.
 
 ## System prompts
 
 Open System Prompts from the notes button beside the composer.
 
-The LocalNook default, **Rich response formats**, is seeded active and placed before custom prompts in model context. You can deactivate or reactivate it, view its instructions, and restore its canonical content. It cannot be edited, deleted, moved into a custom folder, or replaced by import data.
+The LocalNook AI default, **Rich response formats**, is seeded active and placed before custom prompts in model context. You can deactivate or reactivate it, view its instructions, and restore its canonical content. It cannot be edited, deleted, moved into a custom folder, or replaced by import data.
 
 Custom prompts support folders, add/edit, individual activation, activate-all/inactivate-all, JSON/CSV import, and JSON export. Important deletion behavior differs from conversations:
 
@@ -151,7 +153,7 @@ Use Mermaid for flows and relationships, not data plots:
 ````markdown
 ```mermaid
 flowchart LR
-  Fixture[Controlled fixture] --> Render[LocalNook renderers]
+  Fixture[Controlled fixture] --> Render[LocalNook AI renderers]
 ```
 ````
 
@@ -195,25 +197,25 @@ Browser-local does not mean that every part of a request stays on the same machi
 - conversations are in the brand-independent `local-ai-client.conversations` IndexedDB database;
 - prompts are in the separate `local-ai-client.system-prompts` IndexedDB database;
 - the last active model is in localStorage under `local-ai-client.active-model.v1`;
-- browser storage is scoped to the exact origin, including scheme, host, and port; opening LocalNook at a different origin produces a different storage area;
+- browser storage is scoped to the exact origin, including scheme, host, and port; opening LocalNook AI at a different origin produces a different storage area;
 - the model receives only active non-empty system prompts followed by non-empty user and assistant messages from the current conversation, each reduced to `role` and `content`;
 - UI IDs, timestamps, durations, thinking toggles, folders, and persistence metadata are not sent as model context;
 - conversation delete and delete-all are the explicit in-app deletion paths; custom prompt removal/folder deletion are immediate prompt-deletion paths;
-- deleting LocalNook browser data does not delete Ollama models, and New chat deletes neither conversations nor models.
+- deleting LocalNook AI browser data does not delete Ollama models, and New chat deletes neither conversations nor models.
 
-To remove every LocalNook browser record for an origin, including the active-model preference, use that browser's site-data controls after exporting anything you intend to keep. Site-data clearing bypasses the application's confirmation dialogs.
+To remove every LocalNook AI browser record for an origin, including the active-model preference, use that browser's site-data controls after exporting anything you intend to keep. Site-data clearing bypasses the application's confirmation dialogs.
 
-Requests go to the configured Ollama endpoint. A LAN, remote, proxied, or cloud-backed Ollama runtime may process data away from the LocalNook machine. Review that runtime's privacy and retention behavior before sending sensitive content.
+Requests go to the configured Ollama endpoint. A LAN, remote, proxied, or cloud-backed Ollama runtime may process data away from the LocalNook AI machine. Review that runtime's privacy and retention behavior before sending sensitive content.
 
-Markdown answers may contain external links or remote-media URLs. Opening a link—and, depending on rendered Markdown, loading remote media—can contact an external host. LocalNook does not turn arbitrary model output into a guarantee of network isolation.
+Markdown answers may contain external links or remote-media URLs. Opening a link—and, depending on rendered Markdown, loading remote media—can contact an external host. LocalNook AI does not turn arbitrary model output into a guarantee of network isolation.
 
-Local browser storage is not encrypted by LocalNook and is accessible to someone using the same browser profile. Browser clearing tools can remove it outside the application's confirmation dialogs.
+Local browser storage is not encrypted by LocalNook AI and is accessible to someone using the same browser profile. Browser clearing tools can remove it outside the application's confirmation dialogs.
 
 ## Troubleshooting
 
 ### Ollama is offline or unreachable
 
-Start Ollama, confirm the configured endpoint in the page URL, and check that the browser can reach it. LocalNook's connection message includes the endpoint and reminds you to check `OLLAMA_ORIGINS`. Browser CORS errors, offline state, and an unreachable host can look alike.
+Start Ollama, confirm the configured endpoint in the page URL, and check that the browser can reach it. LocalNook AI's connection message includes the endpoint and reminds you to check `OLLAMA_ORIGINS`. Browser CORS errors, offline state, and an unreachable host can look alike.
 
 ### No models appear
 
@@ -225,7 +227,7 @@ Use only an absolute `http` or `https` origin. Remove credentials, paths such as
 
 ### Browser-origin errors
 
-Configure `OLLAMA_ORIGINS` with the exact LocalNook page origin and restart Ollama. Do not use a wildcard merely to bypass an origin error. A remote endpoint may also need `OLLAMA_HOST` or a trusted proxy to bind to a reachable interface.
+Configure `OLLAMA_ORIGINS` with the exact LocalNook AI page origin and restart Ollama. Do not use a wildcard merely to bypass an origin error. A remote endpoint may also need `OLLAMA_HOST` or a trusted proxy to bind to a reachable interface.
 
 ### Docker mode cannot connect
 
@@ -239,11 +241,11 @@ Then pull a model explicitly with the full two-file `exec` command from the star
 
 ### WSL behaves differently
 
-Do not assume one WSL gateway name works everywhere. Depending on the host and networking mode, Ollama may be reachable through `localhost`, the Windows host address, or another configured interface. Verify the endpoint from the browser that runs LocalNook.
+Do not assume one WSL gateway name works everywhere. Depending on the host and networking mode, Ollama may be reachable through `localhost`, the Windows host address, or another configured interface. Verify the endpoint from the browser that runs LocalNook AI.
 
 ### Conversation or prompt storage fails
 
-Check whether site storage is blocked, unavailable, or full. Keep the error visible while diagnosing it. Reload to restore the last durable state. Clearing site data is permanent and affects only the current origin's LocalNook storage.
+Check whether site storage is blocked, unavailable, or full. Keep the error visible while diagnosing it. Reload to restore the last durable state. Clearing site data is permanent and affects only the current origin's LocalNook AI storage.
 
 ### Rich content falls back to source
 

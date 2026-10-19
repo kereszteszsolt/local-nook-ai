@@ -1,6 +1,6 @@
 # Development
 
-For application usage rather than repository maintenance, start with the [LocalNook user guide](user-guide.md).
+For application usage rather than repository maintenance, start with the [LocalNook AI user guide](user-guide.md).
 
 ## Prerequisites
 
@@ -16,7 +16,7 @@ ollama list
 ollama pull <model-name>
 ```
 
-Install and start LocalNook:
+Install and start LocalNook AI:
 
 ```bash
 npm ci
@@ -31,13 +31,13 @@ To use another browser-reachable Ollama origin for the current page load, open:
 http://localhost:4200/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
 ```
 
-`ollamaHost` accepts only an absolute `http` or `https` origin without credentials, a path, query, or fragment. Configure Ollama's `OLLAMA_ORIGINS` for the exact LocalNook page origin and restart Ollama if the browser blocks the request. To reach Ollama through another machine or LAN address, Ollama must also bind to a reachable interface through `OLLAMA_HOST` or sit behind a correctly configured proxy; expose it only on a trusted network. See the [official Ollama FAQ](https://docs.ollama.com/faq), [CLI reference](https://docs.ollama.com/cli), and [JavaScript client](https://github.com/ollama/ollama-js).
+`ollamaHost` accepts only an absolute `http` or `https` origin without credentials, a path, query, or fragment. Configure Ollama's `OLLAMA_ORIGINS` for the exact LocalNook AI page origin and restart Ollama if the browser blocks the request. To reach Ollama through another machine or LAN address, Ollama must also bind to a reachable interface through `OLLAMA_HOST` or sit behind a correctly configured proxy; expose it only on a trusted network. See the [official Ollama FAQ](https://docs.ollama.com/faq), [CLI reference](https://docs.ollama.com/cli), and [JavaScript client](https://github.com/ollama/ollama-js).
 
 ## Docker
 
 ### Existing host Ollama
 
-Build and start the production LocalNook image while keeping Ollama on the host:
+Build and start the production LocalNook AI image while keeping Ollama on the host:
 
 ```bash
 docker compose up --build
@@ -45,7 +45,7 @@ docker compose up --build
 
 Open `http://127.0.0.1:33060`. The browser keeps the default `http://localhost:11434` Ollama endpoint; if the host runtime rejects the page origin, configure its `OLLAMA_ORIGINS` for `http://127.0.0.1:33060` and restart Ollama.
 
-Compose binds host port `33060` only on `127.0.0.1`, so the application is available locally. See [local-only access](user-guide.md#local-only-access). The optional overlay also publishes Ollama only on loopback and allows the two local application origins.
+Compose binds host port `33060` only on `127.0.0.1`, so the application is available locally. See [local-only access](user-guide.md#local-only-access). The optional overlay also publishes Ollama only on loopback and allows the two local application origins. The Docker Compose project is named `local-nook-ai`, matching the repository directory. Both services set `restart: "no"`, so Docker does not automatically restart them after an exit or daemon restart; start them explicitly with Compose. The existing `localnook_ollama-models` volume name is retained to preserve downloaded models.
 
 The multi-stage image builds Angular with Node.js and serves only the production output through Nginx on container port `8080`. There is no source bind mount or Angular development server in this path. Stop it with:
 
@@ -67,7 +67,7 @@ No model is downloaded automatically. Pull one explicitly after the Ollama servi
 docker compose -f docker-compose.yaml -f docker-compose.ollama.yml exec ollama ollama pull <model-name>
 ```
 
-Open LocalNook with the browser-reachable published Ollama endpoint:
+Open LocalNook AI with the browser-reachable published Ollama endpoint:
 
 ```text
 http://127.0.0.1:33060/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435

@@ -11,9 +11,9 @@ import { BRAND_CONFIG } from '../../../core/config/brand.config';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <p>© {{ currentYear }} {{ brand.developer.name }},
-      <a [href]="brand.licenseUrl" target="_blank" rel="noopener noreferrer"
-        [matTooltip]="'Read the ' + brand.license + ' license.\n' + brand.licenseUrl"
-        matTooltipClass="brand-tooltip" matTooltipPosition="above">{{ brand.license }}</a>
+      <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer"
+        matTooltip="Read the Apache-2.0 license.&#10;https://www.apache.org/licenses/LICENSE-2.0"
+        matTooltipClass="brand-tooltip" matTooltipPosition="above">Apache-2.0</a>
     </p>
     @if (showWebsite() && brand.developer.website) {
       <p><a [href]="brand.developer.website" target="_blank" rel="noopener noreferrer"

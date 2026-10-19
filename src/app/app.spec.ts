@@ -10,9 +10,7 @@ import { ChatFacade } from './features/chat/application/chat-facade.service';
 const testBrand: BrandConfig = {
   ...DEFAULT_BRAND_CONFIG,
   productName: 'Test Nook',
-  extendedProductName: 'Test Nook AI',
   tagline: 'Local test conversations',
-  repositoryName: 'test-nook',
   favicon: 'brand/assets/test-mark.svg',
   developer: {
     ...DEFAULT_BRAND_CONFIG.developer,
@@ -68,11 +66,9 @@ describe('App', () => {
     expect(favicon.hasAttribute('href')).toBeFalse();
   });
 
-  it('defines the canonical product and repository identity centrally', () => {
+  it('defines the canonical product name centrally', () => {
     expect(DEFAULT_BRAND_CONFIG).toEqual(jasmine.objectContaining({
-      productName: 'LocalNook',
-      extendedProductName: 'LocalNook AI',
-      repositoryName: 'localnook-ai',
+      productName: 'LocalNook AI',
     }));
   });
 });

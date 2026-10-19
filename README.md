@@ -6,13 +6,13 @@
 ![ollama/browser 0.6.3](https://img.shields.io/badge/ollama%2Fbrowser-0.6.3-000000?logo=ollama&logoColor=white)
 [![Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-0B6E99)](LICENSE)
 
-**LocalNook AI** (also called **LocalNook**) is an Angular chat client for Ollama that can run locally or be self-hosted. It supports streaming conversations, model switching, configurable system prompts, and rich responses. Conversations are stored in the browser; the official `ollama/browser` SDK connects directly to a configured Ollama runtime, without a separate application backend.
+**LocalNook AI** is an Angular chat client for Ollama that can run locally or be self-hosted. It supports streaming conversations, model switching, configurable system prompts, and rich responses. Conversations are stored in the browser; the official `ollama/browser` SDK connects directly to a configured Ollama runtime, without a separate application backend.
 
-![LocalNook desktop conversation showing browser-local history and a privacy-safe fixture response.](docs/screenshots/desktop-chat.png)
+![LocalNook AI desktop conversation showing browser-local history and a privacy-safe fixture response.](docs/screenshots/desktop-chat.png)
 
 _The screenshot uses deterministic fixture content. See the [complete privacy-safe gallery](docs/screenshots/README.md) for desktop, mobile, model-selection, system-prompt, and rich-response views._
 
-## What LocalNook implements
+## What LocalNook AI implements
 
 - Discovers chat-eligible Ollama models while remaining compatible with older model-list responses, and streams assistant content with optional thinking, cancellation, regeneration, and copy controls.
 - Persists and reopens conversations in IndexedDB, including their selected model and thinking state, with confirmed deletion for one or all conversations.
@@ -20,7 +20,7 @@ _The screenshot uses deterministic fixture content. See the [complete privacy-sa
 - Renders Markdown, highlighted code, KaTeX, Mermaid, and a validated, bounded Vega-Lite subset with an accessible data-table view.
 - Builds intentional Ollama context from active prompts and the current conversation without sending UI identifiers, timestamps, durations, or storage metadata.
 
-Browser-local storage is scoped to the exact application origin and is not encrypted by LocalNook. Requests are processed by the configured Ollama endpoint, which may be local, on a trusted LAN, or remote. Read the [privacy and storage boundaries](docs/user-guide.md#privacy-and-storage-boundaries) before sending sensitive content.
+Browser-local storage is scoped to the exact application origin and is not encrypted by LocalNook AI. Requests are processed by the configured Ollama endpoint, which may be local, on a trusted LAN, or remote. Read the [privacy and storage boundaries](docs/user-guide.md#privacy-and-storage-boundaries) before sending sensitive content.
 
 ## Tech stack
 
@@ -34,7 +34,7 @@ Browser-local storage is scoped to the exact application origin and is not encry
 
 ## Quick start
 
-LocalNook does not install Ollama or download models automatically. The [user guide](docs/user-guide.md) covers endpoint overrides, browser-origin configuration, shutdown, and troubleshooting.
+LocalNook AI does not install Ollama or download models automatically. The [user guide](docs/user-guide.md) covers endpoint overrides, browser-origin configuration, shutdown, and troubleshooting.
 
 ### Existing Ollama installation
 
@@ -47,7 +47,7 @@ npm ci
 npm start
 ```
 
-Open `http://localhost:4200`; LocalNook uses `http://localhost:11434` by default. To serve the production application through Docker while keeping Ollama on the host, run `docker compose up --build` and open `http://127.0.0.1:33060`.
+Open `http://localhost:4200`; LocalNook AI uses `http://localhost:11434` by default. To serve the production application through Docker while keeping Ollama on the host, run `docker compose up --build` and open `http://127.0.0.1:33060`.
 
 ### Optional containerized Ollama
 
@@ -107,9 +107,9 @@ The automated suites use controlled fakes; a live Ollama smoke test is still nee
 
 | Property | Canonical value |
 | --- | --- |
-| Product | `LocalNook` / `LocalNook AI` |
-| Repository / package | `localnook-ai` / `@localnook/app` (`0.1.0`) |
-| Angular / Compose project | `localnook-ai` / `localnook` |
+| Product | `LocalNook AI` |
+| Repository / package | `local-nook-ai` / `@localnook/app` (`0.1.0`) |
+| Angular / Compose project | `localnook-ai` / `local-nook-ai` |
 | Application image | `localnook-angular-app:0.3` |
 | Story prefix | `LAC-` |
 | Developer | Keresztes Zsolt — [kereszteszsolt.hu](https://kereszteszsolt.hu/) |
@@ -118,15 +118,15 @@ Product labels come from [`BrandConfig`](src/app/core/config/brand.config.ts); s
 
 ## Branding and About
 
-[`brand/branding.json`](brand/branding.json) owns displayed app and author names, descriptions, links and artwork paths. Angular imports it at build time and packages the existing favicon, icon and poster from `brand/assets/`. Rebuild the web app after changing it. The sidebar shows the current-year author copyright with an inline license link and the author's website domain as a direct link.
+[`brand/branding.json`](brand/branding.json) owns the single app name (`LocalNook AI`), author names, descriptions, support remark, links and artwork paths. Angular imports it at build time and packages the existing favicon, icon and poster from `brand/assets/`. Rebuild the web app after changing it. The sidebar shows the current-year author copyright with an inline license link and the author's website domain as a direct link.
 
-The header's **About** button opens an Angular Material dialog over a blurred backdrop with the large existing LocalNook poster, description and filled project/author link buttons. Buy me a Coffee and Ways to support sit together, followed by the voluntary-support note and copyright. Speech-bubble tooltips appear on hover or keyboard focus, use wider desktop bubbles that fit the destination description on the first line, and show the full URL on the next line; website/support tooltips also list hu | en | ro | de. Escape dismisses a visible tooltip before closing About; closing About returns focus to its button and preserves the conversation draft. See the [branding guide](brand/README.md).
+The header's text-only **About** button is last in the navigation bar and opens an Angular Material dialog over a blurred backdrop with the large existing LocalNook AI poster, description and filled project/author link buttons. Buy me a Coffee and Ways to support sit together, followed by the voluntary-support note and copyright. The two support sentences each occupy one desktop line and wrap naturally on narrow screens. Speech-bubble tooltips appear on hover or keyboard focus, use wider desktop bubbles that fit the destination description on the first line, and show the full URL on the next line; website/support tooltips also list hu | en | ro | de. Escape dismisses a visible tooltip before closing About; closing About returns focus to its button and preserves the conversation draft. See the [branding guide](brand/README.md).
 
-Docker publishes the application on **127.0.0.1:33060**, for local access only. Open `http://localhost:33060` or `http://127.0.0.1:33060` on the same machine. The optional Ollama container also publishes only on loopback. See [local-only access](docs/user-guide.md#local-only-access). Browser history belongs to the exact application origin; history from port 4201 stays under that previous origin.
+Docker publishes the application on **127.0.0.1:33060**, for local access only. Open `http://localhost:33060` or `http://127.0.0.1:33060` on the same machine. The optional Ollama container also publishes only on loopback. The Compose group is `local-nook-ai`; both services use `restart: "no"` and start only when explicitly requested. See [local-only access](docs/user-guide.md#local-only-access). Browser history belongs to the exact application origin; history from port 4201 stays under that previous origin.
 
 ## AI-assisted engineering
 
-Optional development roles — [`architect`](.codex/agents/architect.toml), [`implementation_worker`](.codex/agents/implementation-worker.toml), [`reviewer`](.codex/agents/reviewer.toml), and [`design_reviewer`](.codex/agents/design-reviewer.toml) — are supported by [`angular-feature-delivery`](.agents/skills/angular-feature-delivery/SKILL.md), [`conversation-context`](.agents/skills/conversation-context/SKILL.md), [`ollama-integration`](.agents/skills/ollama-integration/SKILL.md), [`release-evidence`](.agents/skills/release-evidence/SKILL.md), and [`ui-design`](.agents/skills/ui-design/SKILL.md). These development aids are not LocalNook runtime dependencies; see the [Codex setup](.codex/README.md) and [working agreements](AGENTS.md).
+Optional development roles — [`architect`](.codex/agents/architect.toml), [`implementation_worker`](.codex/agents/implementation-worker.toml), [`reviewer`](.codex/agents/reviewer.toml), and [`design_reviewer`](.codex/agents/design-reviewer.toml) — are supported by [`angular-feature-delivery`](.agents/skills/angular-feature-delivery/SKILL.md), [`conversation-context`](.agents/skills/conversation-context/SKILL.md), [`ollama-integration`](.agents/skills/ollama-integration/SKILL.md), [`release-evidence`](.agents/skills/release-evidence/SKILL.md), and [`ui-design`](.agents/skills/ui-design/SKILL.md). These development aids are not LocalNook AI runtime dependencies; see the [Codex setup](.codex/README.md) and [working agreements](AGENTS.md).
 
 ## License and author
 

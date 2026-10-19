@@ -57,9 +57,9 @@ http://localhost:4200/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
 
 The override must be an absolute `http` or `https` origin. Credentials, paths, query strings, and fragments are rejected, and accepted values are normalized to their URL origin. An invalid explicit override produces recoverable guidance before an SDK client is created.
 
-For browser access, the Ollama installation must permit the LocalNook page origin. Configure `OLLAMA_ORIGINS` for the exact application origin, such as `http://localhost:4200` for host development or `http://127.0.0.1:33060` for the production Compose application, then restart Ollama. A remote or LAN endpoint must also bind to a browser-reachable interface through `OLLAMA_HOST` or a correctly configured proxy; expose it only on a trusted network. The [official Ollama FAQ](https://docs.ollama.com/faq) documents host binding, additional origins, and platform-specific environment configuration.
+For browser access, the Ollama installation must permit the LocalNook AI page origin. Configure `OLLAMA_ORIGINS` for the exact application origin, such as `http://localhost:4200` for host development or `http://127.0.0.1:33060` for the production Compose application, then restart Ollama. A remote or LAN endpoint must also bind to a browser-reachable interface through `OLLAMA_HOST` or a correctly configured proxy; expose it only on a trusted network. The [official Ollama FAQ](https://docs.ollama.com/faq) documents host binding, additional origins, and platform-specific environment configuration.
 
-A browser reports offline, unreachable-host, and blocked-origin failures through similar fetch errors. LocalNook therefore shows one actionable message: start Ollama, confirm the configured endpoint, and check `OLLAMA_ORIGINS`. Specific SDK errors such as a missing model remain unchanged.
+A browser reports offline, unreachable-host, and blocked-origin failures through similar fetch errors. LocalNook AI therefore shows one actionable message: start Ollama, confirm the configured endpoint, and check `OLLAMA_ORIGINS`. Specific SDK errors such as a missing model remain unchanged.
 
 ## Existing-host startup
 
@@ -70,7 +70,7 @@ ollama list
 ollama pull <model-name>
 ```
 
-Then start LocalNook:
+Then start LocalNook AI:
 
 ```bash
 npm ci
@@ -81,7 +81,7 @@ The [official CLI reference](https://docs.ollama.com/cli) covers model and serve
 
 ## Containerized startup
 
-The base Compose file serves the production LocalNook build at `http://127.0.0.1:33060` and keeps the existing host Ollama path. Start it with:
+The base Compose file serves the production LocalNook AI build at `http://127.0.0.1:33060` and keeps the existing host Ollama path. Start it with:
 
 ```bash
 docker compose up --build
@@ -118,7 +118,7 @@ See the [official Ollama Docker guide](https://docs.ollama.com/docker), [Ollama 
 
 ## WSL boundary
 
-WSL networking varies by host and mode, so do not assume that `localhost` or one gateway address always reaches Ollama. Verify the endpoint from the browser that runs LocalNook, configure `ollamaHost` with that reachable origin, and allow the LocalNook page origin through `OLLAMA_ORIGINS`.
+WSL networking varies by host and mode, so do not assume that `localhost` or one gateway address always reaches Ollama. Verify the endpoint from the browser that runs LocalNook AI, configure `ollamaHost` with that reachable origin, and allow the LocalNook AI page origin through `OLLAMA_ORIGINS`.
 
 ## Testing
 

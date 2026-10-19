@@ -1,12 +1,12 @@
 # Brand configuration
 
-The display brand is **LocalNook**, and the extended product name is **LocalNook AI**. The repository identity is `localnook-ai`; Ollama remains the separate model provider/runtime name.
+The full app name is **LocalNook AI**, defined once by `appName`. The repository identity is `local-nook-ai`; Ollama remains the separate model provider/runtime name.
 
 The related technical identities are deliberate and do not need to match character-for-character:
 
 - npm package: `@localnook/app`;
 - Angular application ID: `localnook-ai`;
-- Docker Compose project: `localnook`;
+- Docker Compose project: `local-nook-ai`;
 - stable story prefix: `LAC-`.
 
 The repository identity does not rewrite an existing Git remote. Maintainers may update a hosting slug separately when they explicitly intend to change that external repository setting.
@@ -15,17 +15,16 @@ The repository identity does not rewrite an existing Git remote. Maintainers may
 
 `brand/branding.json` is the canonical metadata source, following the [shared contract](../brand/README.md). `src/app/core/config/brand.config.ts` maps it to the existing injectable interface:
 
-The injectable `BrandConfig` exposes product names, tagline, description, repository identity, project website/source URL, local favicon/icon/poster URLs, license label/URL and developer metadata (name, website/domain, languages, GitHub and support URLs). Its [typed definition](../src/app/core/config/brand.config.ts) is the adapter contract.
+The injectable `BrandConfig` exposes the single product name, tagline, description, support remark, project website/source URL, local favicon/icon/poster URLs and developer metadata (name, website/domain, languages, GitHub and support URLs). Its [typed definition](../src/app/core/config/brand.config.ts) is the adapter contract. The attribution component defines the Apache-2.0 label and license URL directly.
 
 The default config contains:
 
-- product name: `LocalNook`;
-- extended product name: `LocalNook AI`;
-- repository name: `localnook-ai`;
+- product name: `LocalNook AI`;
+- support remark: the configured `supportRemarkText`;
 - developer: Keresztes Zsolt;
 - website: `https://kereszteszsolt.hu`.
 
-The browser title, favicon, toolbar name/icon, About dialog and sidebar attribution consume this configuration. The static
+The browser title, favicon, toolbar name/icon, About dialog, sidebar attribution, built-in prompt instructions, prompt-settings labels and restore-error messages consume this configuration. The instructions use the default brand at build time; components and the facade use the injected brand. The About support note also reads `supportRemarkText` from this configuration and starts each sentence on its own line. Documentation uses the exact `LocalNook AI` spelling from the same metadata. Technical project identities are not part of the brand JSON. The static
 HTML title is deliberately brand-neutral so it does not create a second product-name source of
 truth before Angular bootstraps.
 

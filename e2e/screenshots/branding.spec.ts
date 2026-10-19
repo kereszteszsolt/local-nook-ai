@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Keresztes Zsolt <https://kereszteszsolt.hu>
 // SPDX-License-Identifier: Apache-2.0
 
+import branding from '../../brand/branding.json';
 import { expect, test, type Locator } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -22,7 +23,6 @@ test('branding: the declared favicon and ICO fallback both use the configured ar
   const network = await openScreenshotApp(page);
   await expect(page.locator('link[rel~="icon"]')).toHaveCount(1);
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute('sizes', 'any');
-  const branding = JSON.parse(readFileSync(resolve('brand/branding.json'), 'utf8'));
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', `brand/${branding.appFavicon}`);
 
   const response = await page.request.get('/favicon.ico');
@@ -63,12 +63,23 @@ test('branding: About links, speech bubbles and Escape preserve the conversation
   const draft = page.getByRole('textbox', { name: 'Chat message' });
   await draft.fill('Keep this unsent fixture draft.');
   const about = page.getByRole('button', { name: 'About', exact: true });
+  await expect(page.locator('.toolbar-actions > button:last-of-type')).toHaveText('About');
+  await expect(about.locator('mat-icon')).toHaveCount(0);
   await about.click();
   const dialog = page.getByRole('dialog');
   await expect(page.locator('.about-backdrop')).toHaveCSS('backdrop-filter', 'blur(4px)');
-  await expect(dialog.getByRole('heading', { name: 'About LocalNook AI' })).toBeVisible();
+  await expect(dialog.getByRole('heading', { name: `About ${branding.appName}` })).toBeVisible();
   await expect(dialog.getByRole('button', { name: 'Close about' })).toBeFocused();
-  const poster = dialog.getByRole('img', { name: 'LocalNook AI project poster' });
+  const supportSentences = dialog.locator('.support-note p span');
+  await expect(supportSentences).toHaveCount(2);
+  const sentenceBounds = await supportSentences.evaluateAll((elements) => elements.map((element) => {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    return [...range.getClientRects()].map((rect) => ({ top: rect.top, bottom: rect.bottom }));
+  }));
+  expect(sentenceBounds.map((lines) => lines.length), 'Each complete support sentence occupies one desktop line').toEqual([1, 1]);
+  expect(sentenceBounds[1][0].top).toBeGreaterThan(sentenceBounds[0][0].bottom);
+  const poster = dialog.getByRole('img', { name: `${branding.appName} project poster` });
   await expect(poster).toHaveAttribute('src', 'brand/assets/localnook-ai-poster.svg');
   await expect.poll(() => poster.evaluate((image) => (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0)).toBe(true);
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', 'brand/assets/favicon.svg');

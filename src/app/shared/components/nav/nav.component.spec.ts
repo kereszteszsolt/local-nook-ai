@@ -42,7 +42,7 @@ describe('NavComponent', () => {
 
   it('loads local models and renders the configured product name', () => {
     expect(loadModels).toHaveBeenCalledOnceWith();
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('LocalNook');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain(DEFAULT_BRAND_CONFIG.productName);
   });
 
   it('delegates model selection to the facade', () => {
@@ -52,6 +52,8 @@ describe('NavComponent', () => {
 
   it('opens the About dialog from the header without changing the model', async () => {
     const button = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.about-button');
+    expect(button?.querySelector('mat-icon')).toBeNull();
+    expect((fixture.nativeElement as HTMLElement).querySelector('.toolbar-actions > button:last-of-type')).toBe(button);
     button?.click();
     fixture.detectChanges();
     await fixture.whenStable();

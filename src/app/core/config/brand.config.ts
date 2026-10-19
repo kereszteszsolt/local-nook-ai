@@ -8,14 +8,11 @@ import branding from '../../../../brand/branding.json';
 
 export interface BrandConfig {
   readonly productName: string;
-  readonly extendedProductName: string;
   readonly tagline: string;
-  readonly repositoryName: string;
   readonly website: string;
   readonly sourceUrl: string;
   readonly description: string;
-  readonly license: string;
-  readonly licenseUrl: string;
+  readonly supportRemarkText: string;
   readonly favicon?: string;
   readonly icon?: string;
   readonly poster?: string;
@@ -40,14 +37,11 @@ function assetUrl(path: string): string {
 
 export const DEFAULT_BRAND_CONFIG = {
   productName: branding.appName,
-  extendedProductName: branding.appExtendedName,
   tagline: branding.appTagline,
-  repositoryName: branding.technical.repository,
   website: branding.appWebsite,
   sourceUrl: branding.appGithubUrl,
   description: branding.appDescription,
-  license: branding.license,
-  licenseUrl: branding.licenseUrl,
+  supportRemarkText: branding.supportRemarkText,
   favicon: assetUrl(branding.appFavicon),
   icon: assetUrl(branding.appIcon),
   poster: assetUrl(branding.appPoster),

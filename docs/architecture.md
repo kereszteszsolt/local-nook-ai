@@ -2,7 +2,7 @@
 
 ## Goals
 
-LocalNook should remain a small browser application with explicit responsibilities:
+LocalNook AI should remain a small browser application with explicit responsibilities:
 
 - Angular components render state and emit typed user actions.
 - `ChatFacade` owns chat/application state and use-case orchestration.
@@ -56,7 +56,7 @@ flowchart TB
 
 Conversation messages and system prompts use separate, versioned, brand-independent IndexedDB databases through their respective repositories. The general active-model fallback uses a brand-independent localStorage key. `SystemPromptRepository` performs a one-time migration from the former prompt localStorage keys only after its IndexedDB transaction succeeds.
 
-The configured Ollama endpoint defaults to the local machine, but a validated browser-reachable LAN, remote, proxied, or cloud-backed origin can be selected for the current page load. The application boundary therefore does not imply that model processing always stays on the LocalNook machine.
+The configured Ollama endpoint defaults to the local machine, but a validated browser-reachable LAN, remote, proxied, or cloud-backed origin can be selected for the current page load. The application boundary therefore does not imply that model processing always stays on the LocalNook AI machine.
 
 ## Implemented browser-local design
 

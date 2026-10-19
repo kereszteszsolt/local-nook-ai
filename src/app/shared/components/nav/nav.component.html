@@ -5,7 +5,6 @@
   </span>
   <span class="example-spacer"></span>
   <div class="toolbar-actions">
-    <button mat-button (click)="openAbout()" class="about-button"><mat-icon>info_outline</mat-icon>About</button>
     <button mat-button [matMenuTriggerFor]="modelMenu" [disabled]="availableModels().length === 0">
       <mat-icon>arrow_drop_down</mat-icon>
       {{ currentModel()?.name || 'Select model' }}
@@ -17,5 +16,6 @@
         </button>
       }
     </mat-menu>
+    <button mat-button (click)="openAbout()" class="about-button">About</button>
   </div>
 </mat-toolbar>

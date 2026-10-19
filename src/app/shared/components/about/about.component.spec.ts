@@ -9,12 +9,11 @@ import { AboutComponent } from './about.component';
 describe('AboutComponent branding', () => {
   const testBrand: BrandConfig = {
     ...DEFAULT_BRAND_CONFIG,
-    extendedProductName: 'Example Nook',
+    productName: 'Example Nook',
+    supportRemarkText: 'An injected support remark. Thank you for reading!',
     description: 'An injected project description.',
     poster: 'brand/assets/example.svg',
     sourceUrl: 'https://example.org/source',
-    license: 'Example license',
-    licenseUrl: 'https://example.org/license',
     developer: {
       name: 'Example Author',
       website: 'https://example.org',
@@ -38,11 +37,14 @@ describe('AboutComponent branding', () => {
 
     expect(element.textContent).toContain('About Example Nook');
     expect(element.textContent).toContain(testBrand.description);
-    expect(element.textContent).toContain(`© ${new Date().getFullYear()} Example Author, Example license`);
+    expect([...element.querySelectorAll('.support-note p span')].map((line) => line.textContent?.trim())).toEqual([
+      'An injected support remark.', 'Thank you for reading!',
+    ]);
+    expect(element.textContent).toContain(`© ${new Date().getFullYear()} Example Author, Apache-2.0`);
     expect(element.querySelector('img')?.getAttribute('src')).toBe(testBrand.poster);
     expect([...element.querySelectorAll('a')].map((link) => link.getAttribute('href'))).toEqual([
       testBrand.developer.website, testBrand.sourceUrl, testBrand.developer.github,
-      testBrand.developer.buyMeACoffee, testBrand.developer.waysToSupport, testBrand.licenseUrl,
+      testBrand.developer.buyMeACoffee, testBrand.developer.waysToSupport, 'https://www.apache.org/licenses/LICENSE-2.0',
     ]);
     expect(fixture.componentInstance.projectLinks[0].description).toContain('hu | en');
   });
@@ -59,6 +61,6 @@ describe('AboutComponent branding', () => {
     expect(element.querySelector('img')).toBeNull();
     expect(element.querySelector('.about-support-actions')).toBeNull();
     expect(element.querySelectorAll('a').length).toBe(1);
-    expect(element.querySelector('a')?.getAttribute('href')).toBe(testBrand.licenseUrl);
+    expect(element.querySelector('a')?.getAttribute('href')).toBe('https://www.apache.org/licenses/LICENSE-2.0');
   });
 });

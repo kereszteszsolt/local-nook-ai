@@ -2,14 +2,14 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 
 <header class="about-header">
-  <h2 mat-dialog-title>About {{ brand.extendedProductName }}</h2>
+  <h2 mat-dialog-title>About {{ brand.productName }}</h2>
   <button mat-icon-button mat-dialog-close aria-label="Close about">
     <mat-icon>close</mat-icon>
   </button>
 </header>
 <mat-dialog-content class="about-content">
   @if (brand.poster) {
-    <img class="about-poster" [src]="brand.poster" [alt]="brand.extendedProductName + ' project poster'" width="780" height="480">
+    <img class="about-poster" [src]="brand.poster" [alt]="brand.productName + ' project poster'" width="780" height="480">
   }
   <p class="about-intro">{{ brand.description }}</p>
   <nav class="about-actions" aria-label="Project and author links">
@@ -29,10 +29,16 @@
         </a>
       }
     </nav>
-    <div class="support-note" role="note">
-      <mat-icon aria-hidden="true">info_outline</mat-icon>
-      <p>Support is voluntary and does not create any obligation, priority service, special access or other consideration. Thank you for your attention, and also if you support my work in any way!</p>
-    </div>
+    @if (supportRemarkLines.length) {
+      <div class="support-note" role="note">
+        <mat-icon aria-hidden="true">info_outline</mat-icon>
+        <p>
+          @for (line of supportRemarkLines; track $index) {
+            <span>{{ line }}</span>
+          }
+        </p>
+      </div>
+    }
   }
   <app-brand-attribution [showWebsite]="false" />
 </mat-dialog-content>

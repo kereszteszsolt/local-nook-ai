@@ -18,13 +18,14 @@ import { BrandAttributionComponent } from '../brand-attribution/brand-attributio
 })
 export class AboutComponent {
   readonly brand = inject(BRAND_CONFIG);
+  readonly supportRemarkLines = this.brand.supportRemarkText.trim().split(/(?<=[.!?])\s+/).filter(Boolean);
   private readonly languages = this.brand.developer.websiteLanguages;
   private readonly availableLanguages = this.languages.length ? ` Available in ${this.languages.join(' | ')}.` : '';
   readonly projectLinks = [
     { label: this.brand.developer.websiteLabel, href: this.brand.developer.website, icon: 'language', description: "Author's website." + this.availableLanguages },
-    { label: 'Source', href: this.brand.sourceUrl, icon: 'code', description: `View the ${this.brand.extendedProductName} source code on GitHub.` },
+    { label: 'Source', href: this.brand.sourceUrl, icon: 'code', description: `View the ${this.brand.productName} source code on GitHub.` },
     { label: 'GitHub profile', href: this.brand.developer.github, icon: 'person_outline', description: "The author's GitHub profile." },
-    { label: 'Project website', href: this.brand.website, icon: 'open_in_new', description: `Visit the ${this.brand.extendedProductName} website.` },
+    { label: 'Project website', href: this.brand.website, icon: 'open_in_new', description: `Visit the ${this.brand.productName} website.` },
   ].filter((link) => !!link.href);
   readonly supportLinks = [
     { label: 'Buy me a Coffee', href: this.brand.developer.buyMeACoffee, icon: 'local_cafe', coffee: true, description: 'Support the author with a coffee on Buy Me a Coffee.' },

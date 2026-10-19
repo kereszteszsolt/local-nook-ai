@@ -1,6 +1,6 @@
 # Testing
 
-See the [LocalNook user guide](user-guide.md) for user-facing behavior and troubleshooting.
+See the [LocalNook AI user guide](user-guide.md) for user-facing behavior and troubleshooting.
 
 ## Required commands
 

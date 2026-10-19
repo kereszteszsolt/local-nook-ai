@@ -61,7 +61,7 @@
     "karma-jasmine-html-reporter": "2.2.0",
     "typescript": "~5.8.2"
   },
-  "description": "LocalNook: a lightweight local-first Angular client for Ollama.",
+  "description": "LocalNook AI: a lightweight local-first Angular client for Ollama.",
   "author": {
     "name": "Keresztes Zsolt",
     "url": "https://kereszteszsolt.hu"

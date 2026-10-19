@@ -1,4 +1,5 @@
 import {Component, inject, OnInit, ViewChild, ElementRef} from '@angular/core';
+import {BRAND_CONFIG} from '../../../../core/config/brand.config';
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {SystemMessage} from '../../models/message.model';
@@ -38,6 +39,7 @@ import {
   styleUrl: './system-prompt-settings.component.scss',
 })
 export class SystemPromptSettingsComponent implements OnInit {
+  readonly brand = inject(BRAND_CONFIG);
   readonly dialogRef = inject(MatDialogRef<SystemPromptSettingsComponent>);
   readonly chatFacade = inject(ChatFacade);
   readonly snackBar = inject(MatSnackBar);
@@ -216,7 +218,7 @@ export class SystemPromptSettingsComponent implements OnInit {
     void this.chatFacade.restoreBuiltInSystemPrompt()
       .then(() => this.syncFromFacade())
       .catch(() => {
-        this.storageError = this.chatFacade.systemPromptStorageError() ?? 'Could not restore the LocalNook default prompt.';
+        this.storageError = this.chatFacade.systemPromptStorageError() ?? `Could not restore the ${this.brand.productName} default prompt.`;
         this.syncFromFacade();
         this.snackBar.open(this.storageError, 'Close', {duration: 5000});
       })
