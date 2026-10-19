@@ -52,7 +52,7 @@ sequenceDiagram
 The safe default is `http://localhost:11434`. Override it for the current page load with the `ollamaHost` query parameter:
 
 ```text
-http://localhost:4200/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
+http://localhost:4200/?ollamaHost=http%3A%2F%2F127.0.0.1%3A33061
 ```
 
 The override must be an absolute `http` or `https` origin. Credentials, paths, query strings, and fragments are rejected, and accepted values are normalized to their URL origin. An invalid explicit override produces recoverable guidance before an SDK client is created.
@@ -87,7 +87,7 @@ The base Compose file serves the production LocalNook AI build at `http://127.0.
 docker compose up --build
 ```
 
-The optional overlay adds the official pinned Ollama image on loopback host port `11435`. Always name both Compose files for every overlay operation:
+The optional overlay adds the official pinned Ollama image on loopback host port `33061`. Always name both Compose files for every overlay operation:
 
 ```bash
 docker compose -f docker-compose.yaml -f docker-compose.ollama.yml up --build
@@ -97,7 +97,7 @@ docker compose -f docker-compose.yaml -f docker-compose.ollama.yml exec ollama o
 No model is pulled during image build or container startup. Open the application with the published browser endpoint:
 
 ```text
-http://127.0.0.1:33060/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
+http://127.0.0.1:33060/?ollamaHost=http%3A%2F%2F127.0.0.1%3A33061
 ```
 
 Both Compose services publish their host ports only on `127.0.0.1`. The overlay sets `OLLAMA_ORIGINS=http://127.0.0.1:33060,http://localhost:33060` to add the two local application origins without claiming that Ollama's built-in origins become exclusive. Its `OLLAMA_HOST=0.0.0.0:11434` listens inside the container; the loopback host-port binding controls external reachability. It stores models in the `ollama-models` named volume. The default is CPU-only; GPU-vendor configuration is out of scope.

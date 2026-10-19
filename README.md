@@ -63,7 +63,7 @@ After Ollama is healthy, pull a model from another terminal:
 docker compose -f docker-compose.yaml -f docker-compose.ollama.yml exec ollama ollama pull <model-name>
 ```
 
-Open `http://127.0.0.1:33060/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435`. Downloaded models remain in the named volume until you intentionally remove it; the full shutdown and reset commands are in the [user guide](docs/user-guide.md#optional-ollama-container).
+Open `http://127.0.0.1:33060/?ollamaHost=http%3A%2F%2F127.0.0.1%3A33061`. Downloaded models remain in the named volume until you intentionally remove it; the full shutdown and reset commands are in the [user guide](docs/user-guide.md#optional-ollama-container).
 
 ## Architecture
 

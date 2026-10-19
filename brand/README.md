@@ -5,20 +5,20 @@
 | Field | Meaning |
 | --- | --- |
 | `appName` | Full app name: `LocalNook AI` |
-| `appWebsite` | Project website; empty when none is configured |
 | `appTagline` | Short product tagline |
 | `appDescription` | About description |
-| `supportRemarkText` | Voluntary-support note; sentences start on separate lines in About |
+| `appWebsite` | Project website; empty when none is configured |
 | `appGithubUrl` | Project repository |
+| `appFavicon` | Optional local favicon |
+| `appIcon` | Optional local project mark |
+| `appPoster` | Optional local project poster |
 | `authorName` | Author display name |
 | `authorWebsite` | Author website |
 | `authorWebsiteLanguages` | Language codes listed in website/support tooltips |
 | `authorGithub` | Author GitHub profile |
 | `authorWaysToSupportUrl` | General ways to support the author |
 | `authorBuyMeACoffeeUrl` | Direct Buy Me a Coffee link |
-| `appFavicon` | Optional local favicon |
-| `appIcon` | Optional local project mark |
-| `appPoster` | Optional local project poster |
+| `supportRemarkText` | Voluntary-support note; sentences start on separate lines in About |
 
 Asset paths are relative to this `brand/` directory and must stay inside `assets/`. Empty paths mean no image. These are source paths, not public URLs: consumers must package or map them to their own public base. Do not fetch remote artwork or resolve arbitrary filesystem paths.
 

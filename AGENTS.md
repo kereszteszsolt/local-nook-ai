@@ -35,3 +35,7 @@ LocalNook is an **Angular / TypeScript** browser client for an external Ollama r
 - Work only within approved criteria. `npm run build` and focused tests come before broader checks; use `npm test -- --watch=false --browsers=ChromeHeadless` when the environment supports it and `npm run screenshots` for affected UI only.
 - Report real commands, results and limitations. Discuss the diff, evidence and proposed commit separately; never commit/push/start the next story without explicit approval.
 - Keep source comments concise and follow `docs/licensing.md`: the short Apache-2.0 SPDX header belongs to **new** handwritten comment-supporting files, not Markdown, JSON, lock files, generated artifacts or binary assets.
+
+## Docker runtime rules
+
+Use the GitHub repository name as the Compose project: `local-nook-ai`. Publish every host port only on `127.0.0.1`, above 33000, with no port shared by another repository. The current allocation is 33060 for the app and 33061 for optional Ollama. Set `restart: "no"` for every service and disable dependency-triggered restarts. Preserve existing data/model volumes when changing a project name or recreating containers.

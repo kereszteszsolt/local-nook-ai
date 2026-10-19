@@ -37,7 +37,7 @@ The Docker Compose group is `local-nook-ai`. Both services use `restart: "no"`: 
 
 Compose publishes the application only on `127.0.0.1:33060`. Open `http://localhost:33060` or `http://127.0.0.1:33060` on the same machine. The configuration does not publish the application on a LAN interface.
 
-The optional Ollama container publishes only on `127.0.0.1:11435`; its `OLLAMA_ORIGINS` includes `http://127.0.0.1:33060` and `http://localhost:33060`. `OLLAMA_HOST=0.0.0.0:11434` is its internal container listener and does not change the loopback host binding. A separately managed Ollama runtime keeps its own network configuration.
+The optional Ollama container publishes only on `127.0.0.1:33061`; its `OLLAMA_ORIGINS` includes `http://127.0.0.1:33060` and `http://localhost:33060`. `OLLAMA_HOST=0.0.0.0:11434` is its internal container listener and does not change the loopback host binding. A separately managed Ollama runtime keeps its own network configuration.
 
 Changing the application origin, including its hostname or port, selects a separate browser store. Existing conversations and settings remain under the previous origin; LocalNook AI does not automatically migrate between origins.
 
@@ -58,7 +58,7 @@ docker compose -f docker-compose.yaml -f docker-compose.ollama.yml exec ollama o
 No model is downloaded automatically. Open the application with the container's browser-reachable endpoint:
 
 ```text
-http://127.0.0.1:33060/?ollamaHost=http%3A%2F%2F127.0.0.1%3A11435
+http://127.0.0.1:33060/?ollamaHost=http%3A%2F%2F127.0.0.1%3A33061
 ```
 
 Normal shutdown preserves models in the `ollama-models` named volume:
@@ -231,7 +231,7 @@ Configure `OLLAMA_ORIGINS` with the exact LocalNook AI page origin and restart O
 
 ### Docker mode cannot connect
 
-The browser cannot use a Compose-only hostname such as `ollama`. Use the documented encoded `http://127.0.0.1:11435` override for the overlay. Check both services and their health with:
+The browser cannot use a Compose-only hostname such as `ollama`. Use the documented encoded `http://127.0.0.1:33061` override for the overlay. Check both services and their health with:
 
 ```bash
 docker compose -f docker-compose.yaml -f docker-compose.ollama.yml ps
