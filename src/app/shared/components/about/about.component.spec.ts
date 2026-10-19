@@ -3,16 +3,16 @@
 
 import { TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { BRAND_CONFIG, BrandConfig, DEFAULT_BRAND_CONFIG } from '../../../core/config/brand.config';
+import { APP_INFO_CONFIG, AppInfoConfig, DEFAULT_APP_INFO_CONFIG } from '../../../core/config/app-info.config';
 import { AboutComponent } from './about.component';
 
 describe('AboutComponent branding', () => {
-  const testBrand: BrandConfig = {
-    ...DEFAULT_BRAND_CONFIG,
+  const testAppInfo: AppInfoConfig = {
+    ...DEFAULT_APP_INFO_CONFIG,
     productName: 'Example Nook',
     supportRemarkText: 'An injected support remark. Thank you for reading!',
     description: 'An injected project description.',
-    poster: 'brand/assets/example.svg',
+    poster: 'app-assets/assets/example.svg',
     sourceUrl: 'https://example.org/source',
     developer: {
       name: 'Example Author',
@@ -27,7 +27,7 @@ describe('AboutComponent branding', () => {
 
   beforeEach(() => TestBed.configureTestingModule({
     imports: [AboutComponent, NoopAnimationsModule],
-    providers: [{ provide: BRAND_CONFIG, useValue: testBrand }],
+    providers: [{ provide: APP_INFO_CONFIG, useValue: testAppInfo }],
   }));
 
   it('renders injected metadata, artwork and destinations rather than hardcoded identity', () => {
@@ -36,23 +36,23 @@ describe('AboutComponent branding', () => {
     const element = fixture.nativeElement as HTMLElement;
 
     expect(element.textContent).toContain('About Example Nook');
-    expect(element.textContent).toContain(testBrand.description);
+    expect(element.textContent).toContain(testAppInfo.description);
     expect([...element.querySelectorAll('.support-note p span')].map((line) => line.textContent?.trim())).toEqual([
       'An injected support remark.', 'Thank you for reading!',
     ]);
     expect(element.textContent).toContain(`© ${new Date().getFullYear()} Example Author, Apache-2.0`);
-    expect(element.querySelector('img')?.getAttribute('src')).toBe(testBrand.poster);
+    expect(element.querySelector('img')?.getAttribute('src')).toBe(testAppInfo.poster);
     expect([...element.querySelectorAll('a')].map((link) => link.getAttribute('href'))).toEqual([
-      testBrand.developer.website, testBrand.sourceUrl, testBrand.developer.github,
-      testBrand.developer.buyMeACoffee, testBrand.developer.waysToSupport, 'https://www.apache.org/licenses/LICENSE-2.0',
+      testAppInfo.developer.website, testAppInfo.sourceUrl, testAppInfo.developer.github,
+      testAppInfo.developer.buyMeACoffee, testAppInfo.developer.waysToSupport, 'https://www.apache.org/licenses/LICENSE-2.0',
     ]);
     expect(fixture.componentInstance.projectLinks[0].description).toContain('hu | en');
   });
 
   it('omits optional empty artwork and destinations', () => {
-    TestBed.overrideProvider(BRAND_CONFIG, { useValue: {
-      ...testBrand, poster: '', website: '', sourceUrl: '',
-      developer: { ...testBrand.developer, website: '', github: '', waysToSupport: '', buyMeACoffee: '' },
+    TestBed.overrideProvider(APP_INFO_CONFIG, { useValue: {
+      ...testAppInfo, poster: '', website: '', sourceUrl: '',
+      developer: { ...testAppInfo.developer, website: '', github: '', waysToSupport: '', buyMeACoffee: '' },
     } });
     const fixture = TestBed.createComponent(AboutComponent);
     fixture.detectChanges();

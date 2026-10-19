@@ -114,7 +114,7 @@ The automated suites use controlled fakes; a live Ollama smoke test is still nee
 | Story prefix | `LAC-` |
 | Developer | Keresztes Zsolt — [kereszteszsolt.hu](https://kereszteszsolt.hu/) |
 
-Product labels come from [`BrandConfig`](src/app/core/config/brand.config.ts); storage and technical identifiers remain brand-independent. Release 0.3 is a repository milestone, not a published npm package or Git tag.
+Product labels come from [`AppInfoConfig`](src/app/core/config/app-info.config.ts); storage and technical identifiers remain brand-independent. Release 0.3 is a repository milestone, not a published npm package or Git tag.
 
 ## Branding and About
 

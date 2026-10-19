@@ -3,7 +3,7 @@ import { DOCUMENT } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { NavComponent } from './shared/components/nav/nav.component';
-import { BRAND_CONFIG } from './core/config/brand.config';
+import { APP_INFO_CONFIG } from './core/config/app-info.config';
 
 @Component({
   selector: 'app-root',
@@ -12,15 +12,15 @@ import { BRAND_CONFIG } from './core/config/brand.config';
   styleUrl: './app.scss',
 })
 export class App {
-  private readonly brand = inject(BRAND_CONFIG);
+  private readonly appInfo = inject(APP_INFO_CONFIG);
   private readonly title = inject(Title);
   private readonly document = inject(DOCUMENT);
 
   constructor() {
-    this.title.setTitle(this.brand.productName);
+    this.title.setTitle(this.appInfo.productName);
     const favicon = this.document.querySelector<HTMLLinkElement>('link[rel="icon"]');
-    if (this.brand.favicon) {
-      favicon?.setAttribute('href', this.brand.favicon);
+    if (this.appInfo.favicon) {
+      favicon?.setAttribute('href', this.appInfo.favicon);
     } else {
       favicon?.removeAttribute('href');
     }

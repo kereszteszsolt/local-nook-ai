@@ -1,7 +1,7 @@
 <mat-toolbar class="ollama-toolbar">
-  <span class="brand-name font-medium">
-    @if (brand.icon) { <img [src]="brand.icon" alt="" width="28" height="28"> }
-    {{ brand.productName }}
+  <span class="app-name font-medium">
+    @if (appInfo.icon) { <img [src]="appInfo.icon" alt="" width="28" height="28"> }
+    {{ appInfo.productName }}
   </span>
   <span class="example-spacer"></span>
   <div class="toolbar-actions">

@@ -16,7 +16,7 @@ This release improves the supplied MVP without turning it into a backend-heavy o
 | [LAC-013](stories/LAC-013-streaming-error-handling.md) | Harden streaming and error state | Implemented |
 | [LAC-014](stories/LAC-014-design-tokens-penpot.md) | Introduce semantic design tokens and Penpot workflow | Implemented |
 | [LAC-015](stories/LAC-015-quality-agent-workflow.md) | Add a focused AI-assisted repository workflow | Implemented |
-| [LAC-016](stories/LAC-016-brand-configuration.md) | Centralize product branding | Implemented |
+| [LAC-016](stories/LAC-016-app-configuration.md) | Centralize product branding | Implemented |
 | [LAC-017](stories/LAC-017-dependency-modernization.md) | Modernize library versions deliberately | Implemented |
 | [LAC-018](stories/LAC-018-model-thinking-capabilities.md) | Respect model thinking capabilities | Implemented |
 | [LAC-019](stories/LAC-019-conversation-deletion-confirmation.md) | Confirm conversation deletion | Implemented |

@@ -57,4 +57,4 @@ Map future Penpot token changes to these code tokens rather than introducing raw
 
 ## Review checklist
 
-Check keyboard access, focus visibility, disabled/loading/error states, readable contrast, responsive width, clear model selection, and the separation between `BrandConfig` labels and visual tokens.
+Check keyboard access, focus visibility, disabled/loading/error states, readable contrast, responsive width, clear model selection, and the separation between `AppInfoConfig` labels and visual tokens.

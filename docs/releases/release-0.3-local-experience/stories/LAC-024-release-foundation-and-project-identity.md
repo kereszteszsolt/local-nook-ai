@@ -21,13 +21,13 @@ Establish the Release 0.3 evidence structure, apply the approved identity contra
 - [x] Use `LocalNook` as the display brand and `LocalNook AI` as the extended product name.
 - [x] Use `localnook-ai` as the repository identity, `@localnook/app` as the package name, and `localnook-ai` as the Angular application ID.
 - [x] Use `localnook` as the Docker Compose project name without changing Git remotes automatically.
-- [x] Keep a typed central `BrandConfig` for product and developer metadata and update its focused consumers and tests.
+- [x] Keep a typed central `AppInfoConfig` for product and developer metadata and update its focused consumers and tests.
 - [x] Preserve all existing browser-storage database names, store names, keys, migrations, and stable record identifiers independently from the display brand.
-- [x] Update `docs/brand-configuration.md` and other directly affected identity documentation to describe the implemented contract accurately.
+- [x] Update `docs/app-configuration.md` and other directly affected identity documentation to describe the implemented contract accurately.
 - [x] Record the story-start and commit-approval workflow in `AGENTS.md` and `.codex/README.md`.
 - [x] Keep exactly four focused custom agents: architect, implementation_worker, reviewer, and design_reviewer.
 - [x] Keep exactly five focused repository skills: angular-feature-delivery, ollama-integration, conversation-context, ui-design, and release-evidence.
-- [x] Verify package/lock consistency, Angular target references, Docker project naming, BrandConfig behavior, stable storage identifiers, and the absence of unintended semantic changes.
+- [x] Verify package/lock consistency, Angular target references, Docker project naming, AppInfoConfig behavior, stable storage identifiers, and the absence of unintended semantic changes.
 
 ## Verification
 
@@ -45,6 +45,6 @@ Git remote changes, storage-key renames, IndexedDB schema migrations, broad depe
 ## Implementation evidence
 
 - Package and lock metadata use `@localnook/app`; the Angular project and build targets use `localnook-ai`; Compose declares project `localnook`.
-- `BrandConfig` centrally defines `LocalNook`, `LocalNook AI`, repository identity, tagline, and developer metadata, with focused consumer tests.
-- Identity and storage-separation rules are documented in `docs/brand-configuration.md`, while `AGENTS.md` and `.codex/README.md` define explicit story-start and commit-approval checkpoints.
+- `AppInfoConfig` centrally defines `LocalNook`, `LocalNook AI`, repository identity, tagline, and developer metadata, with focused consumer tests.
+- Identity and storage-separation rules are documented in `docs/app-configuration.md`, while `AGENTS.md` and `.codex/README.md` define explicit story-start and commit-approval checkpoints.
 - The existing four custom agents and five repository skills remain the bounded AI-assisted engineering surface.

@@ -4,7 +4,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DEFAULT_BRAND_CONFIG } from '../../../core/config/brand.config';
+import { DEFAULT_APP_INFO_CONFIG } from '../../../core/config/app-info.config';
 import { SystemMessage } from '../models/message.model';
 
 export const SYSTEM_PROMPT_DATABASE_NAME = 'local-ai-client.system-prompts';
@@ -24,7 +24,7 @@ export const BUILT_IN_SYSTEM_PROMPT: SystemMessage = {
   folder: '',
   source: 'built-in',
   position: 0,
-  content: `You are responding in ${DEFAULT_BRAND_CONFIG.productName}. Use standard Markdown. These renderers are available:
+  content: `You are responding in ${DEFAULT_APP_INFO_CONFIG.productName}. Use standard Markdown. These renderers are available:
 
 - Math: \`$...$\` or \`$$...$$\` for KaTeX.
 - Code: \`\`\`language\` followed by code, then \`\`\`.

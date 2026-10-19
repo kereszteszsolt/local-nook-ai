@@ -13,9 +13,9 @@ The repository identity does not rewrite an existing Git remote. Maintainers may
 
 ## Source of truth
 
-`brand/branding.json` is the canonical metadata source, following the [shared contract](../brand/README.md). `src/app/core/config/brand.config.ts` maps it to the existing injectable interface:
+`brand/branding.json` is the canonical metadata source, following the [shared contract](../brand/README.md). `src/app/core/config/app-info.config.ts` maps it to the existing injectable interface:
 
-The injectable `BrandConfig` exposes the single product name, tagline, description, support remark, project website/source URL, local favicon/icon/poster URLs and developer metadata (name, website/domain, languages, GitHub and support URLs). Its [typed definition](../src/app/core/config/brand.config.ts) is the adapter contract. The attribution component defines the Apache-2.0 label and license URL directly.
+The injectable `AppInfoConfig` exposes the single product name, tagline, description, support remark, project website/source URL, local favicon/icon/poster URLs and developer metadata (name, website/domain, languages, GitHub and support URLs). Its [typed definition](../src/app/core/config/app-info.config.ts) is the adapter contract. The attribution component defines the Apache-2.0 label and license URL directly.
 
 The default config contains:
 
@@ -47,7 +47,7 @@ This prevents a rebrand from losing local user data or creating a wide mechanica
 
 ## Local assets
 
-The JSON asset paths are relative to `brand/`. Angular copies `brand/assets` to `brand/assets` in both builds and tests; the Docker build includes the source directory. The adapter maps `appFavicon` to a base-relative browser URL, and the app applies it alongside the title. Empty values disable the SVG favicon. The root `public/favicon.ico` fallback is generated from the SVG selected by `appFavicon`, rather than retaining the Angular template icon. Run `node scripts/generate-favicon.mjs` after changing that SVG; it uses the installed Playwright Chromium. HTML declares only the scalable SVG icon, so a competing ICO link cannot override it. The existing poster is displayed in About and the icon in the toolbar; optional empty paths omit those images. Asset paths must remain inside `brand/assets/`.
+The JSON asset paths are relative to `brand/`. Angular copies `brand/assets` to `app-assets/assets` in both builds and tests; the Docker build includes the source directory. The adapter maps `appFavicon` to a base-relative browser URL, and the app applies it alongside the title. Empty values disable the SVG favicon. The root `public/favicon.ico` fallback is generated from the SVG selected by `appFavicon`, rather than retaining the Angular template icon. Run `node scripts/generate-favicon.mjs` after changing that SVG; it uses the installed Playwright Chromium. HTML declares only the scalable SVG icon, so a competing ICO link cannot override it. The existing poster is displayed in About and the icon in the toolbar; optional empty paths omit those images. Asset paths must remain inside `brand/assets/`.
 
 ## Initial migration verification — 2026-10-18
 
@@ -83,3 +83,13 @@ The JSON asset paths are relative to `brand/`. Angular copies `brand/assets` to 
 - `npm test -- --watch=false --browsers=ChromeHeadless --include=src/app/app.spec.ts --include=src/app/shared/components/nav/nav.component.spec.ts`: 8 passed. `npm run screenshots -- --grep branding`: all 3 focused Playwright checks passed, including exact pixel equivalence of the ICO's 32 px frame and configured SVG, one-line desktop descriptions, mobile tooltip bounds, blur, focus/Escape and preserved draft behavior.
 - The same 3 browser checks also passed against the redeployed production container using isolated browser contexts and synthetic Ollama responses. Reviewed desktop support/coffee tooltip and mobile About screenshots are test artifacts; the existing five gallery images were preserved. Live model generation was not exercised.
 - `docker compose build angular-app` and `docker compose up -d --no-build --force-recreate --no-deps --wait angular-app` succeeded. The healthy container uses image `sha256:e859e589fb1d94207172902a4e220e998d15188adb8b6f0a6596c57024b0acb5`, serves byte-identical generated ICO content and remains bound only to `127.0.0.1:33060`. `git -c core.whitespace=cr-at-eol diff --check` passed.
+
+## 2026-10-19 — Function-based consumer names and one root metadata source
+
+The user explicitly limited this naming cleanup to CiteNook, ContestCheck, OpenNook, LocalNook, StonePlan and StoryCheck. Root `brand/` is the editable data/artwork source; consuming modules, components, scripts, styles, tests and guides use their function. The rule is recorded in `AGENTS.md`. The six source catalogs and all artwork were checked by SHA-256 against the task-start snapshot (25 JSON/artwork files unchanged). Existing unrelated pending changes and historical result fixtures were retained. No commit or push was requested.
+
+Renamed the injectable consumer to `app-info.config.ts` / `AppInfoConfig`, attribution to `author-attribution` / `AuthorAttributionComponent`, and the browser spec to `about.spec.ts`. Public asset copies use `app-assets/assets`; the editable input remains the unchanged root catalog/artwork. Active guides and LAC-016 links use the new functional names, while story IDs and browser storage identifiers remain intact.
+
+`npm run build` passed with the existing approximately 4.72 MB initial-bundle budget warning. The existing app/nav/About/system-prompt-settings ChromeHeadless suites passed 13 tests in a network-disabled browser-tools container. `node node_modules/@playwright/test/cli.js test --config=playwright.screenshots.config.ts e2e/screenshots/about.spec.ts` passed all three fixture-based About/favicon/mobile cases using its temporary dev server. Original tracked screenshots are unchanged. The Docker image was rebuilt and its copied artwork hashes verified. Because the original app was stopped, `docker compose -f docker-compose.yaml create --no-build angular-app` prepared a fresh stopped container without starting it; the next manual start uses the new image. No Ollama container was started.
+
+Cross-repository proof: **540 unit/API tests and 56 browser cases/scenarios passed**. Scoped filename/local-link/whitespace checks and the deployed source/asset/container audit passed. Local helper scripts, build/deploy logs, summaries and captures remain under `/tmp/app-ui-naming/`; they are not committed. Database containers and named mounts were preserved; untouched services retained their original policies. No live/paid model generation, new indexing or submitted-code execution was run. Hosted CI/public deployment and other browser engines were not tested.

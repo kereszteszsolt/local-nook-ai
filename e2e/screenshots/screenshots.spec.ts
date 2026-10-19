@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import branding from '../../brand/branding.json';
+import appMetadata from '../../brand/branding.json';
 import { expect, test } from '@playwright/test';
 import {
   captureScreenshot,
@@ -53,7 +53,7 @@ test('captures browser-local system prompt management', async ({ page }) => {
   const dialog = page.getByRole('dialog');
   await expect(dialog.getByRole('heading', { name: 'System Prompts' })).toBeVisible();
   await expect(dialog.getByRole('heading', { name: 'Rich response formats' })).toBeVisible();
-  await expect(dialog.getByRole('switch', { name: `Deactivate ${branding.appName} rich response formats` })).toBeVisible();
+  await expect(dialog.getByRole('switch', { name: `Deactivate ${appMetadata.appName} rich response formats` })).toBeVisible();
 
   await captureScreenshot(page, 'system-prompts.png', DESKTOP_DIALOG_VIEWPORT);
   expectFixtureNetworkOnly(networkLog);

@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ChatFacade } from '../../../features/chat/application/chat-facade.service';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { AiModelDto } from '../../../features/chat/models/ai-model.model';
-import { BRAND_CONFIG } from '../../../core/config/brand.config';
+import { APP_INFO_CONFIG } from '../../../core/config/app-info.config';
 import { AboutComponent } from '../about/about.component';
 
 @Component({
@@ -25,7 +25,7 @@ import { AboutComponent } from '../about/about.component';
 export class NavComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   readonly chatFacade = inject(ChatFacade);
-  readonly brand = inject(BRAND_CONFIG);
+  readonly appInfo = inject(APP_INFO_CONFIG);
   readonly currentModel = this.chatFacade.currentModel;
   readonly availableModels = this.chatFacade.aiModels;
 

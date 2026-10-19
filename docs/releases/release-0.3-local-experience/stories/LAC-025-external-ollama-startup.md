@@ -21,7 +21,7 @@ Harden the existing-host startup path, add a validated browser-reachable endpoin
 - [x] Import `Ollama` from `ollama/browser` and keep all SDK calls behind `OllamaClientService`.
 - [x] Preserve the typed `Angular UI -> ChatFacade -> OllamaClientService -> ollama/browser` boundary without manual NDJSON parsing or component-level transport calls.
 - [x] Provide a validated runtime endpoint configuration with a safe `http://localhost:11434` default.
-- [x] Support an explicit endpoint override without coupling runtime configuration to BrandConfig or browser-storage identifiers.
+- [x] Support an explicit endpoint override without coupling runtime configuration to AppInfoConfig or browser-storage identifiers.
 - [x] Show clear, recoverable guidance when Ollama is offline, unreachable, or blocked by browser-origin configuration.
 - [x] Document `ollama list`, `ollama pull <model-name>`, `npm ci`, and `npm start` for the existing-host workflow.
 - [x] Document endpoint overrides, browser-origin requirements, and only WSL behavior verified during implementation.

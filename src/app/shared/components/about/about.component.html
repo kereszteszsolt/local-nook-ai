@@ -2,20 +2,20 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 
 <header class="about-header">
-  <h2 mat-dialog-title>About {{ brand.productName }}</h2>
+  <h2 mat-dialog-title>About {{ appInfo.productName }}</h2>
   <button mat-icon-button mat-dialog-close aria-label="Close about">
     <mat-icon>close</mat-icon>
   </button>
 </header>
 <mat-dialog-content class="about-content">
-  @if (brand.poster) {
-    <img class="about-poster" [src]="brand.poster" [alt]="brand.productName + ' project poster'" width="780" height="480">
+  @if (appInfo.poster) {
+    <img class="about-poster" [src]="appInfo.poster" [alt]="appInfo.productName + ' project poster'" width="780" height="480">
   }
-  <p class="about-intro">{{ brand.description }}</p>
+  <p class="about-intro">{{ appInfo.description }}</p>
   <nav class="about-actions" aria-label="Project and author links">
     @for (link of projectLinks; track link.href) {
       <a mat-flat-button [href]="link.href" target="_blank" rel="noopener noreferrer"
-        [matTooltip]="link.description + '\n' + link.href" matTooltipClass="brand-tooltip" matTooltipPosition="above">
+        [matTooltip]="link.description + '\n' + link.href" matTooltipClass="link-tooltip" matTooltipPosition="above">
         <mat-icon>{{ link.icon }}</mat-icon>{{ link.label }}
       </a>
     }
@@ -24,7 +24,7 @@
     <nav class="about-support-actions" aria-label="Support the author">
       @for (link of supportLinks; track link.href) {
         <a mat-flat-button [class.coffee-action]="link.coffee" [href]="link.href" target="_blank" rel="noopener noreferrer"
-          [matTooltip]="link.description + '\n' + link.href" matTooltipClass="brand-tooltip" matTooltipPosition="above">
+          [matTooltip]="link.description + '\n' + link.href" matTooltipClass="link-tooltip" matTooltipPosition="above">
           <mat-icon>{{ link.icon }}</mat-icon>{{ link.label }}
         </a>
       }
@@ -40,5 +40,5 @@
       </div>
     }
   }
-  <app-brand-attribution [showWebsite]="false" />
+  <app-author-attribution [showWebsite]="false" />
 </mat-dialog-content>

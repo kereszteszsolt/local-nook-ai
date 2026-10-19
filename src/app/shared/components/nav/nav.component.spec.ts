@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialog } from '@angular/material/dialog';
-import { BRAND_CONFIG, DEFAULT_BRAND_CONFIG } from '../../../core/config/brand.config';
+import { APP_INFO_CONFIG, DEFAULT_APP_INFO_CONFIG } from '../../../core/config/app-info.config';
 import { ChatFacade } from '../../../features/chat/application/chat-facade.service';
 import { AiModelDto } from '../../../features/chat/models/ai-model.model';
 import { NavComponent } from './nav.component';
@@ -31,7 +31,7 @@ describe('NavComponent', () => {
       imports: [NavComponent, NoopAnimationsModule],
       providers: [
         { provide: ChatFacade, useValue: chatFacade },
-        { provide: BRAND_CONFIG, useValue: DEFAULT_BRAND_CONFIG },
+        { provide: APP_INFO_CONFIG, useValue: DEFAULT_APP_INFO_CONFIG },
       ],
     }).compileComponents();
 
@@ -42,7 +42,7 @@ describe('NavComponent', () => {
 
   it('loads local models and renders the configured product name', () => {
     expect(loadModels).toHaveBeenCalledOnceWith();
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain(DEFAULT_BRAND_CONFIG.productName);
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain(DEFAULT_APP_INFO_CONFIG.productName);
   });
 
   it('delegates model selection to the facade', () => {
@@ -60,7 +60,7 @@ describe('NavComponent', () => {
 
     const dialog = document.querySelector('[role="dialog"]');
     expect(dialog?.textContent).toContain('About LocalNook AI');
-    expect(dialog?.querySelector('img')?.getAttribute('src')).toBe(DEFAULT_BRAND_CONFIG.poster);
+    expect(dialog?.querySelector('img')?.getAttribute('src')).toBe(DEFAULT_APP_INFO_CONFIG.poster);
     expect(document.querySelector('.about-backdrop')).not.toBeNull();
     expect(setCurrentModel).not.toHaveBeenCalled();
   });

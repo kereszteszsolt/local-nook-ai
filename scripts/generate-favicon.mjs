@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const brand = JSON.parse(await readFile(resolve(root, 'brand/branding.json'), 'utf8'));
-const source = brand.appFavicon;
+const appInfo = JSON.parse(await readFile(resolve(root, 'brand/branding.json'), 'utf8'));
+const source = appInfo.appFavicon;
 if (!source.startsWith('assets/') || source.includes('\\') || source.split('/').includes('..') || !source.endsWith('.svg')) {
   throw new Error('The favicon source must be an SVG inside brand/assets/.');
 }

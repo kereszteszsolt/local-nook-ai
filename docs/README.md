@@ -10,7 +10,7 @@
 - [Architecture](architecture.md) — current application, SDK, and browser-storage boundaries.
 - [Ollama integration](ollama-integration.md) — official browser SDK adapter, streaming, and cancellation.
 - [Storage and context](storage-and-context.md) — implemented conversation, prompt, active-model, deletion, and request-context contracts.
-- [Brand configuration](brand-configuration.md) — easy display-name changes without storage coupling.
+- [Brand configuration](app-configuration.md) — easy display-name changes without storage coupling.
 - [Design system](design-system.md) — semantic Tailwind tokens and optional Penpot MCP.
 - [Development](development.md) — setup, Docker, CI, and change workflow.
 - [Testing](testing.md) — focused test boundaries and verification commands.

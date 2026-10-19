@@ -31,7 +31,7 @@
   --color-on-support: #352500;
 }
 
-.mat-mdc-tooltip.brand-tooltip .mat-mdc-tooltip-surface {
+.mat-mdc-tooltip.link-tooltip .mat-mdc-tooltip-surface {
   max-width: min(560px, calc(100vw - 32px));
   padding: .75rem .9rem;
   border: 1px solid var(--color-border-subtle);
@@ -45,7 +45,7 @@
   white-space: pre-line;
 }
 
-.brand-tooltip::after {
+.link-tooltip::after {
   content: '';
   position: absolute;
   left: 50%;
@@ -57,8 +57,8 @@
   transform: translate(-50%, -50%) rotate(45deg);
 }
 
-.mat-mdc-tooltip-panel-above .brand-tooltip::after { top: 100%; }
-.mat-mdc-tooltip-panel-below .brand-tooltip::after { top: 0; transform: translate(-50%, -50%) rotate(225deg); }
+.mat-mdc-tooltip-panel-above .link-tooltip::after { top: 100%; }
+.mat-mdc-tooltip-panel-below .link-tooltip::after { top: 0; transform: translate(-50%, -50%) rotate(225deg); }
 
 .cdk-overlay-backdrop.about-backdrop {
   -webkit-backdrop-filter: blur(4px);

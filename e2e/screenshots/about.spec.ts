@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Keresztes Zsolt <https://kereszteszsolt.hu>
 // SPDX-License-Identifier: Apache-2.0
 
-import branding from '../../brand/branding.json';
+import appMetadata from '../../brand/branding.json';
 import { expect, test, type Locator } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -23,7 +23,7 @@ test('branding: the declared favicon and ICO fallback both use the configured ar
   const network = await openScreenshotApp(page);
   await expect(page.locator('link[rel~="icon"]')).toHaveCount(1);
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute('sizes', 'any');
-  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', `brand/${branding.appFavicon}`);
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', `app-assets/${appMetadata.appFavicon}`);
 
   const response = await page.request.get('/favicon.ico');
   expect(response.ok()).toBe(true);
@@ -50,7 +50,7 @@ test('branding: the declared favicon and ICO fallback both use the configured ar
     const [svg, icoFrame] = await Promise.all([render(source), render(fallback)]);
     return svg.every((channel, index) => channel === icoFrame[index]);
   }, {
-    source: `data:image/svg+xml;base64,${readFileSync(resolve('brand', branding.appFavicon)).toString('base64')}`,
+    source: `data:image/svg+xml;base64,${readFileSync(resolve('brand', appMetadata.appFavicon)).toString('base64')}`,
     fallback: `data:image/png;base64,${ico.subarray(offset, offset + size).toString('base64')}`,
   });
   expect(matches, 'The ICO fallback matches the configured SVG instead of the Angular template icon').toBe(true);
@@ -68,7 +68,7 @@ test('branding: About links, speech bubbles and Escape preserve the conversation
   await about.click();
   const dialog = page.getByRole('dialog');
   await expect(page.locator('.about-backdrop')).toHaveCSS('backdrop-filter', 'blur(4px)');
-  await expect(dialog.getByRole('heading', { name: `About ${branding.appName}` })).toBeVisible();
+  await expect(dialog.getByRole('heading', { name: `About ${appMetadata.appName}` })).toBeVisible();
   await expect(dialog.getByRole('button', { name: 'Close about' })).toBeFocused();
   const supportSentences = dialog.locator('.support-note p span');
   await expect(supportSentences).toHaveCount(2);
@@ -79,23 +79,23 @@ test('branding: About links, speech bubbles and Escape preserve the conversation
   }));
   expect(sentenceBounds.map((lines) => lines.length), 'Each complete support sentence occupies one desktop line').toEqual([1, 1]);
   expect(sentenceBounds[1][0].top).toBeGreaterThan(sentenceBounds[0][0].bottom);
-  const poster = dialog.getByRole('img', { name: `${branding.appName} project poster` });
-  await expect(poster).toHaveAttribute('src', 'brand/assets/localnook-ai-poster.svg');
+  const poster = dialog.getByRole('img', { name: `${appMetadata.appName} project poster` });
+  await expect(poster).toHaveAttribute('src', 'app-assets/assets/localnook-ai-poster.svg');
   await expect.poll(() => poster.evaluate((image) => (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0)).toBe(true);
-  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', 'brand/assets/favicon.svg');
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', 'app-assets/assets/favicon.svg');
   await captureScreenshot(page, testInfo.outputPath('about-desktop.png'), DESKTOP_DIALOG_VIEWPORT);
 
   const website = dialog.getByRole('link', { name: 'kereszteszsolt.hu', exact: true });
   await page.keyboard.press('Tab');
   await expect(website).toBeFocused();
-  let tooltip = page.locator('.brand-tooltip .mat-mdc-tooltip-surface');
+  let tooltip = page.locator('.link-tooltip .mat-mdc-tooltip-surface');
   await expect(tooltip).toBeVisible();
   await expect(tooltip).toHaveText("Author's website. Available in hu | en | ro | de.\nhttps://kereszteszsolt.hu");
   await expectSingleLineDescription(tooltip);
   const description = await website.getAttribute('aria-describedby');
   expect(description).toBeTruthy();
   await expect(page.locator(`[id="${description}"]`)).toContainText("Author's website.");
-  expect(await page.locator('.brand-tooltip').evaluate((element) => getComputedStyle(element, '::after').content)).toBe('""');
+  expect(await page.locator('.link-tooltip').evaluate((element) => getComputedStyle(element, '::after').content)).toBe('""');
   await page.keyboard.press('Escape');
   await expect(tooltip).toBeHidden();
   await expect(dialog).toBeVisible();
@@ -110,7 +110,7 @@ test('branding: About links, speech bubbles and Escape preserve the conversation
     await expect(link).toHaveAttribute('href', destination);
     await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     await link.hover();
-    tooltip = page.locator('.brand-tooltip .mat-mdc-tooltip-surface:visible');
+    tooltip = page.locator('.link-tooltip .mat-mdc-tooltip-surface:visible');
     await expect(tooltip).toContainText(text);
     await expect(tooltip).toContainText(destination);
     await expectSingleLineDescription(tooltip);
@@ -144,7 +144,7 @@ test('branding: mobile About and sidebar attribution fit the viewport', async ({
   await captureScreenshot(page, testInfo.outputPath('about-mobile.png'), MOBILE_CHAT_VIEWPORT);
   for (const name of ['Buy me a Coffee', 'Ways to support']) {
     await dialog.getByRole('link', { name, exact: true }).hover();
-    const tooltip = page.locator('.brand-tooltip .mat-mdc-tooltip-surface:visible');
+    const tooltip = page.locator('.link-tooltip .mat-mdc-tooltip-surface:visible');
     await expect(tooltip).toBeVisible();
     const bounds = await tooltip.evaluate((element) => ({
       left: element.getBoundingClientRect().left,

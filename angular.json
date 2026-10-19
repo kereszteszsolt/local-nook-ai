@@ -38,7 +38,7 @@
               {
                 "glob": "**/*",
                 "input": "brand/assets",
-                "output": "brand/assets"
+                "output": "app-assets/assets"
               }
             ],
             "styles": [
@@ -114,7 +114,7 @@
               {
                 "glob": "**/*",
                 "input": "brand/assets",
-                "output": "brand/assets"
+                "output": "app-assets/assets"
               },
               {
                 "glob": "*.woff*",

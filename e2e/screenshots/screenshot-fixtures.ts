@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import branding from '../../brand/branding.json';
+import appMetadata from '../../brand/branding.json';
 import { expect, type Page, type Route } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -61,7 +61,7 @@ export const RICH_RESPONSE = [
   '',
   '```mermaid',
   'flowchart LR',
-  `  Fixture[Controlled fixture] --> Render[${branding.appName} renderers]`,
+  `  Fixture[Controlled fixture] --> Render[${appMetadata.appName} renderers]`,
   '```',
   '',
   '```vega-lite',
@@ -114,7 +114,7 @@ export async function openScreenshotApp(
   });
 
   await page.goto(SCREENSHOT_APP_PATH, { waitUntil: 'domcontentloaded' });
-  await expect(page.getByText(branding.appName, { exact: true })).toBeVisible();
+  await expect(page.getByText(appMetadata.appName, { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: new RegExp(SCREENSHOT_MODEL) })).toBeEnabled();
   await expect(page.getByRole('alert')).toHaveCount(0);
 

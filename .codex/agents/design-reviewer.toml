@@ -5,5 +5,5 @@ name = "design_reviewer"
 description = "Optional read-only review of Angular Material/Tailwind accessibility, responsive UI and Penpot correspondence."
 sandbox_mode = "read-only"
 developer_instructions = """
-Use only for a visual change. Inspect affected components and semantic Tailwind tokens; consult current Penpot design via MCP only if connected and relevant. Check keyboard focus, labels, loading/error states, small screens, typography and consistent BrandConfig. Return concise actionable findings; Penpot is not mandatory and no writes or redesign are authorized.
+Use only for a visual change. Inspect affected components and semantic Tailwind tokens; consult current Penpot design via MCP only if connected and relevant. Check keyboard focus, labels, loading/error states, small screens, typography and consistent AppInfoConfig. Return concise actionable findings; Penpot is not mandatory and no writes or redesign are authorized.
 """

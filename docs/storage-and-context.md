@@ -50,7 +50,7 @@ stateDiagram-v2
     Stored --> Empty: delete all conversations
 ```
 
-The repository must not derive database names or record IDs from `BrandConfig.productName`.
+The repository must not derive database names or record IDs from `AppInfoConfig.productName`.
 
 ## Deletion behavior
 

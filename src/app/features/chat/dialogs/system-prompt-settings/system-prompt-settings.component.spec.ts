@@ -4,7 +4,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ChatFacade } from '../../application/chat-facade.service';
-import { BRAND_CONFIG, DEFAULT_BRAND_CONFIG } from '../../../../core/config/brand.config';
+import { APP_INFO_CONFIG, DEFAULT_APP_INFO_CONFIG } from '../../../../core/config/app-info.config';
 import { SystemMessage } from '../../models/message.model';
 import { BUILT_IN_SYSTEM_PROMPT_ID } from '../../infrastructure/system-prompt.repository';
 import { SystemPromptSettingsComponent } from './system-prompt-settings.component';
@@ -48,7 +48,7 @@ describe('SystemPromptSettingsComponent', () => {
     await TestBed.configureTestingModule({
       imports: [SystemPromptSettingsComponent, NoopAnimationsModule],
       providers: [
-        { provide: BRAND_CONFIG, useValue: { ...DEFAULT_BRAND_CONFIG, productName: 'Example Nook' } },
+        { provide: APP_INFO_CONFIG, useValue: { ...DEFAULT_APP_INFO_CONFIG, productName: 'Example Nook' } },
         { provide: ChatFacade, useValue: chatFacade },
         { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close']) },
         { provide: MatSnackBar, useValue: snackBar },

@@ -6,29 +6,29 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { BRAND_CONFIG } from '../../../core/config/brand.config';
-import { BrandAttributionComponent } from '../brand-attribution/brand-attribution.component';
+import { APP_INFO_CONFIG } from '../../../core/config/app-info.config';
+import { AuthorAttributionComponent } from '../author-attribution/author-attribution.component';
 
 @Component({
   selector: 'app-about',
-  imports: [MatButton, MatIconButton, MatDialogClose, MatDialogContent, MatDialogTitle, MatIcon, MatTooltip, BrandAttributionComponent],
+  imports: [MatButton, MatIconButton, MatDialogClose, MatDialogContent, MatDialogTitle, MatIcon, MatTooltip, AuthorAttributionComponent],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutComponent {
-  readonly brand = inject(BRAND_CONFIG);
-  readonly supportRemarkLines = this.brand.supportRemarkText.trim().split(/(?<=[.!?])\s+/).filter(Boolean);
-  private readonly languages = this.brand.developer.websiteLanguages;
+  readonly appInfo = inject(APP_INFO_CONFIG);
+  readonly supportRemarkLines = this.appInfo.supportRemarkText.trim().split(/(?<=[.!?])\s+/).filter(Boolean);
+  private readonly languages = this.appInfo.developer.websiteLanguages;
   private readonly availableLanguages = this.languages.length ? ` Available in ${this.languages.join(' | ')}.` : '';
   readonly projectLinks = [
-    { label: this.brand.developer.websiteLabel, href: this.brand.developer.website, icon: 'language', description: "Author's website." + this.availableLanguages },
-    { label: 'Source', href: this.brand.sourceUrl, icon: 'code', description: `View the ${this.brand.productName} source code on GitHub.` },
-    { label: 'GitHub profile', href: this.brand.developer.github, icon: 'person_outline', description: "The author's GitHub profile." },
-    { label: 'Project website', href: this.brand.website, icon: 'open_in_new', description: `Visit the ${this.brand.productName} website.` },
+    { label: this.appInfo.developer.websiteLabel, href: this.appInfo.developer.website, icon: 'language', description: "Author's website." + this.availableLanguages },
+    { label: 'Source', href: this.appInfo.sourceUrl, icon: 'code', description: `View the ${this.appInfo.productName} source code on GitHub.` },
+    { label: 'GitHub profile', href: this.appInfo.developer.github, icon: 'person_outline', description: "The author's GitHub profile." },
+    { label: 'Project website', href: this.appInfo.website, icon: 'open_in_new', description: `Visit the ${this.appInfo.productName} website.` },
   ].filter((link) => !!link.href);
   readonly supportLinks = [
-    { label: 'Buy me a Coffee', href: this.brand.developer.buyMeACoffee, icon: 'local_cafe', coffee: true, description: 'Support the author with a coffee on Buy Me a Coffee.' },
-    { label: 'Ways to support', href: this.brand.developer.waysToSupport, icon: 'favorite_border', coffee: false, description: 'Ways to support the author.' + this.availableLanguages },
+    { label: 'Buy me a Coffee', href: this.appInfo.developer.buyMeACoffee, icon: 'local_cafe', coffee: true, description: 'Support the author with a coffee on Buy Me a Coffee.' },
+    { label: 'Ways to support', href: this.appInfo.developer.waysToSupport, icon: 'favorite_border', coffee: false, description: 'Ways to support the author.' + this.availableLanguages },
   ].filter((link) => !!link.href);
 }

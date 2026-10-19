@@ -4,16 +4,16 @@ import { provideRouter } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { App } from './app';
-import { BRAND_CONFIG, BrandConfig, DEFAULT_BRAND_CONFIG } from './core/config/brand.config';
+import { APP_INFO_CONFIG, AppInfoConfig, DEFAULT_APP_INFO_CONFIG } from './core/config/app-info.config';
 import { ChatFacade } from './features/chat/application/chat-facade.service';
 
-const testBrand: BrandConfig = {
-  ...DEFAULT_BRAND_CONFIG,
+const testAppInfo: AppInfoConfig = {
+  ...DEFAULT_APP_INFO_CONFIG,
   productName: 'Test Nook',
   tagline: 'Local test conversations',
-  favicon: 'brand/assets/test-mark.svg',
+  favicon: 'app-assets/assets/test-mark.svg',
   developer: {
-    ...DEFAULT_BRAND_CONFIG.developer,
+    ...DEFAULT_APP_INFO_CONFIG.developer,
     name: 'Keresztes Zsolt',
     website: 'https://kereszteszsolt.hu',
   },
@@ -38,7 +38,7 @@ describe('App', () => {
       imports: [App, NoopAnimationsModule],
       providers: [
         provideRouter([]),
-        { provide: BRAND_CONFIG, useValue: testBrand },
+        { provide: APP_INFO_CONFIG, useValue: testAppInfo },
         { provide: ChatFacade, useValue: chatFacade },
       ],
     }).compileComponents();
@@ -49,25 +49,25 @@ describe('App', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('sets the browser title from BrandConfig', () => {
+  it('sets the browser title from AppInfoConfig', () => {
     TestBed.createComponent(App);
     expect(TestBed.inject(Title).getTitle()).toBe('Test Nook');
   });
 
   it('sets the favicon from the injected brand', () => {
     TestBed.createComponent(App);
-    expect(favicon.getAttribute('href')).toBe('brand/assets/test-mark.svg');
+    expect(favicon.getAttribute('href')).toBe('app-assets/assets/test-mark.svg');
   });
 
   it('does not request an image for an empty favicon', () => {
-    TestBed.overrideProvider(BRAND_CONFIG, { useValue: { ...testBrand, favicon: '' } });
+    TestBed.overrideProvider(APP_INFO_CONFIG, { useValue: { ...testAppInfo, favicon: '' } });
     favicon.href = 'stale.svg';
     TestBed.createComponent(App);
     expect(favicon.hasAttribute('href')).toBeFalse();
   });
 
   it('defines the canonical product name centrally', () => {
-    expect(DEFAULT_BRAND_CONFIG).toEqual(jasmine.objectContaining({
+    expect(DEFAULT_APP_INFO_CONFIG).toEqual(jasmine.objectContaining({
       productName: 'LocalNook AI',
     }));
   });

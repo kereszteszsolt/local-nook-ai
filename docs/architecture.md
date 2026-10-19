@@ -90,5 +90,5 @@ components -> application -> infrastructure -> external SDK/browser API
 - Components do not call the SDK, localStorage, or IndexedDB directly.
 - Infrastructure does not own user-interface state.
 - Storage records are not reused as Ollama request DTOs.
-- BrandConfig does not contain runtime hosts, secrets, or storage names.
+- AppInfoConfig does not contain runtime hosts, secrets, or storage names.
 - New abstractions require a concrete responsibility and test seam.

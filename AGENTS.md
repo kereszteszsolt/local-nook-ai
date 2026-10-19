@@ -14,7 +14,7 @@ LocalNook is an **Angular / TypeScript** browser client for an external Ollama r
 - **Ollama:** `OllamaClientService` owns the official browser SDK and streaming/abort lifecycle. The host comes from `OllamaRuntimeConfig`, separate from display branding. Do not add backend or alternate provider implicitly.
 - **Context:** `ChatContextBuilder` constructs only model-safe roles/content and selected prompts/history; exclude UI IDs, timing, storage flags and unrelated conversations. Failed/cancelled stream fragments must not become completed messages.
 - **Persistence:** IndexedDB repositories own conversations and system prompts; localStorage keeps a separate active-model setting. Preserve explicit delete-one/delete-all, migration and error behavior. Brand changes must never rename storage keys.
-- **UI design:** `BrandConfig` governs visible identity; semantic Tailwind tokens and Angular Material handle consistent styles/keyboard behavior. Penpot MCP is optional and used only on relevant visual tasks with reversible writes.
+- **UI design:** `AppInfoConfig` governs visible identity; semantic Tailwind tokens and Angular Material handle consistent styles/keyboard behavior. Penpot MCP is optional and used only on relevant visual tasks with reversible writes.
 - Keep client-origin storage/privacy boundaries accurate. Do not claim end-to-end encryption or that an Ollama endpoint is necessarily local.
 
 ## On-demand roles and skills
@@ -39,3 +39,7 @@ LocalNook is an **Angular / TypeScript** browser client for an external Ollama r
 ## Docker runtime rules
 
 Use the GitHub repository name as the Compose project: `local-nook-ai`. Publish every host port only on `127.0.0.1`, above 33000, with no port shared by another repository. The current allocation is 33060 for the app and 33061 for optional Ollama. Set `restart: "no"` for every service and disable dependency-triggered restarts. Preserve existing data/model volumes when changing a project name or recreating containers.
+
+## App metadata and implementation names
+
+The only source directory named `brand` is the repository-root `brand/`, containing the editable JSON catalog and artwork. Name consuming modules, components, styles, scripts and tests for their function, such as app info, app assets, About, tooltips or author attribution. Do not create implementation files/directories or CSS selectors named brand/branding. Public/generated asset copies use app-assets or app-info names; keep source JSON fields, artwork and storage identifiers intact.
